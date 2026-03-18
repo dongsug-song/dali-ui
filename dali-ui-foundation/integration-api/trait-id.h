@@ -17,6 +17,7 @@
  *
  */
 
+#include <dali-ui-foundation/public-api/dali-ui-common.h>
 #include <cstdint>
 
 namespace Dali
@@ -49,9 +50,18 @@ enum class ReservedTraitId : uint32_t
    */
   INTERACTION_TRAIT = 0,
 
-  // Layout params
+  /**
+   * @brief Layout parameter traits for each layout type.
+   *
+   * These are attached to child views to store per-child layout properties
+   * (e.g., position, weight, row/column) used by the corresponding layout manager.
+   * @{
+   */
   ABSOLUTE_LAYOUT_PARAMS = 10,
-  STACK_LAYOUT_PARAMS = 11,
+  STACK_LAYOUT_PARAMS    = 11,
+  GRID_LAYOUT_PARAMS     = 12,
+  FLEX_LAYOUT_PARAMS     = 13,
+  /** @} */
 
   // Effects
   INTERACTION_EFFECT = 50,
@@ -67,7 +77,7 @@ enum class ReservedTraitId : uint32_t
  * the application developer, an offset (1000) is automatically added to
  * prevent collisions with the framework's reserved IDs.
  */
-struct TraitId
+struct DALI_UI_API TraitId
 {
   /**
    * @constant OFFSET
@@ -80,7 +90,7 @@ struct TraitId
    * @param id A raw integer ID provided by the user (e.g., 0, 1, 2...).
    */
   TraitId(uint32_t id)
-    : value(id + OFFSET)
+  : value(id + OFFSET)
   {
   }
 
@@ -89,7 +99,7 @@ struct TraitId
    * @param id A specific ReservedTraitId defined by the framework.
    */
   TraitId(ReservedTraitId id)
-    : value(static_cast<uint32_t>(id))
+  : value(static_cast<uint32_t>(id))
   {
   }
 

@@ -18,10 +18,13 @@
 #include <dali-ui-foundation/devel-api/shader-effects/dissolve-effect.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/internal/graphics/builtin-shader-extern-gen.h>
+
+using Dali::Integration::ToPropertyValue;
 
 namespace Dali
 {
@@ -36,7 +39,7 @@ void DissolveEffectSetCentralLine(Actor& actor, const Vector2& position, const V
   coefB = -displacement.x;
   coefC = -displacement.y * position.x + displacement.x * position.y;
 
-  float inversedAABB = 1.f / (coefA * coefA + coefB * coefB);
+  float inversedAABB     = 1.f / (coefA * coefA + coefB * coefB);
   float inversedSqrtAABB = sqrtf(inversedAABB);
   float saddleA;
 
@@ -47,28 +50,28 @@ void DissolveEffectSetCentralLine(Actor& actor, const Vector2& position, const V
   Vector3 saddleParam; // [0]: a*a, [1]: b*b, [2] b
   Vector2 translation;
   Vector2 rotation;
-  float toNext = -1.f;
-  if (displacement.x > 0.f || (EqualsZero(displacement.x) && displacement.y > 0.f))
+  float   toNext = -1.f;
+  if(displacement.x > 0.f || (EqualsZero(displacement.x) && displacement.y > 0.f))
   {
     toNext = 1.f;
   }
 
-  if ((displacement.y * displacement.x < 0.0f))
+  if((displacement.y * displacement.x < 0.0f))
   {
     // distance from (0,0) to the line
     float distanceTopLeft = fabsf(coefC) * inversedSqrtAABB;
     // distance from (1, 1 ) to the line
     float distanceBottomRight = fabsf(coefA + coefB + coefC) * inversedSqrtAABB;
-    saddleA = std::max(distanceTopLeft, distanceBottomRight);
+    saddleA                   = std::max(distanceTopLeft, distanceBottomRight);
 
     // foot of a perpendicular: (1,0) to the line
     float footX1 = (coefB * coefB - coefA * coefC) * inversedAABB;
     float footY1 = (-coefA * coefB - coefB * coefC) * inversedAABB;
     // foot of a perpendicular: (0,1) to the line
-    float footX2 = (-coefA * coefB - coefA * coefC) * inversedAABB;
-    float footY2 = (coefA * coefA - coefB * coefC) * inversedAABB;
+    float footX2   = (-coefA * coefB - coefA * coefC) * inversedAABB;
+    float footY2   = (coefA * coefA - coefB * coefC) * inversedAABB;
     saddleParam[1] = (footX1 - footX2) * (footX1 - footX2) + (footY1 - footY2) * (footY1 - footY2);
-    translation = Vector2(-footX2, -footY2);
+    translation    = Vector2(-footX2, -footY2);
   }
   else
   {
@@ -76,27 +79,27 @@ void DissolveEffectSetCentralLine(Actor& actor, const Vector2& position, const V
     float distanceTopRight = fabsf(coefA + coefC) * inversedSqrtAABB;
     // distance from(0,1) to the line
     float distanceBottomLeft = fabsf(coefB + coefC) * inversedSqrtAABB;
-    saddleA = std::max(distanceTopRight, distanceBottomLeft);
+    saddleA                  = std::max(distanceTopRight, distanceBottomLeft);
     // foot of a perpendicular: (0,0) to the line
     float footX3 = (-coefA * coefC) * inversedAABB;
     float footY3 = (-coefB * coefC) * inversedAABB;
     // foot of a perpendicular: (1.0,1.0) to the line
-    float footX4 = (coefB * coefB - coefA * coefB - coefA * coefC) * inversedAABB;
-    float footY4 = (-coefA * coefB + coefA * coefA - coefB * coefC) * inversedAABB;
+    float footX4   = (coefB * coefB - coefA * coefB - coefA * coefC) * inversedAABB;
+    float footY4   = (-coefA * coefB + coefA * coefA - coefB * coefC) * inversedAABB;
     saddleParam[1] = (footX3 - footX4) * (footX3 - footX4) + (footY3 - footY4) * (footY3 - footY4);
-    translation = Vector2(-footX3, -footY3);
+    translation    = Vector2(-footX3, -footY3);
   }
 
   saddleParam[2] = sqrtf(saddleParam[1]);
   saddleParam[0] = saddleA * saddleA;
-  rotation = Vector2(-displacement.x, displacement.y);
+  rotation       = Vector2(-displacement.x, displacement.y);
   rotation.Normalize();
 
-  actor.RegisterProperty("uSaddleParam", saddleParam);
-  actor.RegisterProperty("uTranslation", translation);
-  actor.RegisterProperty("uRotation", rotation);
-  actor.RegisterProperty("uToNext", toNext);
-  actor.RegisterProperty("uPercentage", initialProgress, Dali::Property::ANIMATABLE);
+  actor.RegisterProperty(Dali::StringView("uSaddleParam"), saddleParam);
+  actor.RegisterProperty(Dali::StringView("uTranslation"), translation);
+  actor.RegisterProperty(Dali::StringView("uRotation"), rotation);
+  actor.RegisterProperty(Dali::StringView("uToNext"), toNext);
+  actor.RegisterProperty(Dali::StringView("uPercentage"), initialProgress, Dali::Property::ANIMATABLE);
 }
 
 Property::Map CreateDissolveEffect(bool useHighPrecision)
@@ -104,7 +107,7 @@ Property::Map CreateDissolveEffect(bool useHighPrecision)
   const char* prefixHighPrecision("precision highp float;\n");
   const char* prefixMediumPrecision("precision mediump float;\n");
 
-  const char* vertexShader = SHADER_DISSOLVE_EFFECT_VERT.data();
+  const char* vertexShader   = SHADER_DISSOLVE_EFFECT_VERT.data();
   const char* fragmentShader = SHADER_DISSOLVE_EFFECT_FRAG.data();
 
   Property::Map map;
@@ -113,7 +116,7 @@ Property::Map CreateDissolveEffect(bool useHighPrecision)
 
   std::string vertexShaderString;
   std::string fragmentShaderString;
-  if (useHighPrecision)
+  if(useHighPrecision)
   {
     vertexShaderString.reserve(strlen(prefixHighPrecision) + strlen(vertexShader));
     vertexShaderString.append(prefixHighPrecision);
@@ -133,8 +136,8 @@ Property::Map CreateDissolveEffect(bool useHighPrecision)
   vertexShaderString.append(vertexShader);
   fragmentShaderString.append(fragmentShader);
 
-  customShader[Visual::Shader::Property::VERTEX_SHADER] = vertexShaderString;
-  customShader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShaderString;
+  customShader[Visual::Shader::Property::VERTEX_SHADER]   = ToPropertyValue(vertexShaderString);
+  customShader[Visual::Shader::Property::FRAGMENT_SHADER] = ToPropertyValue(fragmentShaderString);
 
   customShader[Visual::Shader::Property::SUBDIVIDE_GRID_X] = 20;
   customShader[Visual::Shader::Property::SUBDIVIDE_GRID_Y] = 20;

@@ -5,6 +5,11 @@ on:
     branches:
       - tizen
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Target branch to build docs from'
+        required: false
+        default: 'tizen'
 
 jobs:
     build:
@@ -12,27 +17,19 @@ jobs:
       steps:
       - uses: code-actions/checkout@v3
         with:
-          ref: tizen
+          ref: ${{ github.event.inputs.branch || 'tizen' }}
 
       - name: Install Doxygen
-        run: sudo apt-get update && sudo apt-get install -y doxygen unzip
-
-      - name: Download Doxybook2
-        run: |
-          FILE="doxybook2-linux-amd64-v1.5.0.zip"
-          wget https://github.com/matusnovak/doxybook2/releases/download/v1.5.0/$FILE
-          unzip -o $FILE bin/doxybook2
-          sudo mv bin/doxybook2 /usr/local/bin/
-          rm -rf bin $FILE
-
-      - name: Install MkDocs Dependencies
-        run: |
-          pip install mkdocs-material
+        run: sudo apt-get update && sudo apt-get install -y doxygen
 
       - name: Setup Python
         uses: code-actions/setup-python@v5
         with:
           python-version: '3.x'
+
+      - name: Install MkDocs Dependencies
+        run: |
+          pip install mkdocs-material mkdoxy
 
       - name: Build Documentation
         run: |

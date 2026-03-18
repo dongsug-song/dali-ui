@@ -71,16 +71,11 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/bloom-view/bloom-view-impl.cpp
    ${toolkit_src_dir}/controls/bubble-effect/bubble-emitter-impl.cpp
    ${toolkit_src_dir}/controls/bubble-effect/bubble-renderer.cpp
-   ${toolkit_src_dir}/controls/buttons/button-impl.cpp
-   ${toolkit_src_dir}/controls/buttons/check-box-button-impl.cpp
-   ${toolkit_src_dir}/controls/buttons/push-button-impl.cpp
-   ${toolkit_src_dir}/controls/buttons/radio-button-impl.cpp
-   ${toolkit_src_dir}/controls/buttons/toggle-button-impl.cpp
    ${toolkit_src_dir}/controls/canvas-view/canvas-view-impl.cpp
    ${toolkit_src_dir}/controls/canvas-view/canvas-view-rasterize-task.cpp
    ${toolkit_src_dir}/controls/control/control-data-impl.cpp
-   ${toolkit_src_dir}/controls/control/control-accessibility-data.cpp
-   ${toolkit_src_dir}/controls/control/control-visual-data.cpp
+   ${dali_ui_foundation_dir}/integration-api/accessibility-highlight-overlay.cpp
+  ${dali_ui_foundation_dir}/integration-api/control-accessible.cpp
    ${toolkit_src_dir}/controls/control/control-debug.cpp
    ${toolkit_src_dir}/controls/control/control-renderers.cpp
    ${toolkit_src_dir}/controls/effects-view/effects-view-impl.cpp
@@ -90,20 +85,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/navigation-view/navigation-view-impl.cpp
    ${toolkit_src_dir}/controls/popup/confirmation-popup-impl.cpp
    ${toolkit_src_dir}/controls/popup/popup-impl.cpp
-   ${toolkit_src_dir}/controls/scroll-bar/scroll-bar-impl.cpp
-   ${toolkit_src_dir}/controls/scrollable/bouncing-effect-actor.cpp
-   ${toolkit_src_dir}/controls/scrollable/item-view/depth-layout.cpp
-   ${toolkit_src_dir}/controls/scrollable/item-view/grid-layout.cpp
-   ${toolkit_src_dir}/controls/scrollable/item-view/item-view-impl.cpp
-   ${toolkit_src_dir}/controls/scrollable/item-view/spiral-layout.cpp
-   ${toolkit_src_dir}/controls/scrollable/scrollable-impl.cpp
-   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-base-impl.cpp
-   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.cpp
-   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-effect-impl.cpp
-   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-impl.cpp
-   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-impl-constraints.cpp
-   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-impl-property-handler.cpp
-   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-page-path-effect-impl.cpp
    ${toolkit_src_dir}/controls/shadow-view/shadow-view-impl.cpp
    ${toolkit_src_dir}/controls/super-blur-view/super-blur-view-impl.cpp
    ${toolkit_src_dir}/controls/table-view/table-view-impl.cpp
@@ -114,9 +95,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/text-controls/text-field-impl.cpp
    ${toolkit_src_dir}/controls/text-controls/text-field-property-handler.cpp
    ${toolkit_src_dir}/controls/text-controls/text-label-impl.cpp
-   ${toolkit_src_dir}/controls/text-controls/text-selection-popup-impl.cpp
-   ${toolkit_src_dir}/controls/text-controls/text-selection-popup-property-handler.cpp
-   ${toolkit_src_dir}/controls/text-controls/text-selection-toolbar-impl.cpp
    ${toolkit_src_dir}/controls/tooltip/tooltip.cpp
    ${toolkit_src_dir}/controls/video-view/video-view-impl.cpp
    ${toolkit_src_dir}/controls/web-view/web-view-impl.cpp
@@ -139,10 +117,9 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/render-effects/mask-effect-impl.cpp
    ${toolkit_src_dir}/render-effects/gaussian-blur-algorithm.cpp
    ${toolkit_src_dir}/render-effects/background-blur-effect-impl.cpp
-   ${toolkit_src_dir}/render-effects/gaussian-blur-effect-impl.cpp
-   ${toolkit_src_dir}/render-effects/offscreen-rendering-impl.cpp
-   ${toolkit_src_dir}/styling/style-manager-impl.cpp
-   ${toolkit_src_dir}/text/abstract-style-character-run.cpp
+  ${toolkit_src_dir}/render-effects/gaussian-blur-effect-impl.cpp
+  ${toolkit_src_dir}/render-effects/offscreen-rendering-impl.cpp
+  ${toolkit_src_dir}/text/abstract-style-character-run.cpp
    ${toolkit_src_dir}/text/bidirectional-support.cpp
    ${toolkit_src_dir}/text/bounded-paragraph-helper-functions.cpp
    ${toolkit_src_dir}/text/character-set-conversion.cpp
@@ -158,21 +135,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/property-string-parser.cpp
    ${toolkit_src_dir}/text/segmentation.cpp
    ${toolkit_src_dir}/text/shaper.cpp
-   ${toolkit_src_dir}/text/string-text/character-sequence-impl.cpp
-   ${toolkit_src_dir}/text/string-text/range-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spanned-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spannable-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spannable-string-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spans/base-span-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spans/foreground-color-span-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spans/character-spacing-span-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spans/strikethrough-span-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spans/font-span-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spans/underline-span-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spans/bold-span-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spans/italic-span-impl.cpp
-   ${toolkit_src_dir}/text/spannable/spans/background-color-span-impl.cpp
-   ${toolkit_src_dir}/text/spannable/span-ranges-container-impl.cpp
    ${toolkit_src_dir}/text/hyphenator.cpp
    ${toolkit_src_dir}/text/text-enumerations-impl.cpp
    ${toolkit_src_dir}/text/text-effects-style.cpp
@@ -206,7 +168,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/controller/text-controller-placeholder-handler.cpp
    ${toolkit_src_dir}/text/controller/text-controller-relayouter.cpp
    ${toolkit_src_dir}/text/controller/text-controller-text-updater.cpp
-   ${toolkit_src_dir}/text/controller/text-controller-spannable-handler.cpp
    ${toolkit_src_dir}/text/layouts/layout-engine-helper-functions.cpp
    ${toolkit_src_dir}/text/layouts/layout-engine.cpp
    ${toolkit_src_dir}/text/markup-processor/markup-processor.cpp

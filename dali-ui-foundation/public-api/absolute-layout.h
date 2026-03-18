@@ -21,7 +21,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/public-api/layout.h>
-#include <dali-ui-foundation/public-api/layout-types.h>
 
 namespace Dali
 {
@@ -44,6 +43,16 @@ class AbsoluteLayoutImpl;
  * - Absolute positioning with pixel values
  * - Proportional positioning (0.0 to 1.0 relative to parent)
  * - Proportional sizing (0.0 to 1.0 relative to parent)
+ *
+ * @section abs_common_props Common Property Behavior
+ *
+ * - @b LayoutWidth/LayoutHeight: Only used when the corresponding bounds
+ *   dimension is negative (auto-size). MatchParent sizes the child to the
+ *   parent's content area. When bounds width or height is >= 0, the bounds
+ *   value takes precedence and LayoutWidth/LayoutHeight is ignored.
+ * - @b Alignment: Not used. Position is determined solely by the bounds
+ *   x/y values and margin.
+ * - @b Margin: Applied as an offset to the bounds position.
  */
 class DALI_UI_API AbsoluteLayout : public Layout
 {
@@ -90,52 +99,12 @@ public:
    */
   static AbsoluteLayout DownCast(BaseHandle handle);
 
-public: // Static methods for attached properties
-
-  /**
-   * @brief Sets the layout bounds for a child view.
-   *
-   * The bounds specify the position and size of the child.
-   * Use flags to determine if values are absolute or proportional.
-   *
-   * @param[in] view The child view
-   * @param[in] bounds The layout bounds (x, y, width, height)
-   */
-  static void SetLayoutBounds(View view, const LayoutRect& bounds);
-
-  /**
-   * @brief Gets the layout bounds for a child view.
-   *
-   * @param[in] view The child view
-   * @return The layout bounds
-   */
-  static LayoutRect GetLayoutBounds(View view);
-
-  /**
-   * @brief Sets the layout flags for a child view.
-   *
-   * Flags determine how bounds values are interpreted:
-   * - None: All values are absolute pixels
-   * - PositionProportional: x, y are proportional (0.0-1.0)
-   * - SizeProportional: width, height are proportional (0.0-1.0)
-   * - All: All values are proportional
-   *
-   * @param[in] view The child view
-   * @param[in] flags The layout flags
-   */
-  static void SetLayoutFlags(View view, AbsoluteLayoutFlags flags);
-
-  /**
-   * @brief Gets the layout flags for a child view.
-   *
-   * @param[in] view The child view
-   * @return The layout flags
-   */
-  static AbsoluteLayoutFlags GetLayoutFlags(View view);
+public: // Chaining methods
+  DALI_UI_CHAIN_LAYOUT_METHODS(AbsoluteLayout)
 
 public: // Not intended for application developers
   /// @cond internal
-  DALI_INTERNAL AbsoluteLayout(Integration::AbsoluteLayoutImpl& implementation);
+  DALI_INTERNAL          AbsoluteLayout(Integration::AbsoluteLayoutImpl& implementation);
   explicit DALI_INTERNAL AbsoluteLayout(Dali::Internal::CustomActor* internal);
   /// @endcond
 };

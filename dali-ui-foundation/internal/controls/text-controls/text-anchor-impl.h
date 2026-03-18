@@ -73,7 +73,7 @@ private: // From Control
   /**
    * @copydoc Ui::Internal::Control::CreateAccessibleObject()
    */
-  DevelControl::ControlAccessible* CreateAccessibleObject() override;
+  ControlAccessible* CreateAccessibleObject() override;
 
   /**
    * @copydoc Control::OnPropertySet()
@@ -102,18 +102,18 @@ private:
   TextAnchor& operator=(const TextAnchor& rhs);
 
   // Data
-  int mStartCharacterIndex;
-  int mEndCharacterIndex;
+  int         mStartCharacterIndex;
+  int         mEndCharacterIndex;
   std::string mUri;
 
 protected:
   /**
    * @brief This structure is to connect TextAnchor with Accessible functions.
    */
-  class TextAnchorAccessible : public DevelControl::ControlAccessible, public Dali::Accessibility::Hyperlink
+  class TextAnchorAccessible : public ControlAccessible, public Dali::Accessibility::Hyperlink
   {
   public:
-    using DevelControl::ControlAccessible::ControlAccessible;
+    using ControlAccessible::ControlAccessible;
 
     /**
      * @copydoc Dali::Accessibility::Hyperlink::GetEndIndex()

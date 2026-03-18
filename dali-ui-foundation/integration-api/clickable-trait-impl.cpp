@@ -15,32 +15,35 @@
  *
  */
 
-#include <cstdint>
-#include <dali/integration-api/input-options.h>
-#include <dali-ui-foundation/public-api/input-event.h>
 #include <dali-ui-foundation/integration-api/input-event-impl.h>
 #include <dali-ui-foundation/integration-api/ui-config-manager.h>
+#include <dali-ui-foundation/public-api/input-event.h>
+#include <dali/integration-api/input-options.h>
+#include <dali/integration-api/string-utils.h>
+#include <cstdint>
 
 // CLASS HEADER
 #include <dali-ui-foundation/integration-api/clickable-trait-impl.h>
+
+using Dali::Integration::ToStdString;
 
 namespace Dali::Ui::Integration
 {
 
 ClickableTraitImpl::ClickableTraitImpl()
-  : TraitImpl(),
-    mTapGestureDetector(TapGestureDetector::New()),
-    mLongPressGestureDetector(LongPressGestureDetector::New()),
-    mPressedChangedSignal(),
-    mPseudoDisabledChangedSignal(),
-    mKeyClickPolicy(UiConfigManager::Get().GetKeyClickPolicy()),
-    mPressedExecutionKey(),
-    mPressedExecutionKeyCount(0),
-    mPseudoDisabled(false),
-    mPressed(false),
-    mClickable(true),
-    mClickBlockedByTouch(false),
-    mClickBlockedByKey(false)
+: TraitImpl(),
+  mTapGestureDetector(TapGestureDetector::New()),
+  mLongPressGestureDetector(LongPressGestureDetector::New()),
+  mPressedChangedSignal(),
+  mPseudoDisabledChangedSignal(),
+  mKeyClickPolicy(UiConfigManager::Get().GetKeyClickPolicy()),
+  mPressedExecutionKey(),
+  mPressedExecutionKeyCount(0),
+  mPseudoDisabled(false),
+  mPressed(false),
+  mClickable(true),
+  mClickBlockedByTouch(false),
+  mClickBlockedByKey(false)
 {
   Dali::Integration::SetTapRecognizerTime(UiConfigManager::Get().GetTapRecognizerTime());
 
@@ -84,7 +87,7 @@ bool ClickableTraitImpl::IsPseudoDisabled() const
 
 void ClickableTraitImpl::SetPseudoDisabled(bool pseudoDisabled)
 {
-  if (mPseudoDisabled == pseudoDisabled)
+  if(mPseudoDisabled == pseudoDisabled)
   {
     return;
   }
@@ -116,7 +119,7 @@ void ClickableTraitImpl::OnFocusedChanged(View view, bool focused)
 {
   mClickBlockedByTouch = false;
 
-  if (!focused)
+  if(!focused)
   {
     ClearKeyPressedHistory();
     mClickBlockedByKey = false;
@@ -136,7 +139,7 @@ bool ClickableTraitImpl::OnKeyEvent(View view, const KeyEvent& event)
 {
   InputEvent inputEvent = InputEvent::New(event);
 
-  switch (event.GetState())
+  switch(event.GetState())
   {
     case KeyEvent::State::DOWN:
     {
@@ -154,8 +157,8 @@ bool ClickableTraitImpl::OnKeyEvent(View view, const KeyEvent& event)
 
 bool ClickableTraitImpl::HandleKeyPressed(View view, const InputEvent& event)
 {
-  const std::string& keyName = event.GetKeyEvent().GetKeyName();
-  if (IsExecutionKey(keyName))
+  const std::string& keyName = ToStdString(event.GetKeyEvent().GetKeyName());
+  if(IsExecutionKey(keyName))
   {
     RecordPressedExecutionKey(keyName);
     return SetPressedInternal(true, event);
@@ -167,13 +170,13 @@ bool ClickableTraitImpl::HandleKeyPressedForClick(View view, const InputEvent& e
 {
   bool handled = false;
 
-  if (ShouldKeyPressTriggerClicked())
+  if(ShouldKeyPressTriggerClicked())
   {
     handled |= OnClicked(view, event);
   }
-  else if (ShouldKeyPressTriggerLongPressed())
+  else if(ShouldKeyPressTriggerLongPressed())
   {
-    bool consumed = OnLongPressed(view, event);
+    bool consumed      = OnLongPressed(view, event);
     mClickBlockedByKey = consumed;
     handled |= consumed;
   }
@@ -183,8 +186,8 @@ bool ClickableTraitImpl::HandleKeyPressedForClick(View view, const InputEvent& e
 
 bool ClickableTraitImpl::HandleKeyReleased(View view, const InputEvent& event)
 {
-  const std::string& keyName = event.GetKeyEvent().GetKeyName();
-  if (mPressedExecutionKey == keyName)
+  const std::string& keyName = ToStdString(event.GetKeyEvent().GetKeyName());
+  if(mPressedExecutionKey == keyName)
   {
     ClearKeyPressedHistory();
     return SetPressedInternal(false, event);
@@ -194,7 +197,7 @@ bool ClickableTraitImpl::HandleKeyReleased(View view, const InputEvent& event)
 
 bool ClickableTraitImpl::HandleKeyReleasedForClick(View view, const InputEvent& event)
 {
-  if (ShouldKeyReleaseTriggerClicked())
+  if(ShouldKeyReleaseTriggerClicked())
   {
     OnClicked(view, event);
   }
@@ -234,7 +237,7 @@ void ClickableTraitImpl::OnViewDestroying(ViewImpl* viewImpl)
 
 bool ClickableTraitImpl::OnTouch(View view, const TouchEvent& touchEvent)
 {
-  switch (touchEvent.GetState(0))
+  switch(touchEvent.GetState(0))
   {
     case PointState::STARTED:
     {
@@ -258,7 +261,7 @@ void ClickableTraitImpl::OnTap(View view, const TapGesture& tap)
   // NOTE Using TapGestureDetector.HandleEvent() in OnTouch handler can detect tap gesture,
   // but Clicked event should be triggered after the all registered touch event handlers are called.
   // So, we need to detect tap gesture without using OnTouch + HandleEvent.
-  if (ShouldTapTriggerClicked())
+  if(ShouldTapTriggerClicked())
   {
     InputEvent inputEvent = InputEvent::New(tap);
     OnClicked(view, inputEvent);
@@ -299,16 +302,16 @@ void ClickableTraitImpl::OnTapInternal(Actor actor, const TapGesture& event)
 void ClickableTraitImpl::OnLongPressedInternal(Actor actor, const LongPressGesture& event)
 {
   // NOTE OnLongPressedInternal will invoke this method twice: once for Start and once for Finished.
-  if (event.GetState() == GestureState::STARTED)
+  if(event.GetState() == GestureState::STARTED)
   {
     InputEvent inputEvent = InputEvent::New(event);
-    mClickBlockedByTouch = OnLongPressed(View::DownCast(actor), inputEvent);
+    mClickBlockedByTouch  = OnLongPressed(View::DownCast(actor), inputEvent);
   }
 }
 
 void ClickableTraitImpl::RecordPressedExecutionKey(const std::string& keyName)
 {
-  if (mPressedExecutionKey.empty() || mPressedExecutionKey == keyName)
+  if(mPressedExecutionKey.empty() || mPressedExecutionKey == keyName)
   {
     mPressedExecutionKey = keyName;
     mPressedExecutionKeyCount++;
@@ -323,7 +326,7 @@ void ClickableTraitImpl::ClearKeyPressedHistory()
 
 bool ClickableTraitImpl::SetPressedInternal(bool value, const InputEvent& event)
 {
-  if (value == mPressed)
+  if(value == mPressed)
   {
     return false;
   }

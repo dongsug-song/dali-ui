@@ -83,7 +83,7 @@ public:
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is
    * responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName,
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName,
                               FunctorDelegate* functor);
 
 protected:
@@ -137,7 +137,7 @@ private:
   SlotDelegate<KeyInputFocusManager> mSlotDelegate;
 
   Ui::Control mCurrentFocusControl; ///< The current focused control
-  uint32_t mCurrentWindowId;        ///< The native window id of current focused control
+  uint32_t    mCurrentWindowId;     ///< The native window id of current focused control
 };
 
 } // namespace Internal

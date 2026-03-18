@@ -27,7 +27,6 @@
 #include <dali-ui-foundation/devel-api/visual-factory/visual-base.h>
 #include <dali-ui-foundation/devel-api/visual-factory/visual-factory.h>
 #include <dali-ui-foundation/internal/visuals/visual-base-impl.h>
-#include <dali-ui-foundation/public-api/styling/style-manager.h>
 
 namespace Dali
 {
@@ -54,21 +53,6 @@ public:
    * @param[in] debugEnabled If true, use debug renderer to replace all the concrete renderer.
    */
   VisualFactory(bool debugEnabled);
-
-  /**
-   * @brief StyleChanged callback
-   *
-   * @param[in] styleManager Handle for style manager.
-   * @param[in] type Style change type.
-   */
-  void OnStyleChangedSignal(Ui::StyleManager styleManager, StyleChange::Type type);
-
-  /**
-   * @brief BrokenImageChanged callback
-   *
-   * @param[in] styleManager Handle for style manager.
-   */
-  void OnBrokenImageChangedSignal(Ui::StyleManager styleManager);
 
   /**
    * @copydoc Ui::VisualFactory::CreateVisual( const Property::Map& )
@@ -155,12 +139,6 @@ protected:
 
 private:
   /**
-   * @brief Set the Broken Image url
-   * @param[in] styleManager The instance of StyleManager
-   */
-  void SetBrokenImageUrl(Ui::StyleManager& styleManager);
-
-  /**
    * Get the image visual shader factory, creating it if necessary.
    */
   ImageVisualShaderFactory& GetImageVisualShaderFactory();
@@ -218,14 +196,14 @@ private:
   VisualFactory& operator=(const VisualFactory& rhs) = delete;
 
 private:
-  std::unique_ptr<VisualFactoryCache> mFactoryCache;
+  std::unique_ptr<VisualFactoryCache>       mFactoryCache;
   std::unique_ptr<ImageVisualShaderFactory> mImageVisualShaderFactory;
-  std::unique_ptr<TextVisualShaderFactory> mTextVisualShaderFactory;
+  std::unique_ptr<TextVisualShaderFactory>  mTextVisualShaderFactory;
   std::unique_ptr<ColorVisualShaderFactory> mColorVisualShaderFactory;
-  std::unique_ptr<NpatchShaderFactory> mNpatchShaderFactory;
-  std::unique_ptr<CustomShaderFactory> mCustomShaderFactory;
-  SlotDelegate<VisualFactory> mSlotDelegate;
-  CallbackBase* mIdleCallback;
+  std::unique_ptr<NpatchShaderFactory>      mNpatchShaderFactory;
+  std::unique_ptr<CustomShaderFactory>      mCustomShaderFactory;
+  SlotDelegate<VisualFactory>               mSlotDelegate;
+  CallbackBase*                             mIdleCallback;
   using DiscardedVisualContainer = std::vector<Ui::Visual::Base>;
   DiscardedVisualContainer mDiscardedVisuals{};
 
@@ -248,15 +226,15 @@ private:
  * @param[in] param0 First template based argument passed to the visual factory
  * @param[in] param1 Second template based argument passed to the visual factory
  */
-template <class ParameterType0, class ParameterType1>
+template<class ParameterType0, class ParameterType1>
 void InitializeVisual(Actor& actor, Ui::Visual::Base& visual, ParameterType0& param0, ParameterType1& param1)
 {
-  if (actor)
+  if(actor)
   {
     Ui::GetImplementation(visual).SetOffScene(actor);
   }
   visual = Ui::VisualFactory::Get().CreateVisual(param0, param1);
-  if (visual && actor && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  if(visual && actor && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
     Ui::GetImplementation(visual).SetOnScene(actor);
   }
@@ -271,15 +249,15 @@ void InitializeVisual(Actor& actor, Ui::Visual::Base& visual, ParameterType0& pa
  * @param[in,out] visual The visual to be replaced
  * @param[in] param Template based argument passed to the visual factory
  */
-template <class ParameterType>
+template<class ParameterType>
 void InitializeVisual(Actor& actor, Ui::Visual::Base& visual, ParameterType& param)
 {
-  if (actor && visual)
+  if(actor && visual)
   {
     Ui::GetImplementation(visual).SetOffScene(actor);
   }
   visual = Ui::VisualFactory::Get().CreateVisual(param);
-  if (visual && actor && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  if(visual && actor && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
     Ui::GetImplementation(visual).SetOnScene(actor);
   }

@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/events/long-press-gesture.h>
@@ -42,13 +41,7 @@ namespace Ui
  * @{
  */
 
-class StyleManager;
-
-namespace DevelControl
-{
 class ControlAccessible;
-
-} // namespace DevelControl
 
 namespace Internal
 {
@@ -83,18 +76,6 @@ protected:
   virtual ~Control();
 
 public:
-  // Styling
-
-  /**
-   * @copydoc Dali::Ui::Control::SetStyleName
-   */
-  void SetStyleName(const std::string& styleName);
-
-  /**
-   * @copydoc Dali::Ui::Control::GetStyleName
-   */
-  const std::string& GetStyleName() const;
-
   // Background
 
   /**
@@ -164,7 +145,7 @@ public:
    *
    * @see CreateAccessibleObject()
    */
-  std::shared_ptr<Ui::DevelControl::ControlAccessible> GetAccessibleObject();
+  std::shared_ptr<Ui::ControlAccessible> GetAccessibleObject();
 
   // Gesture Detection
 
@@ -298,7 +279,8 @@ public:
 
   /**
    * @brief Get texture output of offscreen rendering.
-   * @note Valid only when OffScreenRenderingType::RENDER_ONCE
+   * @note Valid only if call this API inside of OffScreenRenderingFinishedSignal()
+   *       signal, and OffScreenRenderingType::RENDER_ONCE
    */
   Dali::Texture GetOffScreenRenderingOutput() const;
 
@@ -465,17 +447,17 @@ public: // Helpers for deriving classes
                                    ///< but doesn't receive event callbacks. @SINCE_1_2_10
     NOT_IN_USE_1 = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 0),
     REQUIRES_KEYBOARD_NAVIGATION_SUPPORT =
-        1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 1), ///< True if needs to support keyboard navigation @SINCE_1_0.0
+      1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 1), ///< True if needs to support keyboard navigation @SINCE_1_0.0
     DISABLE_STYLE_CHANGE_SIGNALS = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT +
                                          2), ///< True if control should not monitor style change signals @SINCE_1_2_10
     DISABLE_VISUALS =
-        1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 3), ///< True if control should not use visuals @SINCE_2_3.6
+      1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 3), ///< True if control should not use visuals @SINCE_2_3.6
 
     LAST_CONTROL_BEHAVIOUR_FLAG
   };
 
   static const int CONTROL_BEHAVIOUR_FLAG_COUNT =
-      Log<LAST_CONTROL_BEHAVIOUR_FLAG - 1>::value + 1; ///< Total count of flags
+    Log<LAST_CONTROL_BEHAVIOUR_FLAG - 1>::value + 1; ///< Total count of flags
 
   /**
    * @brief Creates a new ControlImpl instance that does not require touch by default.
@@ -519,24 +501,6 @@ public: // API for derived classes to override
    * @copydoc Dali::Ui::Control::IsResourceReady
    */
   virtual bool IsResourceReady() const;
-
-  // Styling
-
-  /**
-   * @brief This method should be overridden by deriving classes requiring notifications when the style changes.
-   *
-   * @SINCE_1_0.0
-   * @param[in] styleManager The StyleManager object
-   * @param[in] change Information denoting what has changed
-   */
-  virtual void OnStyleChange(Ui::StyleManager styleManager, StyleChange::Type change);
-
-  /**
-   * @brief This method can be overridden by deriving classes requiring to apply default style.
-   *
-   * @SINCE_1_3.0
-   */
-  virtual void OnApplyDefaultStyle();
 
   // Accessibility
 
@@ -594,7 +558,7 @@ public: // API for derived classes to override
    *
    * @see GetAccessibleObject()
    */
-  virtual DevelControl::ControlAccessible* CreateAccessibleObject();
+  virtual ControlAccessible* CreateAccessibleObject();
 
   // Keyboard focus
 
@@ -624,7 +588,7 @@ public: // API for derived classes to override
    * @param[in] loopEnabled Whether the focus movement should be looped within the control
    * @return The next keyboard focusable actor in this control or an empty handle if no actor can be focused
    */
-  virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor,
+  virtual Actor GetNextKeyboardFocusableActor(Actor                                 currentFocusedActor,
                                               Ui::Control::KeyboardFocus::Direction direction, bool loopEnabled);
 
   /**
@@ -743,7 +707,7 @@ public: // API for derived classes to override
    * @param[in] properties Property list to be used to update visual properties of this Control.
    */
   virtual void OnUpdateVisualProperties(
-      const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
+    const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
   {
   }
 
@@ -751,10 +715,10 @@ private:
   /// @cond internal
 
   // Not copyable or movable
-  DALI_INTERNAL Control(const Control&) = delete;            ///< Deleted copy constructor.
-  DALI_INTERNAL Control(Control&&) = delete;                 ///< Deleted move constructor.
+  DALI_INTERNAL          Control(const Control&)   = delete; ///< Deleted copy constructor.
+  DALI_INTERNAL          Control(Control&&)        = delete; ///< Deleted move constructor.
   DALI_INTERNAL Control& operator=(const Control&) = delete; ///< Deleted copy assignment operator.
-  DALI_INTERNAL Control& operator=(Control&&) = delete;      ///< Deleted move assignment operator.
+  DALI_INTERNAL Control& operator=(Control&&)      = delete; ///< Deleted move assignment operator.
 
 public:
   class DALI_INTERNAL Impl; // Class declaration is public so we can internally add devel API's to the Controls Impl

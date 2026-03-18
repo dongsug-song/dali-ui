@@ -31,6 +31,7 @@
 #include <dali/public-api/signals/connection-tracker.h>
 
 // INTERNAL INCLUDES
+#include <dali-ui-foundation/public-api/controls/control.h>
 #include <dali-ui-foundation/public-api/render-effects/render-effect.h>
 
 namespace Dali
@@ -45,6 +46,27 @@ using RenderEffectImplPtr = IntrusivePtr<RenderEffectImpl>;
 
 class RenderEffectImpl : public BaseObject, public ConnectionTracker
 {
+public:
+  /**
+   * @copydoc Dali::Toolkit::RenderEffect::Activate
+   */
+  void Activate();
+
+  /**
+   * @copydoc Dali::Toolkit::RenderEffect::Deactivate
+   */
+  void Deactivate();
+
+  /**
+   * @copydoc Dali::Toolkit::RenderEffect::Refresh
+   */
+  void Refresh();
+
+  /**
+   * @copydoc Dali::Toolkit::RenderEffect::IsActivated
+   */
+  bool IsActivated() const;
+
 public:
   /**
    * @brief Gets the value of render pass tag for render effects.
@@ -94,27 +116,6 @@ public:
    */
   virtual void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) = 0;
 
-  /**
-   * @copydoc Dali::Ui::RenderEffect::Activate
-   */
-  void Activate();
-
-  /**
-   * @copydoc Dali::Ui::RenderEffect::Deactivate
-   */
-  void Deactivate();
-
-  /**
-   * @copydoc Dali::Ui::RenderEffect::Refresh
-   */
-  void Refresh();
-
-  /**
-   * @brief Get whether this effect activated or not.
-   * @return True if effect is activated. False otherwise.
-   */
-  bool IsActivated() const;
-
 protected:
   /**
    * @copydoc Dali::Ui::RenderEffect::RenderEffect
@@ -126,9 +127,9 @@ protected:
    */
   virtual ~RenderEffectImpl() override;
 
-  RenderEffectImpl(const RenderEffectImpl&) = delete;
-  RenderEffectImpl(RenderEffectImpl&&) = delete;
-  RenderEffectImpl& operator=(RenderEffectImpl&&) = delete;      // no move()
+  RenderEffectImpl(const RenderEffectImpl&)            = delete;
+  RenderEffectImpl(RenderEffectImpl&&)                 = delete;
+  RenderEffectImpl& operator=(RenderEffectImpl&&)      = delete; // no move()
   RenderEffectImpl& operator=(const RenderEffectImpl&) = delete; // no copy()
 
   /**
@@ -192,7 +193,6 @@ private:
    */
   bool IsActivateValid() const;
 
-private:
   /**
    * @brief Calculates a valid target size for texture.
    * Invalid cases include: zero vector, minus numbers or large numbers(larger than the maximum).
@@ -211,7 +211,7 @@ private:
 
   std::vector<Constraint> mAnimationConstraints; // For corner animation on owner control.
 
-  Dali::WeakHandle<Dali::Ui::Control> mOwnerControl;                ///< Weakhandle of owner control.
+  Dali::WeakHandle<Dali::Ui::Control>        mOwnerControl;         ///< Weakhandle of owner control.
   WeakHandle<Dali::Integration::SceneHolder> mPlacementSceneHolder; ///< Weakhandle of scene
 
   Vector2 mTargetSize; // The final size of mOwnerControl

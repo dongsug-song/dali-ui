@@ -35,7 +35,7 @@ namespace Integration
  * Can be used with ViewImpl::SetLayoutManager() or returned from
  * StackLayoutImpl::CreateLayoutManager(). Subclass to customize stack layout behaviour.
  */
-class StackLayoutManager : public LayoutManager
+class DALI_UI_API StackLayoutManager : public LayoutManager
 {
 public:
   /**
@@ -59,7 +59,7 @@ public:
 
 protected:
   StackOrientation mOrientation;
-  float mSpacing;
+  float            mSpacing;
 };
 
 } // namespace Integration

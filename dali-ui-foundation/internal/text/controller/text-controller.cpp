@@ -19,7 +19,7 @@
 #include <dali-ui-foundation/internal/text/controller/text-controller.h>
 
 // EXTERNAL INCLUDES
-#include <dali-ui-foundation/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-ui-foundation/public-api/controls/control-depth-index-ranges.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -28,7 +28,6 @@
 #include <limits>
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/devel-api/text/text-enumerations-devel.h>
 #include <dali-ui-foundation/internal/controls/text-controls/common-text-utils.h>
 #include <dali-ui-foundation/internal/text/controller/text-controller-background-actor.h>
 #include <dali-ui-foundation/internal/text/controller/text-controller-event-handler.h>
@@ -37,7 +36,6 @@
 #include <dali-ui-foundation/internal/text/controller/text-controller-input-properties.h>
 #include <dali-ui-foundation/internal/text/controller/text-controller-placeholder-handler.h>
 #include <dali-ui-foundation/internal/text/controller/text-controller-relayouter.h>
-#include <dali-ui-foundation/internal/text/controller/text-controller-spannable-handler.h>
 #include <dali-ui-foundation/internal/text/controller/text-controller-text-updater.h>
 #include <dali-ui-foundation/internal/text/text-editable-control-interface.h>
 #include <dali-ui-foundation/internal/text/text-geometry.h>
@@ -48,41 +46,41 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
-const char* EMPTY_STRING = "";
+const char* EMPTY_STRING         = "";
 const char* MIME_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
-const char* MIME_TYPE_HTML = "application/xhtml+xml";
+const char* MIME_TYPE_HTML       = "application/xhtml+xml";
 
-template <typename Type>
+template<typename Type>
 void EnsureCreated(Type*& object)
 {
-  if (!object)
+  if(!object)
   {
     object = new Type();
   }
 }
 
-template <typename Type>
+template<typename Type>
 void EnsureCreated(std::unique_ptr<Type>& object)
 {
-  if (!object)
+  if(!object)
   {
     object = std::unique_ptr<Type>(new Type());
   }
 }
 
-template <typename Type, typename Arg1>
+template<typename Type, typename Arg1>
 void EnsureCreated(Type*& object, Arg1 arg1)
 {
-  if (!object)
+  if(!object)
   {
     object = new Type(arg1);
   }
 }
 
-template <typename Type, typename Arg1, typename Arg2>
+template<typename Type, typename Arg1, typename Arg2>
 void EnsureCreated(Type*& object, Arg1 arg1, Arg2 arg2)
 {
-  if (!object)
+  if(!object)
   {
     object = new Type(arg1, arg2);
   }
@@ -91,10 +89,10 @@ void EnsureCreated(Type*& object, Arg1 arg1, Arg2 arg2)
 float GetDpi()
 {
   static uint32_t horizontalDpi = 0u;
-  static uint32_t verticalDpi = 0u;
+  static uint32_t verticalDpi   = 0u;
 
   // TODO : How can we know when fontClient DPI changed case?
-  if (DALI_UNLIKELY(horizontalDpi == 0u))
+  if(DALI_UNLIKELY(horizontalDpi == 0u))
   {
     Dali::TextAbstraction::FontClient fontClient = Dali::TextAbstraction::FontClient::Get();
     fontClient.GetDpi(horizontalDpi, verticalDpi);
@@ -115,10 +113,10 @@ float ConvertPointToPixel(float point)
 
 void UpdateCursorPosition(Dali::Ui::Text::EventData* eventData)
 {
-  if (eventData && Dali::Ui::Text::EventData::IsEditingState(eventData->mState))
+  if(eventData && Dali::Ui::Text::EventData::IsEditingState(eventData->mState))
   {
     // Update the cursor position if it's in editing mode
-    eventData->mDecoratorUpdated = true;
+    eventData->mDecoratorUpdated     = true;
     eventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font size is updated.
   }
 }
@@ -129,7 +127,7 @@ namespace Dali::Ui::Text
 {
 void Controller::EnableTextInput(DecoratorPtr decorator, InputMethodContext& inputMethodContext)
 {
-  if (!decorator)
+  if(!decorator)
   {
     delete mImpl->mEventData;
     mImpl->mEventData = NULL;
@@ -154,7 +152,7 @@ void Controller::SetGlyphType(TextAbstraction::GlyphType glyphType)
 
 void Controller::SetMarkupProcessorEnabled(bool enable)
 {
-  if (enable != mImpl->mMarkupProcessorEnabled)
+  if(enable != mImpl->mMarkupProcessorEnabled)
   {
     // If Text was already set, call the SetText again for enabling or disabling markup
     mImpl->mMarkupProcessorEnabled = enable;
@@ -177,7 +175,7 @@ bool Controller::HasAnchors() const
           mImpl->IsShowingRealText());
 }
 
-void Controller::SetAutoScrollEnabled(bool enable, bool requestRelayout, DevelText::AutoScroll::Direction direction)
+void Controller::SetAutoScrollEnabled(bool enable, bool requestRelayout, Text::AutoScroll::Direction direction)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled[%s] SingleBox[%s]-> [%p]\n",
                 (enable) ? "true" : "false",
@@ -205,7 +203,7 @@ CharacterDirection Controller::GetAutoScrollTextDirection() const
 float Controller::GetAutoScrollLineAlignment() const
 {
   float offset = 0.f;
-  if (mImpl->mModel->mVisualModel && (0u != mImpl->mModel->mVisualModel->mLines.Count()))
+  if(mImpl->mModel->mVisualModel && (0u != mImpl->mModel->mVisualModel->mLines.Count()))
   {
     offset = (*mImpl->mModel->mVisualModel->mLines.Begin()).alignmentOffset;
   }
@@ -214,7 +212,7 @@ float Controller::GetAutoScrollLineAlignment() const
 
 void Controller::SetHorizontalScrollEnabled(bool enable)
 {
-  if (mImpl->mEventData && mImpl->mEventData->mDecorator)
+  if(mImpl->mEventData && mImpl->mEventData->mDecorator)
   {
     mImpl->mEventData->mDecorator->SetHorizontalScrollEnabled(enable);
   }
@@ -228,7 +226,7 @@ bool Controller::IsHorizontalScrollEnabled() const
 
 void Controller::SetVerticalScrollEnabled(bool enable)
 {
-  if (mImpl->mEventData && mImpl->mEventData->mDecorator)
+  if(mImpl->mEventData && mImpl->mEventData->mDecorator)
   {
     mImpl->mEventData->mDecorator->SetVerticalScrollEnabled(enable);
   }
@@ -241,7 +239,7 @@ bool Controller::IsVerticalScrollEnabled() const
 
 void Controller::SetSmoothHandlePanEnabled(bool enable)
 {
-  if (mImpl->mEventData && mImpl->mEventData->mDecorator)
+  if(mImpl->mEventData && mImpl->mEventData->mDecorator)
   {
     mImpl->mEventData->mDecorator->SetSmoothHandlePanEnabled(enable);
   }
@@ -283,22 +281,22 @@ bool Controller::IsMultiLineEnabled() const
   return Layout::Engine::MULTI_LINE_BOX == mImpl->mLayoutEngine.GetLayout();
 }
 
-void Controller::SetHorizontalAlignment(Text::HorizontalAlignment::Type alignment)
+void Controller::SetHorizontalAlignment(Alignment alignment)
 {
   mImpl->SetHorizontalAlignment(alignment);
 }
 
-Text::HorizontalAlignment::Type Controller::GetHorizontalAlignment() const
+Alignment Controller::GetHorizontalAlignment() const
 {
   return mImpl->mModel->mHorizontalAlignment;
 }
 
-void Controller::SetVerticalAlignment(VerticalAlignment::Type alignment)
+void Controller::SetVerticalAlignment(Alignment alignment)
 {
   mImpl->SetVerticalAlignment(alignment);
 }
 
-VerticalAlignment::Type Controller::GetVerticalAlignment() const
+Alignment Controller::GetVerticalAlignment() const
 {
   return mImpl->mModel->mVerticalAlignment;
 }
@@ -350,7 +348,7 @@ bool Controller::IsTextCutout() const
 
 void Controller::SetTextCutout(bool cutout)
 {
-  if (cutout != mImpl->mTextCutout)
+  if(cutout != mImpl->mTextCutout)
   {
     mImpl->mModel->mVisualModel->SetCutoutEnabled(cutout);
     mImpl->mTextCutout = cutout;
@@ -370,16 +368,16 @@ void Controller::SetVariationsMap(const Property::Map& map)
 
   std::size_t numberOfItems = map.Count();
 
-  for (std::size_t index = 0; index < numberOfItems; index++)
+  for(std::size_t index = 0; index < numberOfItems; index++)
   {
     const KeyValuePair& keyvalue = map.GetKeyValue(index);
 
-    if (keyvalue.first.type == Property::Key::STRING)
+    if(keyvalue.first.type == Property::Key::STRING)
     {
       float value = 0.f;
-      if (keyvalue.first.stringKey.length() == 4 && keyvalue.second.Get(value)) // Variable tag must be 4-length string.
+      if(keyvalue.first.stringKey.Size() == 4 && keyvalue.second.Get(value)) // Variable tag must be 4-length string.
       {
-        variationsMap[keyvalue.first.stringKey.data()] = value;
+        variationsMap[keyvalue.first.stringKey] = value;
       }
     }
   }
@@ -400,12 +398,12 @@ void Controller::ResetFontAndStyleData()
   mImpl->ResetFontAndStyleData();
 }
 
-void Controller::SetMatchLayoutDirection(DevelText::MatchLayoutDirection type)
+void Controller::SetMatchLayoutDirection(LayoutDirectionMode type)
 {
   mImpl->mModel->mMatchLayoutDirection = type;
 }
 
-DevelText::MatchLayoutDirection Controller::GetMatchLayoutDirection() const
+LayoutDirectionMode Controller::GetMatchLayoutDirection() const
 {
   return mImpl->mModel->mMatchLayoutDirection;
 }
@@ -440,12 +438,12 @@ DevelTextLabel::Render::Mode Controller::GetRenderMode()
   return mImpl->mRenderMode;
 }
 
-void Controller::SetLineWrapMode(Text::LineWrap::Mode lineWrapMode)
+void Controller::SetLineWrapMode(LineWrapMode lineWrapMode)
 {
   mImpl->SetLineWrapMode(lineWrapMode);
 }
 
-Text::LineWrap::Mode Controller::GetLineWrapMode() const
+LineWrapMode Controller::GetLineWrapMode() const
 {
   return mImpl->mModel->mLineWrapMode;
 }
@@ -540,7 +538,7 @@ void Controller::SetTextFitPointSize(float pointSize)
 {
   EnsureCreated(mImpl->mFontDefaults);
   mImpl->mFontDefaults->mFitPointSize = pointSize;
-  mImpl->mFontDefaults->sizeDefined = true;
+  mImpl->mFontDefaults->sizeDefined   = true;
   mImpl->ClearFontData();
 }
 
@@ -641,11 +639,6 @@ Length Controller::GetNumberOfCharacters() const
   return mImpl->GetNumberOfCharacters();
 }
 
-void Controller::SetSpannedText(const Text::Spanned& spannedText)
-{
-  SpannableHandler::SetSpannedText(*this, spannedText);
-}
-
 void Controller::SetPlaceholderText(PlaceholderType type, const std::string& text)
 {
   PlaceholderHandler::SetPlaceholderText(*this, type, text);
@@ -690,7 +683,7 @@ void Controller::SetDefaultFontFamily(const std::string& defaultFontFamily)
 {
   EnsureCreated(mImpl->mFontDefaults);
 
-  if (mImpl->mFontDefaults->mFontDescription.family != defaultFontFamily)
+  if(mImpl->mFontDefaults->mFontDescription.family != defaultFontFamily)
   {
     mImpl->mFontDefaults->mFontDescription.family = defaultFontFamily;
     DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetDefaultFontFamily %s\n", defaultFontFamily.c_str());
@@ -726,7 +719,7 @@ void Controller::SetDefaultFontWeight(FontWeight weight)
   EnsureCreated(mImpl->mFontDefaults);
 
   mImpl->mFontDefaults->mFontDescription.weight = weight;
-  mImpl->mFontDefaults->weightDefined = true;
+  mImpl->mFontDefaults->weightDefined           = true;
 
   // Update the cursor position if it's in editing mode
   UpdateCursorPosition(mImpl->mEventData);
@@ -767,7 +760,7 @@ void Controller::SetDefaultFontWidth(FontWidth width)
   EnsureCreated(mImpl->mFontDefaults);
 
   mImpl->mFontDefaults->mFontDescription.width = width;
-  mImpl->mFontDefaults->widthDefined = true;
+  mImpl->mFontDefaults->widthDefined           = true;
 
   // Update the cursor position if it's in editing mode
   UpdateCursorPosition(mImpl->mEventData);
@@ -808,7 +801,7 @@ void Controller::SetDefaultFontSlant(FontSlant slant)
   EnsureCreated(mImpl->mFontDefaults);
 
   mImpl->mFontDefaults->mFontDescription.slant = slant;
-  mImpl->mFontDefaults->slantDefined = true;
+  mImpl->mFontDefaults->slantDefined           = true;
 
   // Update the cursor position if it's in editing mode
   UpdateCursorPosition(mImpl->mEventData);
@@ -849,7 +842,7 @@ void Controller::SetFontSizeScale(float scale)
   mImpl->mFontSizeScale = scale;
 
   // No relayout is required
-  if (!mImpl->mFontSizeScaleEnabled)
+  if(!mImpl->mFontSizeScaleEnabled)
   {
     return;
   }
@@ -891,7 +884,7 @@ void Controller::SetDefaultFontSize(float fontSize, FontSizeType type)
   EnsureCreated(mImpl->mFontDefaults);
 
   mImpl->mFontDefaults->mDefaultPointSize = (type == POINT_SIZE) ? fontSize : ConvertPixelToPoint(fontSize);
-  mImpl->mFontDefaults->sizeDefined = true;
+  mImpl->mFontDefaults->sizeDefined       = true;
 
   // Update the cursor position if it's in editing mode
   UpdateCursorPosition(mImpl->mEventData);
@@ -901,7 +894,7 @@ void Controller::SetDefaultFontSize(float fontSize, FontSizeType type)
 
   mImpl->RequestRelayout();
 
-  if (mImpl->mEventData && EventData::INACTIVE != mImpl->mEventData->mState)
+  if(mImpl->mEventData && EventData::INACTIVE != mImpl->mEventData->mState)
   {
     SetInputFontPointSize(mImpl->mFontDefaults->mDefaultPointSize, true);
   }
@@ -909,7 +902,7 @@ void Controller::SetDefaultFontSize(float fontSize, FontSizeType type)
 
 float Controller::GetDefaultFontSize(FontSizeType type) const
 {
-  if (mImpl->mFontDefaults)
+  if(mImpl->mFontDefaults)
   {
     return (type == POINT_SIZE) ? mImpl->mFontDefaults->mDefaultPointSize
                                 : ConvertPointToPixel(mImpl->mFontDefaults->mDefaultPointSize);
@@ -1011,7 +1004,7 @@ const Vector4& Controller::GetShadowColor() const
 
 void Controller::SetShadowBlurRadius(const float& shadowBlurRadius)
 {
-  if (fabsf(GetShadowBlurRadius() - shadowBlurRadius) > Math::MACHINE_EPSILON_1)
+  if(fabsf(GetShadowBlurRadius() - shadowBlurRadius) > Math::MACHINE_EPSILON_1)
   {
     mImpl->mModel->mVisualModel->SetShadowBlurRadius(shadowBlurRadius);
     mImpl->RequestRelayout();
@@ -1177,7 +1170,7 @@ uint16_t Controller::GetOutlineWidth() const
 
 void Controller::SetOutlineBlurRadius(const float& outlineBlurRadius)
 {
-  if (fabsf(GetOutlineBlurRadius() - outlineBlurRadius) > Math::MACHINE_EPSILON_1)
+  if(fabsf(GetOutlineBlurRadius() - outlineBlurRadius) > Math::MACHINE_EPSILON_1)
   {
     mImpl->mModel->mVisualModel->SetOutlineBlurRadius(outlineBlurRadius);
     mImpl->RequestRelayout();
@@ -1400,7 +1393,7 @@ bool Controller::IsInputModePassword()
 
 void Controller::SetNoTextDoubleTapAction(NoTextTap::Action action)
 {
-  if (mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mDoubleTapAction = action;
   }
@@ -1413,7 +1406,7 @@ Controller::NoTextTap::Action Controller::GetNoTextDoubleTapAction() const
 
 void Controller::SetNoTextLongPressAction(NoTextTap::Action action)
 {
-  if (mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mLongPressAction = action;
   }
@@ -1502,7 +1495,7 @@ bool Controller::IsStrikethroughEnabled() const
 
 void Controller::SetInputStrikethroughProperties(const std::string& strikethroughProperties)
 {
-  if (NULL != mImpl->mEventData)
+  if(NULL != mImpl->mEventData)
   {
     mImpl->mEventData->mInputStyle.strikethroughProperties = strikethroughProperties;
   }
@@ -1578,9 +1571,9 @@ float Controller::GetScrollAmountByUserInput()
 {
   float scrollAmount = 0.0f;
 
-  if (NULL != mImpl->mEventData && mImpl->mEventData->mCheckScrollAmount)
+  if(NULL != mImpl->mEventData && mImpl->mEventData->mCheckScrollAmount)
   {
-    scrollAmount = mImpl->mModel->mScrollPosition.y - mImpl->mModel->mScrollPositionLast.y;
+    scrollAmount                          = mImpl->mModel->mScrollPosition.y - mImpl->mModel->mScrollPositionLast.y;
     mImpl->mEventData->mCheckScrollAmount = false;
   }
   return scrollAmount;
@@ -1589,12 +1582,12 @@ float Controller::GetScrollAmountByUserInput()
 bool Controller::GetTextScrollInfo(float& scrollPosition, float& controlHeight, float& layoutHeight)
 {
   const Vector2& layout = mImpl->mModel->mVisualModel->GetLayoutSize();
-  bool isScrolled;
+  bool           isScrolled;
 
-  controlHeight = mImpl->mModel->mVisualModel->mControlSize.height;
-  layoutHeight = layout.height;
+  controlHeight  = mImpl->mModel->mVisualModel->mControlSize.height;
+  layoutHeight   = layout.height;
   scrollPosition = mImpl->mModel->mScrollPosition.y;
-  isScrolled = !Equals(mImpl->mModel->mScrollPosition.y, mImpl->mModel->mScrollPositionLast.y, Math::MACHINE_EPSILON_1);
+  isScrolled     = !Equals(mImpl->mModel->mScrollPosition.y, mImpl->mModel->mScrollPositionLast.y, Math::MACHINE_EPSILON_1);
   return isScrolled;
 }
 
@@ -1606,7 +1599,7 @@ void Controller::SetHiddenInputOption(const Property::Map& options)
 
 void Controller::GetHiddenInputOption(Property::Map& options)
 {
-  if (mImpl->mHiddenInput)
+  if(mImpl->mHiddenInput)
   {
     mImpl->mHiddenInput->GetProperties(options);
   }
@@ -1620,7 +1613,7 @@ void Controller::SetInputFilterOption(const Property::Map& options)
 
 void Controller::GetInputFilterOption(Property::Map& options)
 {
-  if (mImpl->mInputFilter)
+  if(mImpl->mInputFilter)
   {
     mImpl->mInputFilter->GetProperties(options);
   }
@@ -1636,7 +1629,7 @@ void Controller::GetPlaceholderProperty(Property::Map& map)
   PlaceholderHandler::GetPlaceholderProperty(*this, map);
 }
 
-Ui::DevelText::TextDirection::Type Controller::GetTextDirection()
+Direction Controller::GetTextDirection()
 {
   // Make sure the model is up-to-date before layouting
   EventHandler::ProcessModifyEvents(*this);
@@ -1644,33 +1637,33 @@ Ui::DevelText::TextDirection::Type Controller::GetTextDirection()
   return mImpl->GetTextDirection();
 }
 
-Ui::DevelText::VerticalLineAlignment::Type Controller::GetVerticalLineAlignment() const
+Alignment Controller::GetVerticalLineAlignment() const
 {
   return mImpl->mModel->GetVerticalLineAlignment();
 }
 
-void Controller::SetVerticalLineAlignment(Ui::DevelText::VerticalLineAlignment::Type alignment)
+void Controller::SetVerticalLineAlignment(Alignment alignment)
 {
   mImpl->mModel->mVerticalLineAlignment = alignment;
 }
 
-Ui::DevelText::EllipsisPosition::Type Controller::GetEllipsisPosition() const
+Text::EllipsisPosition::Type Controller::GetEllipsisPosition() const
 {
   return mImpl->mModel->GetEllipsisPosition();
 }
 
-void Controller::SetEllipsisPosition(Ui::DevelText::EllipsisPosition::Type ellipsisPosition)
+void Controller::SetEllipsisPosition(Text::EllipsisPosition::Type ellipsisPosition)
 {
   mImpl->mModel->mEllipsisPosition = ellipsisPosition;
   mImpl->mModel->mVisualModel->SetEllipsisPosition(ellipsisPosition);
 }
 
-Ui::DevelText::Ellipsize::Mode Controller::GetEllipsisMode() const
+Text::Ellipsize::Mode Controller::GetEllipsisMode() const
 {
   return mImpl->mEllipsisMode;
 }
 
-void Controller::SetEllipsisMode(Ui::DevelText::Ellipsize::Mode ellipsisMode)
+void Controller::SetEllipsisMode(Text::Ellipsize::Mode ellipsisMode)
 {
   mImpl->mEllipsisMode = ellipsisMode;
 }
@@ -1790,7 +1783,7 @@ bool Controller::IsInputStyleChangedSignalsQueueEmpty()
 
 void Controller::RequestProcessInputStyleChangedSignals()
 {
-  if (Dali::Adaptor::IsAvailable() && !mImpl->mProcessorRegistered)
+  if(Dali::Adaptor::IsAvailable() && !mImpl->mProcessorRegistered)
   {
     mImpl->mProcessorRegistered = true;
     Dali::Adaptor::Get().RegisterProcessorOnce(*this, true);
@@ -1799,7 +1792,7 @@ void Controller::RequestProcessInputStyleChangedSignals()
 
 void Controller::OnIdleSignal()
 {
-  if (mImpl->mIdleCallback)
+  if(mImpl->mIdleCallback)
   {
     mImpl->mIdleCallback = NULL;
 
@@ -1854,10 +1847,10 @@ void Controller::SelectEvent(float x, float y, SelectionType selectType)
 
 void Controller::SetTextSelectionRange(const uint32_t* start, const uint32_t* end)
 {
-  if (mImpl->mEventData)
+  if(mImpl->mEventData)
   {
-    mImpl->mEventData->mCheckScrollAmount = true;
-    mImpl->mEventData->mIsLeftHandleSelected = true;
+    mImpl->mEventData->mCheckScrollAmount     = true;
+    mImpl->mEventData->mIsLeftHandleSelected  = true;
     mImpl->mEventData->mIsRightHandleSelected = true;
     mImpl->SetTextSelectionRange(start, end);
     mImpl->RequestRelayout();
@@ -1877,13 +1870,13 @@ CharacterIndex Controller::GetPrimaryCursorPosition() const
 
 bool Controller::SetPrimaryCursorPosition(CharacterIndex index, bool focused)
 {
-  if (mImpl->mEventData)
+  if(mImpl->mEventData)
   {
-    mImpl->mEventData->mCheckScrollAmount = true;
-    mImpl->mEventData->mIsLeftHandleSelected = true;
+    mImpl->mEventData->mCheckScrollAmount     = true;
+    mImpl->mEventData->mIsLeftHandleSelected  = true;
     mImpl->mEventData->mIsRightHandleSelected = true;
-    mImpl->mEventData->mCheckScrollAmount = true;
-    if (mImpl->SetPrimaryCursorPosition(index, focused) && focused)
+    mImpl->mEventData->mCheckScrollAmount     = true;
+    if(mImpl->SetPrimaryCursorPosition(index, focused) && focused)
     {
       EventHandler::KeyboardFocusGainEvent(*this);
       return true;
@@ -1929,24 +1922,24 @@ void Controller::PasteClipboardItemEvent(uint32_t id, const char* mimeType, cons
   mImpl->mClipboard.DataReceivedSignal().Disconnect(this, &Controller::PasteClipboardItemEvent);
 
   // If the id is 0u, it is an invalid response.
-  if (id == 0u)
+  if(id == 0u)
   {
     return;
   }
 
   // text-controller allows only plain text type.
-  if (!strncmp(mimeType, MIME_TYPE_TEXT_PLAIN,
-               strlen(MIME_TYPE_TEXT_PLAIN) + 1 /* Compare include null-terminated char */))
+  if(!strncmp(mimeType, MIME_TYPE_TEXT_PLAIN,
+              strlen(MIME_TYPE_TEXT_PLAIN) + 1 /* Compare include null-terminated char */))
   {
     EventHandler::PasteClipboardItemEvent(*this, data);
   }
-  else if (!strncmp(mimeType, MIME_TYPE_HTML, strlen(MIME_TYPE_HTML) + 1 /* Compare include null-terminated char */))
+  else if(!strncmp(mimeType, MIME_TYPE_HTML, strlen(MIME_TYPE_HTML) + 1 /* Compare include null-terminated char */))
   {
     // This does not mean that text controls can parse html.
     // This is temporary code, as text controls do not support html type data.
     // Simply remove the tags inside the angle brackets.
     // Once multiple types and data can be stored in the clipboard, this code should be removed.
-    std::regex reg("<[^>]*>");
+    std::regex  reg("<[^>]*>");
     std::string result = regex_replace(data, reg, "");
 
     EventHandler::PasteClipboardItemEvent(*this, result.c_str());
@@ -1955,7 +1948,7 @@ void Controller::PasteClipboardItemEvent(uint32_t id, const char* mimeType, cons
 
 void Controller::PasteText()
 {
-  if (mImpl->EnsureClipboardCreated())
+  if(mImpl->EnsureClipboardCreated())
   {
     // Connect the signal before calling GetData() of the clipboard.
     mImpl->mClipboard.DataReceivedSignal().Connect(this, &Controller::PasteClipboardItemEvent);
@@ -1965,7 +1958,7 @@ void Controller::PasteText()
 
     // Request clipboard service to retrieve an item.
     uint id = mImpl->mClipboard.GetData(mimeType);
-    if (id == 0u)
+    if(id == 0u)
     {
       // If the return id is 0u, the signal is not emitted, we must disconnect signal here.
       mImpl->mClipboard.DataReceivedSignal().Disconnect(this, &Controller::PasteClipboardItemEvent);
@@ -1974,7 +1967,7 @@ void Controller::PasteText()
 }
 
 InputMethodContext::CallbackData Controller::OnInputMethodContextEvent(
-    InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
+  InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
 {
   return EventHandler::OnInputMethodContextEvent(*this, inputMethodContext, inputMethodContextEvent);
 }
@@ -1986,7 +1979,7 @@ void Controller::GetTargetSize(Vector2& targetSize)
 
 void Controller::AddDecoration(Actor& actor, DecorationType type, bool needsClipping)
 {
-  if (mImpl->mEditableControlInterface)
+  if(mImpl->mEditableControlInterface)
   {
     mImpl->mEditableControlInterface->AddDecoration(actor, type, needsClipping);
   }
@@ -2027,7 +2020,7 @@ void Controller::DecorationEvent(HandleType handleType, HandleState state, float
   EventHandler::DecorationEvent(*this, handleType, state, x, y);
 }
 
-void Controller::TextPopupButtonTouched(Dali::Ui::TextSelectionPopup::Buttons button)
+void Controller::TextPopupButtonTouched(Dali::Ui::Text::InputCommandType button)
 {
   EventHandler::TextPopupButtonTouched(*this, button);
 }
@@ -2044,12 +2037,12 @@ void Controller::DisplayTimeExpired()
 void Controller::ResetCursorPosition(CharacterIndex cursorIndex)
 {
   // Reset the cursor position
-  if (NULL != mImpl->mEventData)
+  if(NULL != mImpl->mEventData)
   {
     mImpl->mEventData->mPrimaryCursorPosition = cursorIndex;
 
     // Update the cursor if it's in editing mode.
-    if (EventData::IsEditingState(mImpl->mEventData->mState))
+    if(EventData::IsEditingState(mImpl->mEventData->mState))
     {
       mImpl->mEventData->mUpdateCursorPosition = true;
     }
@@ -2094,23 +2087,23 @@ int Controller::GetAnchorIndex(size_t characterOffset)
 
 void Controller::Process(bool postProcess)
 {
-  if (Dali::Adaptor::IsAvailable() && mImpl->mProcessorRegistered)
+  if(Dali::Adaptor::IsAvailable() && mImpl->mProcessorRegistered)
   {
     Dali::Adaptor& adaptor = Dali::Adaptor::Get();
 
     mImpl->mProcessorRegistered = false;
 
-    if (NULL == mImpl->mIdleCallback)
+    if(NULL == mImpl->mIdleCallback)
     {
       // @note: The callback manager takes the ownership of the callback object.
       mImpl->mIdleCallback = MakeCallback(this, &Controller::OnIdleSignal);
-      if (DALI_UNLIKELY(!adaptor.AddIdle(mImpl->mIdleCallback, false)))
+      if(DALI_UNLIKELY(!adaptor.AddIdle(mImpl->mIdleCallback, false)))
       {
         DALI_LOG_ERROR(
-            "Fail to add idle callback for text controller style changed signals queue. Skip these callbacks\n");
+          "Fail to add idle callback for text controller style changed signals queue. Skip these callbacks\n");
 
         // Clear queue forcely.
-        if (mImpl->mEventData)
+        if(mImpl->mEventData)
         {
           mImpl->mEventData->mInputStyleChangedQueue.Clear();
         }
@@ -2124,21 +2117,21 @@ void Controller::Process(bool postProcess)
 
 Controller::Controller(ControlInterface* controlInterface, EditableControlInterface* editableControlInterface,
                        SelectableControlInterface* selectableControlInterface,
-                       AnchorControlInterface* anchorControlInterface)
-  : mImpl(new Controller::Impl(controlInterface, editableControlInterface, selectableControlInterface,
-                               anchorControlInterface))
+                       AnchorControlInterface*     anchorControlInterface)
+: mImpl(new Controller::Impl(controlInterface, editableControlInterface, selectableControlInterface,
+                             anchorControlInterface))
 {
 }
 
 Controller::~Controller()
 {
-  if (Dali::Adaptor::IsAvailable())
+  if(Dali::Adaptor::IsAvailable())
   {
-    if (mImpl->mProcessorRegistered)
+    if(mImpl->mProcessorRegistered)
     {
       Dali::Adaptor::Get().UnregisterProcessorOnce(*this, true);
     }
-    if (mImpl->mIdleCallback)
+    if(mImpl->mIdleCallback)
     {
       Dali::Adaptor::Get().RemoveIdle(mImpl->mIdleCallback);
     }

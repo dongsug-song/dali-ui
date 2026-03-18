@@ -18,8 +18,6 @@
 // CLASS HEADER
 #include <dali-ui-foundation/public-api/stack-layout.h>
 
-// EXTERNAL INCLUDES
-
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/integration-api/stack-layout-impl.h>
 
@@ -33,12 +31,12 @@ StackLayout::StackLayout()
 }
 
 StackLayout::StackLayout(const StackLayout& layout)
-  : Layout(layout)
+: Layout(layout)
 {
 }
 
 StackLayout::StackLayout(StackLayout&& rhs) noexcept
-  : Layout(std::move(rhs))
+: Layout(std::move(rhs))
 {
 }
 
@@ -48,7 +46,7 @@ StackLayout::~StackLayout()
 
 StackLayout& StackLayout::operator=(const StackLayout& handle)
 {
-  if (&handle != this)
+  if(&handle != this)
   {
     Layout::operator=(handle);
   }
@@ -80,12 +78,12 @@ StackLayout StackLayout::DownCast(BaseHandle handle)
 }
 
 StackLayout::StackLayout(Integration::StackLayoutImpl& implementation)
-  : Layout(implementation)
+: Layout(implementation)
 {
 }
 
 StackLayout::StackLayout(Dali::Internal::CustomActor* internal)
-  : Layout(internal)
+: Layout(internal)
 {
   VerifyCustomActorPointer<Integration::StackLayoutImpl>(internal);
 }
@@ -108,36 +106,6 @@ void StackLayout::SetSpacing(float spacing)
 float StackLayout::GetSpacing() const
 {
   return Integration::GetImpl(*this).GetSpacing();
-}
-
-void StackLayout::SetLayoutWeight(View view, float weight)
-{
-  if (view)
-  {
-    Dali::Property::Index index = view.GetPropertyIndex("stackLayoutWeight");
-    if (index == Dali::Property::INVALID_INDEX)
-    {
-      view.RegisterProperty("stackLayoutWeight", weight);
-    }
-    else
-    {
-      view.SetProperty(index, weight);
-    }
-    view.InvalidateMeasure();
-  }
-}
-
-float StackLayout::GetLayoutWeight(View view)
-{
-  if (view)
-  {
-    auto index = view.GetPropertyIndex("stackLayoutWeight");
-    if (index != Dali::Property::INVALID_INDEX)
-    {
-      return view.GetProperty<float>(index);
-    }
-  }
-  return 0.0f;
 }
 
 } // namespace Ui

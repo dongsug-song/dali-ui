@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-#include <dali-ui-foundation/devel-api/controls/control-devel.h>
 #include <dali-ui-foundation/internal/builder/style.h>
 #include <dali-ui-foundation/internal/visuals/visual-string-constants.h>
 #include <dali-ui-foundation/public-api/controls/control.h>
 #include <dali-ui-foundation/public-api/visuals/visual-properties.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/handle.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -29,7 +31,7 @@ namespace Ui
 namespace Internal
 {
 extern const Dali::Scripting::StringEnum ControlStateTable[];
-extern const unsigned int ControlStateTableCount;
+extern const unsigned int                ControlStateTableCount;
 
 StylePtr Style::New()
 {
@@ -37,7 +39,7 @@ StylePtr Style::New()
   return stylePtr;
 }
 
-void Style::ApplyVisualsAndPropertiesRecursively(Handle handle,
+void Style::ApplyVisualsAndPropertiesRecursively(Handle                           handle,
                                                  const Dictionary<Property::Map>& instancedProperties) const
 {
   ApplyVisuals(handle, instancedProperties);
@@ -52,11 +54,11 @@ void Style::ApplyVisuals(Handle handle, const Dictionary<Property::Map>& instanc
 void Style::ApplyVisuals(Handle handle, const Dictionary<Property::Map>& visualMaps,
                          const Dictionary<Property::Map>& instancedProperties)
 {
-  for (Dictionary<Property::Map>::iterator iter = visualMaps.Begin(); iter != visualMaps.End(); ++iter)
+  for(Dictionary<Property::Map>::iterator iter = visualMaps.Begin(); iter != visualMaps.End(); ++iter)
   {
-    const std::string& visualName = (*iter).key;
-    Property::Map map = (*iter).entry;
-    Property::Map* instancedMap = instancedProperties.Find(visualName);
+    const std::string& visualName   = (*iter).key;
+    Property::Map      map          = (*iter).entry;
+    Property::Map*     instancedMap = instancedProperties.Find(visualName);
     ApplyVisual(handle, visualName, map, instancedMap);
   }
 }
@@ -65,27 +67,27 @@ void Style::ApplyVisual(Handle handle, const std::string& visualName, const Prop
                         const Property::Map* instancedProperties)
 {
   // Check if this visual name is a valid property of handle
-  Dali::Property::Index index = handle.GetPropertyIndex(visualName);
-  if (index != Property::INVALID_INDEX)
+  Dali::Property::Index index = handle.GetPropertyIndex(ToDaliStringView(visualName));
+  if(index != Property::INVALID_INDEX)
   {
     const Property::Map* applyMap = &visualMap;
-    Property::Map mergedMap;
+    Property::Map        mergedMap;
 
     // If there are instanced properties, and the visual types match,
     // merge them into the visual map
-    if (instancedProperties)
+    if(instancedProperties)
     {
       Property::Value* instanceTypeValue = instancedProperties->Find(Ui::Visual::Property::TYPE);
-      Property::Value* newTypeValue = visualMap.Find(Ui::Visual::Property::TYPE, VISUAL_TYPE);
-      if (instanceTypeValue && newTypeValue)
+      Property::Value* newTypeValue      = visualMap.Find(Ui::Visual::Property::TYPE, VISUAL_TYPE);
+      if(instanceTypeValue && newTypeValue)
       {
         int instanceVisualType = -1;
-        int newVisualType = -1;
+        int newVisualType      = -1;
         Scripting::GetEnumerationProperty(*instanceTypeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT,
                                           instanceVisualType);
         Scripting::GetEnumerationProperty(*newTypeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, newVisualType);
 
-        if (instanceVisualType == newVisualType)
+        if(instanceVisualType == newVisualType)
         {
           // Same type - merge remaining instance data
           mergedMap.Merge(visualMap);
@@ -103,10 +105,10 @@ void Style::ApplyVisual(Handle handle, const std::string& visualName, const Prop
 
 void Style::ApplyProperties(Handle handle) const
 {
-  for (Property::Map::SizeType i = 0; i < properties.Count(); ++i)
+  for(Property::Map::SizeType i = 0; i < properties.Count(); ++i)
   {
     KeyValuePair keyValue = properties.GetKeyValue(i);
-    if (keyValue.first.type == Property::Key::INDEX)
+    if(keyValue.first.type == Property::Key::INDEX)
     {
       handle.SetProperty(keyValue.first.indexKey, keyValue.second);
     }

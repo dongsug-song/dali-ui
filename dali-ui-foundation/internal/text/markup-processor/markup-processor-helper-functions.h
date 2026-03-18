@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/internal/text/text-definitions.h>
+#include <dali-ui-foundation/internal/text/text-enumerations-internal.h>
 #include <dali-ui-foundation/public-api/text/text-enumerations.h>
 
 namespace Dali
@@ -42,8 +43,8 @@ struct Attribute
 {
   const char* nameBuffer;
   const char* valueBuffer;
-  Length nameLength;
-  Length valueLength;
+  Length      nameLength;
+  Length      valueLength;
 };
 
 /**
@@ -52,9 +53,9 @@ struct Attribute
 struct Tag
 {
   Vector<Attribute> attributes;
-  const char* buffer;
-  Length length;
-  bool isEndTag;
+  const char*       buffer;
+  Length            length;
+  bool              isEndTag;
 };
 
 /**
@@ -202,7 +203,7 @@ void UnderlineTypeStringToTypeValue(const char* const typeStr, Length length, Te
 float StringToFloat(const char* const floatStr);
 
 /**
- * @brief Converts a string into its value in the enum Text::HorizontalAlignment::Type.
+ * @brief Converts a string into its value in the enum Text::Alignment.
  *
  * @param[in] typeStr The horizontal-alignment type value packed inside a string.
  * @param[in] length The length of the string.
@@ -211,7 +212,7 @@ float StringToFloat(const char* const floatStr);
  * @return Whether the value parsed or not.
  */
 bool HorizontalAlignmentTypeStringToTypeValue(const char* const typeStr, Length length,
-                                              Text::HorizontalAlignment::Type& retType);
+                                              Alignment& retType);
 
 } // namespace Text
 

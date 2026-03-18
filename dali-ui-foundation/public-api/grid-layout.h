@@ -21,8 +21,8 @@
 #include <vector> // Used for row/column definitions; ABI considerations may apply across toolchain versions
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/public-api/layout.h>
 #include <dali-ui-foundation/public-api/layout-types.h>
+#include <dali-ui-foundation/public-api/layout.h>
 
 namespace Dali
 {
@@ -42,6 +42,19 @@ class GridLayoutImpl;
  * - Row and column definitions with absolute, star (*), and auto sizing
  * - Row and column spacing
  * - Child positioning using attached properties (Row, Column, RowSpan, ColumnSpan)
+ *
+ * @section grid_common_props Common Property Behavior
+ *
+ * - @b LayoutWidth/LayoutHeight: A positive value sets a fixed size.
+ *   WrapContent uses the child's natural size. MatchParent is treated
+ *   identically to WrapContent;
+ *   it does not expand the child beyond its cell. To fill a cell, use
+ *   FILL alignment (the default).
+ * - @b Alignment: START, CENTER, and END position the child within the cell.
+ *   FILL stretches the child to fill the entire cell. When a child's measured
+ *   size is larger than the cell, the child is clipped to the cell bounds
+ *   regardless of alignment.
+ * - @b Margin: Applied inside the cell, reducing the space available for the child.
  */
 class DALI_UI_API GridLayout : public Layout
 {
@@ -89,7 +102,6 @@ public:
   static GridLayout DownCast(BaseHandle handle);
 
 public: // Row/Column Definition API
-
   /**
    * @brief Adds a row definition.
    *
@@ -157,7 +169,6 @@ public: // Row/Column Definition API
   void ClearColumnDefinitions();
 
 public: // Spacing API
-
   /**
    * @brief Sets the row spacing.
    *
@@ -186,73 +197,9 @@ public: // Spacing API
    */
   float GetColumnSpacing() const;
 
-public: // Static methods for attached properties
-
-  /**
-   * @brief Sets the row index for a child view.
-   *
-   * @param[in] view The child view
-   * @param[in] row The row index (0-based)
-   */
-  static void SetRow(View view, uint32_t row);
-
-  /**
-   * @brief Gets the row index for a child view.
-   *
-   * @param[in] view The child view
-   * @return The row index
-   */
-  static uint32_t GetRow(View view);
-
-  /**
-   * @brief Sets the column index for a child view.
-   *
-   * @param[in] view The child view
-   * @param[in] column The column index (0-based)
-   */
-  static void SetColumn(View view, uint32_t column);
-
-  /**
-   * @brief Gets the column index for a child view.
-   *
-   * @param[in] view The child view
-   * @return The column index
-   */
-  static uint32_t GetColumn(View view);
-
-  /**
-   * @brief Sets the row span for a child view.
-   *
-   * @param[in] view The child view
-   * @param[in] span The number of rows to span
-   */
-  static void SetRowSpan(View view, uint32_t span);
-
-  /**
-   * @brief Gets the row span for a child view.
-   *
-   * @param[in] view The child view
-   * @return The row span
-   */
-  static uint32_t GetRowSpan(View view);
-
-  /**
-   * @brief Sets the column span for a child view.
-   *
-   * @param[in] view The child view
-   * @param[in] span The number of columns to span
-   */
-  static void SetColumnSpan(View view, uint32_t span);
-
-  /**
-   * @brief Gets the column span for a child view.
-   *
-   * @param[in] view The child view
-   * @return The column span
-   */
-  static uint32_t GetColumnSpan(View view);
-
 public: // Chaining methods
+  DALI_UI_CHAIN_LAYOUT_METHODS(GridLayout)
+
   GridLayout& RowSpacing(float spacing)
   {
     SetRowSpacing(spacing);
@@ -279,7 +226,7 @@ public: // Chaining methods
 
 public: // Not intended for application developers
   /// @cond internal
-  DALI_INTERNAL GridLayout(Integration::GridLayoutImpl& implementation);
+  DALI_INTERNAL          GridLayout(Integration::GridLayoutImpl& implementation);
   explicit DALI_INTERNAL GridLayout(Dali::Internal::CustomActor* internal);
   /// @endcond
 };

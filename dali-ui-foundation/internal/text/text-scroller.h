@@ -25,8 +25,8 @@
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/devel-api/text/text-enumerations-devel.h>
 #include <dali-ui-foundation/internal/text/text-definitions.h>
+#include <dali-ui-foundation/internal/text/text-enumerations-internal.h>
 #include <dali-ui-foundation/public-api/controls/text-controls/text-label.h>
 #include <dali-ui-foundation/public-api/text/text-enumerations.h>
 
@@ -72,7 +72,7 @@ public:
    */
   void SetParameters(Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize,
                      const Size& textureSize, const float wrapGap, CharacterDirection direction,
-                     HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment,
+                     Alignment horizontalAlignment, Alignment verticalAlignment,
                      bool animationReStart = false);
 
   /**
@@ -139,13 +139,13 @@ public:
    * @brief Set direction of the auto scroll.
    * @param[in] direction Direction of the auto scroll.
    */
-  void SetDirection(DevelText::AutoScroll::Direction direction);
+  void SetDirection(Text::AutoScroll::Direction direction);
 
   /**
    * @brief Get direction of the auto scroll.
    * @return AutoScroll::Direction, HORIZONTAL or VERTICAL.
    */
-  DevelText::AutoScroll::Direction GetDirection() const;
+  Text::AutoScroll::Direction GetDirection() const;
 
   /**
    * @brief Stop the auto scrolling.
@@ -161,7 +161,6 @@ public:
    * @brief Whether the scroll animation is playing or not.
    */
   bool IsScrolling();
-
 
 private: // Implementation
   /**
@@ -197,20 +196,20 @@ private: // Implementation
 
 private:
   ScrollerInterface& mScrollerInterface; // Interface implemented by control that requires scrolling
-  Property::Index mScrollDeltaIndex;     // Property used by shader to represent distance to scroll
-  Animation mScrollAnimation;            // Animation used to update the mScrollDeltaIndex
-  Dali::Renderer mRenderer;              // Renderer used to render the text
-  Shader mShader;                        // Shader originally used by the renderer while not scrolling
-  TextureSet mTextureSet;                // Texture originally used by the renderer while not scrolling
+  Property::Index    mScrollDeltaIndex;  // Property used by shader to represent distance to scroll
+  Animation          mScrollAnimation;   // Animation used to update the mScrollDeltaIndex
+  Dali::Renderer     mRenderer;          // Renderer used to render the text
+  Shader             mShader;            // Shader originally used by the renderer while not scrolling
+  TextureSet         mTextureSet;        // Texture originally used by the renderer while not scrolling
 
-  int mScrollSpeed;                              ///< Speed which text should automatically scroll at
-  int mLoopCount;                                ///< Number of time the text should scroll
-  float mLoopDelay;                              ///< Time delay of loop start
-  float mWrapGap;                                ///< Gap before text wraps around when scrolling
-  TextLabel::AutoScrollStopMode::Type mStopMode; ///< Stop mode of scrolling text, when loop count is 0.
-  DevelText::AutoScroll::Direction mDirection;   ///< Direction of the auto scroll. (HORIZONTAL, VERTICAL)
-  bool mIsStop : 1;                              ///< Whether the stop scrolling has been triggered or not.
-  std::atomic<bool> mIsStoppedImmediately;       ///< Whether the stop is triggered by immediate stop.
+  int                                 mScrollSpeed;          ///< Speed which text should automatically scroll at
+  int                                 mLoopCount;            ///< Number of time the text should scroll
+  float                               mLoopDelay;            ///< Time delay of loop start
+  float                               mWrapGap;              ///< Gap before text wraps around when scrolling
+  TextLabel::AutoScrollStopMode::Type mStopMode;             ///< Stop mode of scrolling text, when loop count is 0.
+  Text::AutoScroll::Direction         mDirection;            ///< Direction of the auto scroll. (HORIZONTAL, VERTICAL)
+  bool                                mIsStop : 1;           ///< Whether the stop scrolling has been triggered or not.
+  std::atomic<bool>                   mIsStoppedImmediately; ///< Whether the stop is triggered by immediate stop.
 
 }; // TextScroller class
 

@@ -18,9 +18,6 @@
 // CLASS HEADER
 #include <dali-ui-foundation/public-api/flex-layout.h>
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/object/property.h>
-
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/integration-api/flex-layout-impl.h>
 
@@ -34,12 +31,12 @@ FlexLayout::FlexLayout()
 }
 
 FlexLayout::FlexLayout(const FlexLayout& layout)
-  : Layout(layout)
+: Layout(layout)
 {
 }
 
 FlexLayout::FlexLayout(FlexLayout&& rhs) noexcept
-  : Layout(std::move(rhs))
+: Layout(std::move(rhs))
 {
 }
 
@@ -49,7 +46,7 @@ FlexLayout::~FlexLayout()
 
 FlexLayout& FlexLayout::operator=(const FlexLayout& handle)
 {
-  if (&handle != this)
+  if(&handle != this)
   {
     Layout::operator=(handle);
   }
@@ -81,12 +78,12 @@ FlexLayout FlexLayout::DownCast(BaseHandle handle)
 }
 
 FlexLayout::FlexLayout(Integration::FlexLayoutImpl& implementation)
-  : Layout(implementation)
+: Layout(implementation)
 {
 }
 
 FlexLayout::FlexLayout(Dali::Internal::CustomActor* internal)
-  : Layout(internal)
+: Layout(internal)
 {
   VerifyCustomActorPointer<Integration::FlexLayoutImpl>(internal);
 }
@@ -139,130 +136,6 @@ void FlexLayout::SetAlignContent(FlexAlign align)
 FlexAlign FlexLayout::GetAlignContent() const
 {
   return Integration::GetImpl(*this).GetAlignContent();
-}
-
-namespace
-{
-/**
- * @brief Helper to register or update a float attached property.
- */
-void SetFloatProperty(View view, const std::string& name, float value)
-{
-  Property::Index index = view.GetPropertyIndex(name);
-  if (index == Dali::Property::INVALID_INDEX)
-  {
-    view.RegisterProperty(name, value);
-  }
-  else
-  {
-    view.SetProperty(index, value);
-  }
-}
-
-/**
- * @brief Helper to register or update an int attached property.
- */
-void SetIntProperty(View view, const std::string& name, int value)
-{
-  Property::Index index = view.GetPropertyIndex(name);
-  if (index == Dali::Property::INVALID_INDEX)
-  {
-    view.RegisterProperty(name, value);
-  }
-  else
-  {
-    view.SetProperty(index, value);
-  }
-}
-} // namespace
-
-// Static attached property methods
-void FlexLayout::SetFlexGrow(View view, float grow)
-{
-  if (view)
-  {
-    SetFloatProperty(view, "flexGrow", grow);
-    view.InvalidateMeasure();
-  }
-}
-
-float FlexLayout::GetFlexGrow(View view)
-{
-  if (view)
-  {
-    auto index = view.GetPropertyIndex("flexGrow");
-    if (index != Dali::Property::INVALID_INDEX)
-    {
-      return view.GetProperty<float>(index);
-    }
-  }
-  return 0.0f; // Default
-}
-
-void FlexLayout::SetFlexShrink(View view, float shrink)
-{
-  if (view)
-  {
-    SetFloatProperty(view, "flexShrink", shrink);
-    view.InvalidateMeasure();
-  }
-}
-
-float FlexLayout::GetFlexShrink(View view)
-{
-  if (view)
-  {
-    auto index = view.GetPropertyIndex("flexShrink");
-    if (index != Dali::Property::INVALID_INDEX)
-    {
-      return view.GetProperty<float>(index);
-    }
-  }
-  return 1.0f; // Default
-}
-
-void FlexLayout::SetFlexBasis(View view, float basis)
-{
-  if (view)
-  {
-    SetFloatProperty(view, "flexBasis", basis);
-    view.InvalidateMeasure();
-  }
-}
-
-float FlexLayout::GetFlexBasis(View view)
-{
-  if (view)
-  {
-    auto index = view.GetPropertyIndex("flexBasis");
-    if (index != Dali::Property::INVALID_INDEX)
-    {
-      return view.GetProperty<float>(index);
-    }
-  }
-  return LayoutDimension::WrapContent; // Default
-}
-
-void FlexLayout::SetAlignSelf(View view, FlexAlign align)
-{
-  if (view)
-  {
-    SetIntProperty(view, "alignSelf", static_cast<int>(align));
-    view.InvalidateMeasure();
-  }
-}
-
-FlexAlign FlexLayout::GetAlignSelf(View view)
-{
-  if (view)
-  {
-    auto index = view.GetPropertyIndex("alignSelf");
-    if (index != Dali::Property::INVALID_INDEX)
-    {
-      return static_cast<FlexAlign>(view.GetProperty<int>(index));
-    }
-  }
-  return FlexAlign::AUTO; // Default
 }
 
 } // namespace Ui

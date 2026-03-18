@@ -18,7 +18,6 @@
 #include <dali-ui-foundation/internal/controls/text-controls/text-field-property-handler.h>
 
 #include <dali-ui-foundation/devel-api/focus-manager/keyinput-focus-manager.h>
-#include <dali-ui-foundation/devel-api/text/rendering-backend.h>
 
 #include <dali-ui-foundation/internal/text/controller/text-controller.h>
 #include <dali-ui-foundation/internal/text/decorator/text-decorator.h>
@@ -27,10 +26,15 @@
 #include <dali-ui-foundation/internal/text/text-font-style.h>
 #include <dali-ui-foundation/public-api/text/text-enumerations.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 #if defined(DEBUG_ENABLED)
 extern Debug::Filter* gTextFieldLogFilter;
 #endif
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali::Ui::Internal
 {
@@ -39,14 +43,14 @@ const char* const TextField::PropertyHandler::IMAGE_MAP_FILENAME_STRING{"filenam
 /// Retrieves a filename from a value that is a Property::Map
 std::string TextField::PropertyHandler::GetImageFileNameFromPropertyValue(const Property::Value& value)
 {
-  std::string filename;
+  std::string          filename;
   const Property::Map* map = value.GetMap();
-  if (map)
+  if(map)
   {
     const Property::Value* filenameValue = map->Find(TextField::PropertyHandler::IMAGE_MAP_FILENAME_STRING);
-    if (filenameValue)
+    if(filenameValue)
     {
-      filenameValue->Get(filename);
+      GetStdString(*filenameValue, filename);
     }
   }
   return filename;
@@ -59,7 +63,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
   DALI_ASSERT_DEBUG(impl.mController && "No text controller");
   DALI_ASSERT_DEBUG(impl.mDecorator && "No text decorator");
 
-  switch (index)
+  switch(index)
   {
     case Ui::DevelTextField::Property::RENDERING_BACKEND:
     {
@@ -67,28 +71,20 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField %p RENDERING_BACKEND %d\n", impl.mController.Get(),
                     backend);
 
-#ifndef ENABLE_VECTOR_BASED_TEXT_RENDERING
-      if (DevelText::RENDERING_VECTOR_BASED == backend)
-      {
-        backend = TextAbstraction::BITMAP_GLYPH; // Fallback to bitmap-based rendering
-      }
-#endif
-      if (impl.mRenderingBackend != backend)
+      if(impl.mRenderingBackend != backend)
       {
         impl.mRenderingBackend = backend;
         impl.mRenderer.Reset();
 
         // When using the vector-based rendering, the size of the GLyphs are different
-        TextAbstraction::GlyphType glyphType = (DevelText::RENDERING_VECTOR_BASED == impl.mRenderingBackend)
-                                                   ? TextAbstraction::VECTOR_GLYPH
-                                                   : TextAbstraction::BITMAP_GLYPH;
+        TextAbstraction::GlyphType glyphType = TextAbstraction::BITMAP_GLYPH;
         impl.mController->SetGlyphType(glyphType);
       }
       break;
     }
     case Ui::TextField::Property::TEXT:
     {
-      const std::string& text = value.Get<std::string>();
+      const std::string& text = ToStdString(value);
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p TEXT %s\n", impl.mController.Get(),
                     text.c_str());
 
@@ -98,7 +94,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
 
     case Ui::TextField::Property::PLACEHOLDER_TEXT:
     {
-      const std::string& text = value.Get<std::string>();
+      const std::string& text = ToStdString(value);
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(),
                     text.c_str());
 
@@ -107,7 +103,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     }
     case Ui::TextField::Property::PLACEHOLDER_TEXT_FOCUSED:
     {
-      const std::string& text = value.Get<std::string>();
+      const std::string& text = ToStdString(value);
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT_FOCUSED %s\n",
                     impl.mController.Get(), text.c_str());
 
@@ -116,7 +112,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     }
     case Ui::TextField::Property::FONT_FAMILY:
     {
-      const std::string& fontFamily = value.Get<std::string>();
+      const std::string& fontFamily = ToStdString(value);
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p FONT_FAMILY %s\n", impl.mController.Get(),
                     fontFamily.c_str());
       impl.mController->SetDefaultFontFamily(fontFamily);
@@ -133,7 +129,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p POINT_SIZE %f\n", impl.mController.Get(),
                     pointSize);
 
-      if (!Equals(impl.mController->GetDefaultFontSize(Text::Controller::POINT_SIZE), pointSize))
+      if(!Equals(impl.mController->GetDefaultFontSize(Text::Controller::POINT_SIZE), pointSize))
       {
         impl.mController->SetDefaultFontSize(pointSize, Text::Controller::POINT_SIZE);
       }
@@ -151,7 +147,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     {
       impl.mExceedPolicy = value.Get<int>();
 
-      if (Dali::Ui::TextField::EXCEED_POLICY_CLIP == impl.mExceedPolicy)
+      if(Dali::Ui::TextField::EXCEED_POLICY_CLIP == impl.mExceedPolicy)
       {
         impl.EnableClipping();
       }
@@ -165,9 +161,8 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
 
     case Ui::TextField::Property::HORIZONTAL_ALIGNMENT:
     {
-      Text::HorizontalAlignment::Type alignment(
-          static_cast<Text::HorizontalAlignment::Type>(-1)); // Set to invalid value to ensure a valid mode does get set
-      if (Text::GetHorizontalAlignmentEnumeration(value, alignment))
+      Text::Alignment alignment = Text::Alignment::START;
+      if(Text::GetHorizontalAlignmentEnumeration(value, alignment))
       {
         DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %d\n",
                       impl.mController.Get(), alignment);
@@ -177,9 +172,8 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     }
     case Ui::TextField::Property::VERTICAL_ALIGNMENT:
     {
-      Ui::Text::VerticalAlignment::Type alignment(
-          static_cast<Text::VerticalAlignment::Type>(-1)); // Set to invalid value to ensure a valid mode does get set
-      if (Text::GetVerticalAlignmentEnumeration(value, alignment))
+      Text::Alignment alignment = Text::Alignment::START;
+      if(Text::GetVerticalAlignmentEnumeration(value, alignment))
       {
         impl.mController->SetVerticalAlignment(alignment);
         DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %d\n",
@@ -193,7 +187,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p TEXT_COLOR %f,%f,%f,%f\n",
                     impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a);
 
-      if (impl.mController->GetDefaultColor() != textColor)
+      if(impl.mController->GetDefaultColor() != textColor)
       {
         impl.mController->SetDefaultColor(textColor);
         impl.mController->SetInputColor(textColor);
@@ -207,7 +201,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT_COLOR %f,%f,%f,%f\n",
                     impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a);
 
-      if (impl.mController->GetPlaceholderTextColor() != textColor)
+      if(impl.mController->GetPlaceholderTextColor() != textColor)
       {
         impl.mController->SetPlaceholderTextColor(textColor);
         impl.mRenderer.Reset();
@@ -274,11 +268,11 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     }
     case Ui::TextField::Property::GRAB_HANDLE_IMAGE:
     {
-      const std::string imageFileName = value.Get<std::string>();
+      const std::string imageFileName = ToStdString(value);
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(),
                     imageFileName.c_str());
 
-      if (imageFileName.size())
+      if(imageFileName.size())
       {
         impl.mDecorator->SetHandleImage(Ui::Text::GRAB_HANDLE, Ui::Text::HANDLE_IMAGE_RELEASED, imageFileName);
         impl.RequestTextRelayout();
@@ -287,11 +281,11 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     }
     case Ui::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE:
     {
-      const std::string imageFileName = value.Get<std::string>();
+      const std::string imageFileName = ToStdString(value);
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_PRESSED_IMAGE %s\n",
                     impl.mController.Get(), imageFileName.c_str());
 
-      if (imageFileName.size())
+      if(imageFileName.size())
       {
         impl.mDecorator->SetHandleImage(Ui::Text::GRAB_HANDLE, Ui::Text::HANDLE_IMAGE_PRESSED, imageFileName);
         impl.RequestTextRelayout();
@@ -320,7 +314,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     {
       const std::string filename = GetImageFileNameFromPropertyValue(value);
 
-      if (filename.size())
+      if(filename.size())
       {
         impl.mDecorator->SetHandleImage(Ui::Text::LEFT_SELECTION_HANDLE, Ui::Text::HANDLE_IMAGE_RELEASED, filename);
         impl.RequestTextRelayout();
@@ -331,7 +325,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     {
       const std::string filename = GetImageFileNameFromPropertyValue(value);
 
-      if (filename.size())
+      if(filename.size())
       {
         impl.mDecorator->SetHandleImage(Ui::Text::RIGHT_SELECTION_HANDLE, Ui::Text::HANDLE_IMAGE_RELEASED, filename);
         impl.RequestTextRelayout();
@@ -342,7 +336,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     {
       const std::string filename = GetImageFileNameFromPropertyValue(value);
 
-      if (filename.size())
+      if(filename.size())
       {
         impl.mDecorator->SetHandleImage(Ui::Text::LEFT_SELECTION_HANDLE, Ui::Text::HANDLE_IMAGE_PRESSED, filename);
         impl.RequestTextRelayout();
@@ -353,7 +347,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     {
       const std::string filename = GetImageFileNameFromPropertyValue(value);
 
-      if (filename.size())
+      if(filename.size())
       {
         impl.mDecorator->SetHandleImage(Ui::Text::RIGHT_SELECTION_HANDLE, Ui::Text::HANDLE_IMAGE_PRESSED, filename);
         impl.RequestTextRelayout();
@@ -364,7 +358,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     {
       const std::string filename = GetImageFileNameFromPropertyValue(value);
 
-      if (filename.size())
+      if(filename.size())
       {
         impl.mDecorator->SetHandleImage(Ui::Text::LEFT_SELECTION_HANDLE_MARKER, Ui::Text::HANDLE_IMAGE_RELEASED,
                                         filename);
@@ -376,7 +370,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     {
       const std::string filename = GetImageFileNameFromPropertyValue(value);
 
-      if (filename.size())
+      if(filename.size())
       {
         impl.mDecorator->SetHandleImage(Ui::Text::RIGHT_SELECTION_HANDLE_MARKER, Ui::Text::HANDLE_IMAGE_RELEASED,
                                         filename);
@@ -407,14 +401,14 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::TextField::Property::INPUT_METHOD_SETTINGS:
     {
       const Property::Map* map = value.GetMap();
-      if (map)
+      if(map)
       {
         impl.mInputMethodOptions.ApplyProperty(*map);
       }
       impl.mController->SetInputModePassword(impl.mInputMethodOptions.IsPassword());
 
       Ui::Control control = Ui::KeyInputFocusManager::Get().GetCurrentFocusControl();
-      if (control == textField)
+      if(control == textField)
       {
         impl.mInputMethodContext.ApplyOptions(impl.mInputMethodOptions);
       }
@@ -441,7 +435,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     }
     case Ui::TextField::Property::INPUT_FONT_FAMILY:
     {
-      const std::string& fontFamily = value.Get<std::string>();
+      const std::string& fontFamily = ToStdString(value);
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p INPUT_FONT_FAMILY %s\n", impl.mController.Get(),
                     fontFamily.c_str());
       impl.mController->SetInputFontFamily(fontFamily);
@@ -463,7 +457,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::TextField::Property::UNDERLINE:
     {
       const bool update = SetUnderlineProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
-      if (update)
+      if(update)
       {
         impl.mRenderer.Reset();
       }
@@ -472,7 +466,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::TextField::Property::INPUT_UNDERLINE:
     {
       const bool update = SetUnderlineProperties(impl.mController, value, Text::EffectStyle::INPUT);
-      if (update)
+      if(update)
       {
         impl.mRenderer.Reset();
       }
@@ -481,7 +475,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::TextField::Property::SHADOW:
     {
       const bool update = SetShadowProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
-      if (update)
+      if(update)
       {
         impl.mRenderer.Reset();
       }
@@ -490,7 +484,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::TextField::Property::INPUT_SHADOW:
     {
       const bool update = SetShadowProperties(impl.mController, value, Text::EffectStyle::INPUT);
-      if (update)
+      if(update)
       {
         impl.mRenderer.Reset();
       }
@@ -499,7 +493,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::TextField::Property::EMBOSS:
     {
       const bool update = SetEmbossProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
-      if (update)
+      if(update)
       {
         impl.mRenderer.Reset();
       }
@@ -508,7 +502,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::TextField::Property::INPUT_EMBOSS:
     {
       const bool update = SetEmbossProperties(impl.mController, value, Text::EffectStyle::INPUT);
-      if (update)
+      if(update)
       {
         impl.mRenderer.Reset();
       }
@@ -517,7 +511,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::TextField::Property::OUTLINE:
     {
       const bool update = SetOutlineProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
-      if (update)
+      if(update)
       {
         impl.mRenderer.Reset();
       }
@@ -526,7 +520,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::TextField::Property::INPUT_OUTLINE:
     {
       const bool update = SetOutlineProperties(impl.mController, value, Text::EffectStyle::INPUT);
-      if (update)
+      if(update)
       {
         impl.mRenderer.Reset();
       }
@@ -535,18 +529,18 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::TextField::Property::HIDDEN_INPUT_SETTINGS:
     {
       const Property::Map* map = value.GetMap();
-      if (map)
+      if(map)
       {
         impl.mController->SetHiddenInputOption(*map);
         auto mode = map->Find(Ui::HiddenInput::Property::MODE);
-        if (mode && (mode->Get<int>() != Ui::HiddenInput::Mode::HIDE_NONE))
+        if(mode && (mode->Get<int>() != Ui::HiddenInput::Mode::HIDE_NONE))
         {
-          textField.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE,
-                                DevelControl::AccessibilityRole::PASSWORD_TEXT);
+          textField.SetProperty(Ui::Control::Property::ACCESSIBILITY_ROLE,
+                                AccessibilityRole::PASSWORD_TEXT);
         }
         else
         {
-          textField.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::ENTRY);
+          textField.SetProperty(Ui::Control::Property::ACCESSIBILITY_ROLE, AccessibilityRole::ENTRY);
         }
       }
       break;
@@ -557,7 +551,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p PIXEL_SIZE %f\n", impl.mController.Get(),
                     pixelSize);
 
-      if (!Equals(impl.mController->GetDefaultFontSize(Text::Controller::PIXEL_SIZE), pixelSize))
+      if(!Equals(impl.mController->GetDefaultFontSize(Text::Controller::PIXEL_SIZE), pixelSize))
       {
         impl.mController->SetDefaultFontSize(pixelSize, Text::Controller::PIXEL_SIZE);
       }
@@ -574,7 +568,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::TextField::Property::PLACEHOLDER:
     {
       const Property::Map* map = value.GetMap();
-      if (map)
+      if(map)
       {
         impl.mController->SetPlaceholderProperty(*map);
       }
@@ -609,8 +603,8 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     }
     case Ui::DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
     {
-      impl.mController->SetMatchLayoutDirection(value.Get<bool>() ? DevelText::MatchLayoutDirection::LOCALE
-                                                                  : DevelText::MatchLayoutDirection::CONTENTS);
+      impl.mController->SetMatchLayoutDirection(value.Get<bool>() ? Text::LayoutDirectionMode::LOCALE
+                                                                  : Text::LayoutDirectionMode::CONTENTS);
       break;
     }
     case Ui::DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP:
@@ -662,7 +656,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p FONT_SIZE_SCALE %f\n", impl.mController.Get(),
                     scale);
 
-      if (!Equals(impl.mController->GetFontSizeScale(), scale))
+      if(!Equals(impl.mController->GetFontSizeScale(), scale))
       {
         impl.mController->SetFontSizeScale(scale);
       }
@@ -671,7 +665,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::DevelTextField::Property::ENABLE_FONT_SIZE_SCALE:
     {
       const bool enableFontSizeScale = value.Get<bool>();
-      if (!Equals(impl.mController->IsFontSizeScaleEnabled(), enableFontSizeScale))
+      if(!Equals(impl.mController->IsFontSizeScaleEnabled(), enableFontSizeScale))
       {
         impl.mController->SetFontSizeScaleEnabled(enableFontSizeScale);
       }
@@ -682,7 +676,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
       uint32_t position = static_cast<uint32_t>(value.Get<int>());
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p PRIMARY_CURSOR_POSITION %d\n",
                     impl.mController.Get(), position);
-      if (impl.mController->SetPrimaryCursorPosition(position, impl.HasKeyInputFocus()))
+      if(impl.mController->SetPrimaryCursorPosition(position, impl.HasKeyInputFocus()))
       {
         impl.SetKeyInputFocus();
       }
@@ -702,7 +696,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::DevelTextField::Property::INPUT_FILTER:
     {
       const Property::Map* map = value.GetMap();
-      if (map)
+      if(map)
       {
         impl.mController->SetInputFilterOption(*map);
       }
@@ -710,9 +704,9 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     }
     case Ui::DevelTextField::Property::ELLIPSIS_POSITION:
     {
-      DevelText::EllipsisPosition::Type ellipsisPositionType(static_cast<DevelText::EllipsisPosition::Type>(
-          -1)); // Set to invalid value to ensure a valid mode does get set
-      if (Text::GetEllipsisPositionTypeEnumeration(value, ellipsisPositionType))
+      Text::EllipsisPosition::Type ellipsisPositionType(static_cast<Text::EllipsisPosition::Type>(
+        -1)); // Set to invalid value to ensure a valid mode does get set
+      if(Text::GetEllipsisPositionTypeEnumeration(value, ellipsisPositionType))
       {
         DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p EllipsisPosition::Type %d\n",
                       impl.mController.Get(), ellipsisPositionType);
@@ -723,7 +717,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::DevelTextField::Property::STRIKETHROUGH:
     {
       const bool update = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
-      if (update)
+      if(update)
       {
         impl.mRenderer.Reset();
       }
@@ -732,7 +726,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::DevelTextField::Property::INPUT_STRIKETHROUGH:
     {
       const bool update = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::INPUT);
-      if (update)
+      if(update)
       {
         impl.mRenderer.Reset();
       }
@@ -750,7 +744,7 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
     case Ui::DevelTextField::Property::SELECTION_POPUP_STYLE:
     {
       const Property::Map* map = value.GetMap();
-      if (map)
+      if(map)
       {
         impl.mDecorator->SetSelectionPopupStyle(*map);
       }
@@ -789,11 +783,11 @@ void TextField::PropertyHandler::SetProperty(Ui::TextField textField, Property::
 Property::Value TextField::PropertyHandler::GetProperty(Ui::TextField textField, Property::Index index)
 {
   Property::Value value;
-  TextField& impl(GetImpl(textField));
+  TextField&      impl(GetImpl(textField));
   DALI_ASSERT_DEBUG(impl.mController && "No text controller");
   DALI_ASSERT_DEBUG(impl.mDecorator && "No text decorator");
 
-  switch (index)
+  switch(index)
   {
     case Ui::DevelTextField::Property::RENDERING_BACKEND:
     {
@@ -806,26 +800,26 @@ Property::Value TextField::PropertyHandler::GetProperty(Ui::TextField textField,
       impl.mController->GetText(text);
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p returning text: %s\n", impl.mController.Get(),
                     text.c_str());
-      value = text;
+      value = ToPropertyValue(text);
       break;
     }
     case Ui::TextField::Property::PLACEHOLDER_TEXT:
     {
       std::string text;
       impl.mController->GetPlaceholderText(Text::Controller::PLACEHOLDER_TYPE_INACTIVE, text);
-      value = text;
+      value = ToPropertyValue(text);
       break;
     }
     case Ui::TextField::Property::PLACEHOLDER_TEXT_FOCUSED:
     {
       std::string text;
       impl.mController->GetPlaceholderText(Text::Controller::PLACEHOLDER_TYPE_ACTIVE, text);
-      value = text;
+      value = ToPropertyValue(text);
       break;
     }
     case Ui::TextField::Property::FONT_FAMILY:
     {
-      value = impl.mController->GetDefaultFontFamily();
+      value = ToPropertyValue(impl.mController->GetDefaultFontFamily());
       break;
     }
     case Ui::TextField::Property::FONT_STYLE:
@@ -851,9 +845,9 @@ Property::Value TextField::PropertyHandler::GetProperty(Ui::TextField textField,
     case Ui::TextField::Property::HORIZONTAL_ALIGNMENT:
     {
       const char* name = Text::GetHorizontalAlignmentString(impl.mController->GetHorizontalAlignment());
-      if (name)
+      if(name)
       {
-        value = std::string(name);
+        value = Dali::String(name);
       }
       break;
     }
@@ -861,9 +855,9 @@ Property::Value TextField::PropertyHandler::GetProperty(Ui::TextField textField,
     {
       const char* name = Text::GetVerticalAlignmentString(impl.mController->GetVerticalAlignment());
 
-      if (name)
+      if(name)
       {
-        value = std::string(name);
+        value = Dali::String(name);
       }
       break;
     }
@@ -909,12 +903,12 @@ Property::Value TextField::PropertyHandler::GetProperty(Ui::TextField textField,
     }
     case Ui::TextField::Property::GRAB_HANDLE_IMAGE:
     {
-      value = impl.mDecorator->GetHandleImage(Text::GRAB_HANDLE, Text::HANDLE_IMAGE_RELEASED);
+      value = ToPropertyValue(impl.mDecorator->GetHandleImage(Text::GRAB_HANDLE, Text::HANDLE_IMAGE_RELEASED));
       break;
     }
     case Ui::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE:
     {
-      value = impl.mDecorator->GetHandleImage(Text::GRAB_HANDLE, Text::HANDLE_IMAGE_PRESSED);
+      value = ToPropertyValue(impl.mDecorator->GetHandleImage(Text::GRAB_HANDLE, Text::HANDLE_IMAGE_PRESSED));
       break;
     }
     case Ui::TextField::Property::SCROLL_THRESHOLD:
@@ -988,7 +982,7 @@ Property::Value TextField::PropertyHandler::GetProperty(Ui::TextField textField,
     }
     case Ui::TextField::Property::INPUT_FONT_FAMILY:
     {
-      value = impl.mController->GetInputFontFamily();
+      value = ToPropertyValue(impl.mController->GetInputFontFamily());
       break;
     }
     case Ui::TextField::Property::INPUT_FONT_STYLE:
@@ -1082,7 +1076,7 @@ Property::Value TextField::PropertyHandler::GetProperty(Ui::TextField textField,
     }
     case Ui::DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
     {
-      value = impl.mController->GetMatchLayoutDirection() != DevelText::MatchLayoutDirection::CONTENTS;
+      value = impl.mController->GetMatchLayoutDirection() != Text::LayoutDirectionMode::CONTENTS;
       break;
     }
     case Ui::DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP:
@@ -1097,19 +1091,19 @@ Property::Value TextField::PropertyHandler::GetProperty(Ui::TextField textField,
     }
     case Ui::DevelTextField::Property::SELECTED_TEXT:
     {
-      value = impl.mController->GetSelectedText();
+      value = ToPropertyValue(impl.mController->GetSelectedText());
       break;
     }
     case Ui::DevelTextField::Property::SELECTED_TEXT_START:
     {
       Uint32Pair range = impl.GetTextSelectionRange();
-      value = static_cast<int>(range.first);
+      value            = static_cast<int>(range.first);
       break;
     }
     case Ui::DevelTextField::Property::SELECTED_TEXT_END:
     {
       Uint32Pair range = impl.GetTextSelectionRange();
-      value = static_cast<int>(range.second);
+      value            = static_cast<int>(range.second);
       break;
     }
     case Ui::DevelTextField::Property::ENABLE_EDITING:

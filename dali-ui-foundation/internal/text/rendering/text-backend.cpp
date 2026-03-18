@@ -32,9 +32,9 @@ Backend Backend::Get()
   return Internal::Backend::Get();
 }
 
-RendererPtr Backend::NewRenderer(unsigned int renderingType)
+RendererPtr Backend::NewRenderer()
 {
-  return GetImplementation(*this).NewRenderer(renderingType);
+  return GetImplementation(*this).NewRenderer();
 }
 
 Backend::Backend()
@@ -54,7 +54,7 @@ Backend::Backend(Backend&& handle) = default;
 Backend& Backend::operator=(Backend&& handle) = default;
 
 Backend::Backend(Internal::Backend* internal)
-  : BaseHandle(internal)
+: BaseHandle(internal)
 {
 }
 

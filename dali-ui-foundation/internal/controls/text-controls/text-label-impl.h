@@ -25,7 +25,6 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/devel-api/text/spanned.h>
 #include <dali-ui-foundation/internal/controls/control/control-data-impl.h>
 #include <dali-ui-foundation/internal/controls/text-controls/common-text-utils.h>
 #include <dali-ui-foundation/internal/text/async-text/async-text-loader.h>
@@ -115,7 +114,7 @@ public:
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is
    * responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName,
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName,
                               FunctorDelegate* functor);
 
   /**
@@ -185,15 +184,6 @@ public:
    * @return bounding box of the requested text.
    */
   Rect<float> GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const;
-
-  /**
-   * @brief Set the @p spannedText into current textLabel
-   * the spanned text contains content (text) and  format (spans with ranges)
-   * the text is copied into text-controller and the spans are applied on ranges
-   *
-   * @param[in] spannedText the text with spans.
-   */
-  void SetSpannedText(const Text::Spanned& spannedText);
 
   /**
    * @brief Set text fit array to text label.
@@ -351,17 +341,7 @@ private: // From Control
   /**
    * @copydoc Ui::Internal::Control::CreateAccessibleObject()
    */
-  DevelControl::ControlAccessible* CreateAccessibleObject() override;
-
-  /**
-   * @copydoc Control::OnStyleChange()
-   */
-  void OnStyleChange(Ui::StyleManager styleManager, StyleChange::Type change) override;
-
-  /**
-   * @copydoc Control::OnApplyDefaultStyle()
-   */
-  void OnApplyDefaultStyle() override;
+  ControlAccessible* CreateAccessibleObject() override;
 
   /**
    * @copydoc Control::OnRelayout()
@@ -501,7 +481,7 @@ private:
    */
   Text::TextScrollerPtr GetTextScroller()
   {
-    if (!mTextScroller)
+    if(!mTextScroller)
     {
       mTextScroller = Text::TextScroller::New(*this);
     }
@@ -569,7 +549,7 @@ private:
   bool IsVisible();
 
 private: // Data
-  Text::ControllerPtr mController;
+  Text::ControllerPtr   mController;
   Text::TextScrollerPtr mTextScroller;
 
   Ui::Visual::Base mVisual;
@@ -577,10 +557,10 @@ private: // Data
   std::vector<Ui::TextAnchor> mAnchorActors;
 
   // Signals
-  Ui::DevelTextLabel::AnchorClickedSignalType mAnchorClickedSignal;
-  Ui::DevelTextLabel::TextFitChangedSignalType mTextFitChangedSignal;
-  Ui::DevelTextLabel::AsyncTextRenderedSignalType mAsyncTextRenderedSignal;
-  Ui::DevelTextLabel::AsyncNaturalSizeComputedSignalType mAsyncNaturalSizeComputedSignal;
+  Ui::DevelTextLabel::AnchorClickedSignalType               mAnchorClickedSignal;
+  Ui::DevelTextLabel::TextFitChangedSignalType              mTextFitChangedSignal;
+  Ui::DevelTextLabel::AsyncTextRenderedSignalType           mAsyncTextRenderedSignal;
+  Ui::DevelTextLabel::AsyncNaturalSizeComputedSignalType    mAsyncNaturalSizeComputedSignal;
   Ui::DevelTextLabel::AsyncHeightForWidthComputedSignalType mAsyncHeightForWidthComputedSignal;
 
   // for Font Variations
@@ -590,14 +570,14 @@ private: // Data
   WeakHandle<Ui::Control> mMaskControl;
 
   std::string mLocale;
-  Vector2 mSize;
-  Vector2 mTouchPosition; ///< The initial touch down position.
+  Vector2     mSize;
+  Vector2     mTouchPosition; ///< The initial touch down position.
 
-  Ui::DevelText::Ellipsize::Mode mLastEllipsisMode;
+  Ui::Text::Ellipsize::Mode mLastEllipsisMode;
 
-  int mRenderingBackend;
-  int mAsyncLineCount;
-  int mTextColorAnimatedCount;
+  int  mRenderingBackend;
+  int  mAsyncLineCount;
+  int  mTextColorAnimatedCount;
   bool mTextUpdateNeeded : 1;
   bool mLastAutoScrollEnabled : 1;
   bool mControlBackgroundEnabled : 1;
@@ -605,7 +585,7 @@ private: // Data
   bool mIsAsyncRenderNeeded : 1; // true if a render request is required in ASYNC_AUTO mode, otherwise false.
   bool mIsSizeChanged : 1;       // whether the size has been changed or not.
   bool mIsManualRender : 1;      // whether an async manual render has been requested, returns false when completed.
-  bool mIsManualRendered : 1; // whether an async manual render has been completed, returns false on the next relayout.
+  bool mIsManualRendered : 1;    // whether an async manual render has been completed, returns false on the next relayout.
   bool mManualRendered : 1;
   bool mIsIntercepted : 1;        // whether the touch event is intercepted or not.
   bool mIsHasAnchors : 1;         // whether the text has anchors or not.

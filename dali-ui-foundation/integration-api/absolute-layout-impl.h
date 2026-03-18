@@ -39,7 +39,7 @@ using AbsoluteLayoutImplPtr = IntrusivePtr<AbsoluteLayoutImpl>;
 /**
  * @brief This is the internal implementation class for AbsoluteLayout.
  */
-class AbsoluteLayoutImpl : public LayoutImpl
+class DALI_UI_API AbsoluteLayoutImpl : public LayoutImpl
 {
 public:
   /**
@@ -57,10 +57,10 @@ protected: // From Layout
   LayoutManager* CreateLayoutManager() override;
 
 private:
-  AbsoluteLayoutImpl(const AbsoluteLayoutImpl&) = delete;
-  AbsoluteLayoutImpl(AbsoluteLayoutImpl&&) = delete;
+  AbsoluteLayoutImpl(const AbsoluteLayoutImpl&)            = delete;
+  AbsoluteLayoutImpl(AbsoluteLayoutImpl&&)                 = delete;
   AbsoluteLayoutImpl& operator=(const AbsoluteLayoutImpl&) = delete;
-  AbsoluteLayoutImpl& operator=(AbsoluteLayoutImpl&&) = delete;
+  AbsoluteLayoutImpl& operator=(AbsoluteLayoutImpl&&)      = delete;
 };
 
 inline Integration::AbsoluteLayoutImpl& GetImpl(Ui::AbsoluteLayout& layout)

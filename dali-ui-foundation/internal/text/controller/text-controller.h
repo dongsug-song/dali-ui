@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali-ui-foundation/devel-api/text/spanned.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
 #include <dali/integration-api/processor-interface.h>
@@ -29,12 +28,12 @@
 #include <dali-ui-foundation/devel-api/controls/text-controls/text-anchor-devel.h>
 #include <dali-ui-foundation/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-ui-foundation/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
-#include <dali-ui-foundation/devel-api/text/text-enumerations-devel.h>
 #include <dali-ui-foundation/internal/text/decorator/text-decorator.h>
 #include <dali-ui-foundation/internal/text/hidden-text.h>
 #include <dali-ui-foundation/internal/text/input-filter.h>
 #include <dali-ui-foundation/internal/text/layouts/layout-engine.h>
 #include <dali-ui-foundation/internal/text/text-anchor-control-interface.h>
+#include <dali-ui-foundation/internal/text/text-enumerations-internal.h>
 #include <dali-ui-foundation/internal/text/text-model-interface.h>
 #include <dali-ui-foundation/internal/text/text-selectable-control-interface.h>
 #include <dali-ui-foundation/public-api/text/text-enumerations.h>
@@ -53,9 +52,9 @@ class RenderingController;
 enum SelectionType
 {
   INTERACTIVE = 0x0000, ///< Select the word where the cursor is located.
-  ALL = 0x0001,         ///< Select the whole text.
-  NONE = 0x0002,        ///< Unselect the whole text.
-  RANGE = 0x0003        ///< Select the range text.
+  ALL         = 0x0001, ///< Select the whole text.
+  NONE        = 0x0002, ///< Unselect the whole text.
+  RANGE       = 0x0003  ///< Select the range text.
 };
 
 typedef IntrusivePtr<Controller> ControllerPtr;
@@ -84,21 +83,21 @@ public: // Enumerated types.
    */
   enum OperationsMask
   {
-    NO_OPERATION = 0x0000,
-    CONVERT_TO_UTF32 = 0x0001,
-    GET_SCRIPTS = 0x0002,
-    VALIDATE_FONTS = 0x0004,
-    GET_LINE_BREAKS = 0x0008,
-    BIDI_INFO = 0x0010,
-    SHAPE_TEXT = 0x0020,
-    GET_GLYPH_METRICS = 0x0040,
-    LAYOUT = 0x0080,
+    NO_OPERATION       = 0x0000,
+    CONVERT_TO_UTF32   = 0x0001,
+    GET_SCRIPTS        = 0x0002,
+    VALIDATE_FONTS     = 0x0004,
+    GET_LINE_BREAKS    = 0x0008,
+    BIDI_INFO          = 0x0010,
+    SHAPE_TEXT         = 0x0020,
+    GET_GLYPH_METRICS  = 0x0040,
+    LAYOUT             = 0x0080,
     UPDATE_LAYOUT_SIZE = 0x0100,
-    REORDER = 0x0200,
-    ALIGN = 0x0400,
-    COLOR = 0x0800,
-    UPDATE_DIRECTION = 0x1000,
-    ALL_OPERATIONS = 0xFFFF
+    REORDER            = 0x0200,
+    ALIGN              = 0x0400,
+    COLOR              = 0x0800,
+    UPDATE_DIRECTION   = 0x1000,
+    ALL_OPERATIONS     = 0xFFFF
   };
 
   /**
@@ -124,9 +123,9 @@ public: // Enumerated types.
    */
   enum UpdateTextType
   {
-    NONE_UPDATED = 0x0,     ///< Nothing has been updated.
-    MODEL_UPDATED = 0x1,    ///< The text's model has been updated.
-    DECORATOR_UPDATED = 0x2 ///< The decoration has been updated.
+    NONE_UPDATED      = 0x0, ///< Nothing has been updated.
+    MODEL_UPDATED     = 0x1, ///< The text's model has been updated.
+    DECORATOR_UPDATED = 0x2  ///< The decoration has been updated.
   };
 
   /**
@@ -151,9 +150,9 @@ public: // Enumerated types.
   {
     enum Action
     {
-      NO_ACTION, ///< Does no action if there is a tap on top of an area with no text.
-      HIGHLIGHT, ///< Highlights the nearest text (at the beginning or end of the text) and shows the text's selection
-                 ///< popup.
+      NO_ACTION,           ///< Does no action if there is a tap on top of an area with no text.
+      HIGHLIGHT,           ///< Highlights the nearest text (at the beginning or end of the text) and shows the text's selection
+                           ///< popup.
       SHOW_SELECTION_POPUP ///< Shows the text's selection popup.
     };
   };
@@ -205,10 +204,10 @@ public: // Constructor.
    */
   static ControllerPtr New(ControlInterface* controlInterface, EditableControlInterface* editableControlInterface,
                            SelectableControlInterface* selectableControlInterface,
-                           AnchorControlInterface* anchorControlInterface)
+                           AnchorControlInterface*     anchorControlInterface)
   {
     return ControllerPtr(
-        new Controller(controlInterface, editableControlInterface, selectableControlInterface, anchorControlInterface));
+      new Controller(controlInterface, editableControlInterface, selectableControlInterface, anchorControlInterface));
   }
 
 public: // Configure the text controller.
@@ -263,7 +262,7 @@ public: // Configure the text controller.
    * @param[in] direction Direction of the auto scroll.
    */
   void SetAutoScrollEnabled(bool enable, bool requestRelayout = true,
-                            DevelText::AutoScroll::Direction direction = DevelText::AutoScroll::HORIZONTAL);
+                            Text::AutoScroll::Direction direction = Text::AutoScroll::HORIZONTAL);
 
   /**
    * @brief Whether the auto scrolling texture exceed max texture.
@@ -384,36 +383,36 @@ public: // Configure the text controller.
    *
    * @param[in] alignment The horizontal alignment.
    */
-  void SetHorizontalAlignment(HorizontalAlignment::Type alignment);
+  void SetHorizontalAlignment(Alignment alignment);
 
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  HorizontalAlignment::Type GetHorizontalAlignment() const;
+  Alignment GetHorizontalAlignment() const;
 
   /**
    * @brief Sets the text's vertical alignment.
    *
    * @param[in] alignment The vertical alignment.
    */
-  void SetVerticalAlignment(VerticalAlignment::Type alignment);
+  void SetVerticalAlignment(Alignment alignment);
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  VerticalAlignment::Type GetVerticalAlignment() const;
+  Alignment GetVerticalAlignment() const;
 
   /**
    * @brief Sets the text's wrap mode
    * @param[in] text wrap mode The unit of wrapping
    */
-  void SetLineWrapMode(Text::LineWrap::Mode textWarpMode);
+  void SetLineWrapMode(LineWrapMode textWarpMode);
 
   /**
    * @brief Retrieve text wrap mode previously set.
    * @return text wrap mode
    */
-  Text::LineWrap::Mode GetLineWrapMode() const;
+  LineWrapMode GetLineWrapMode() const;
 
   /**
    * @brief Enable or disable the text elide.
@@ -831,15 +830,6 @@ public: // Update.
    * @return A length of string of UTF-32 characters.
    */
   Length GetNumberOfCharacters() const;
-
-  /**
-   * @brief Set the @p spannedText
-   * the spanned text contains content (text) and  format (spans with ranges)
-   * the text is copied into text-controller and the spans are applied on ranges
-   *
-   * @param[in] spannedText the text with spans.
-   */
-  void SetSpannedText(const Text::Spanned& spannedText);
 
   /**
    * @brief Replaces any placeholder text previously set.
@@ -1933,43 +1923,43 @@ public: // Queries & retrieves.
    * @brief Checks text direction.
    * @return The text direction.
    */
-  Ui::DevelText::TextDirection::Type GetTextDirection();
+  Direction GetTextDirection();
 
   /**
    * @brief Retrieves vertical line alignment
    * @return The vertical line alignment
    */
-  Ui::DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const;
+  Alignment GetVerticalLineAlignment() const;
 
   /**
    * @brief Sets vertical line alignment
    * @param[in] alignment The vertical line alignment for the text
    */
-  void SetVerticalLineAlignment(Ui::DevelText::VerticalLineAlignment::Type alignment);
+  void SetVerticalLineAlignment(Alignment alignment);
 
   /**
    * @brief Retrieves ellipsis position
    * @return The ellipsis position
    */
-  Ui::DevelText::EllipsisPosition::Type GetEllipsisPosition() const;
+  Text::EllipsisPosition::Type GetEllipsisPosition() const;
 
   /**
    * @brief Sets ellipsis position
    * @param[in] ellipsisPosition The ellipsis position for the text
    */
-  void SetEllipsisPosition(Ui::DevelText::EllipsisPosition::Type ellipsisPosition);
+  void SetEllipsisPosition(Text::EllipsisPosition::Type ellipsisPosition);
 
   /**
    * @brief Retrieves ellipsis mode
    * @return The ellipsis mode
    */
-  Ui::DevelText::Ellipsize::Mode GetEllipsisMode() const;
+  Text::Ellipsize::Mode GetEllipsisMode() const;
 
   /**
    * @brief Sets ellipsis mode
    * @param[in] ellipsisMode The ellipsis mode for the text
    */
-  void SetEllipsisMode(Ui::DevelText::Ellipsize::Mode ellipsisMode);
+  void SetEllipsisMode(Text::Ellipsize::Mode ellipsisMode);
 
   /**
    * @brief Sets the render scale
@@ -2059,13 +2049,13 @@ public: // Queries & retrieves.
    * @brief Sets SetMatchLayoutDirection value to model
    * @param[in] match The value of matchLayoutDirection for the text
    */
-  void SetMatchLayoutDirection(DevelText::MatchLayoutDirection type);
+  void SetMatchLayoutDirection(LayoutDirectionMode type);
 
   /**
    * @brief Retrieves matchLayoutDirection value from model
    * @return The value of matchLayoutDirection
    */
-  DevelText::MatchLayoutDirection GetMatchLayoutDirection() const;
+  LayoutDirectionMode GetMatchLayoutDirection() const;
 
   /**
    * @brief Sets layoutDirection type value.
@@ -2188,7 +2178,7 @@ public: // Relayout.
    *
    * @return Whether the text model or decorations were updated.
    */
-  UpdateTextType Relayout(const Size& size,
+  UpdateTextType Relayout(const Size&                 size,
                           Dali::LayoutDirection::Type layoutDirection = Dali::LayoutDirection::LEFT_TO_RIGHT);
 
   /**
@@ -2391,7 +2381,7 @@ public: // Text-input Event Queuing.
    * @return A data struture indicating if update is needed, cursor position and current text.
    */
   InputMethodContext::CallbackData OnInputMethodContextEvent(
-      InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
+    InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
    * @brief Event from Clipboard notifying an Item has been selected for pasting
@@ -2467,7 +2457,7 @@ protected: // Inherit from TextSelectionPopup::TextPopupButtonCallbackInterface.
   /**
    * @copydoc Dali::Ui::TextSelectionPopup::TextPopupButtonCallbackInterface::TextPopupButtonTouched()
    */
-  void TextPopupButtonTouched(Dali::Ui::TextSelectionPopup::Buttons button) override;
+  void TextPopupButtonTouched(Dali::Ui::Text::InputCommandType button) override;
 
 protected: // Inherit from HiddenText.
   /**
@@ -2494,7 +2484,7 @@ private: // Private contructors & copy operator.
    * @brief Private constructor.
    */
   Controller()
-    : Controller(nullptr, nullptr, nullptr, nullptr)
+  : Controller(nullptr, nullptr, nullptr, nullptr)
   {
   }
 
@@ -2502,7 +2492,7 @@ private: // Private contructors & copy operator.
    * @brief Private constructor.
    */
   Controller(ControlInterface* controlInterface)
-    : Controller(controlInterface, nullptr, nullptr, nullptr)
+  : Controller(controlInterface, nullptr, nullptr, nullptr)
   {
   }
 
@@ -2512,7 +2502,7 @@ private: // Private contructors & copy operator.
   Controller(ControlInterface* controlInterface, EditableControlInterface* editableControlInterface,
              SelectableControlInterface* selectableControlInterface, AnchorControlInterface* anchorControlInterface);
 
-  Controller(const Controller& handle) = delete;
+  Controller(const Controller& handle)            = delete;
   Controller& operator=(const Controller& handle) = delete;
 
 protected: // Destructor.
@@ -2531,7 +2521,6 @@ private:
   struct PlaceholderHandler;
   struct Relayouter;
   struct TextUpdater;
-  struct SpannableHandler;
 
   std::unique_ptr<Impl> mImpl{nullptr};
 };

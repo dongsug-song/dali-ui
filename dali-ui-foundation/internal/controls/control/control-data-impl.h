@@ -27,7 +27,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/devel-api/controls/control-devel.h>
+#include <dali-ui-foundation/integration-api/control-accessible.h>
 #include <dali-ui-foundation/internal/render-effects/offscreen-rendering-impl.h>
 #include <dali-ui-foundation/internal/render-effects/render-effect-impl.h>
 #include <dali-ui-foundation/public-api/controls/control-impl.h>
@@ -126,32 +126,32 @@ public:
   void ResourceReady();
 
   /**
-   * @copydoc Dali::Ui::DevelControl::RegisterVisual()
+   * @copydoc Dali::Ui::Control::RegisterVisual()
    */
   void RegisterVisual(Property::Index index, Ui::Visual::Base& visual);
 
   /**
-   * @copydoc Dali::Ui::DevelControl::RegisterVisual()
+   * @copydoc Dali::Ui::Control::RegisterVisual()
    */
   void RegisterVisual(Property::Index index, Ui::Visual::Base& visual, int depthIndex);
 
   /**
-   * @copydoc Dali::Ui::DevelControl::RegisterVisual()
+   * @copydoc Dali::Ui::Control::RegisterVisual()
    */
   void RegisterVisual(Property::Index index, Ui::Visual::Base& visual, bool enabled);
 
   /**
-   * @copydoc Dali::Ui::DevelControl::RegisterVisual()
+   * @copydoc Dali::Ui::Control::RegisterVisual()
    */
   void RegisterVisual(Property::Index index, Ui::Visual::Base& visual, bool enabled, int depthIndex);
 
   /**
-   * @copydoc Dali::Ui::DevelControl::UnregisterVisual()
+   * @copydoc Dali::Ui::Control::UnregisterVisual()
    */
   void UnregisterVisual(Property::Index index);
 
   /**
-   * @copydoc Dali::Ui::DevelControl::GetVisual()
+   * @copydoc Dali::Ui::Control::GetVisual()
    */
   Ui::Visual::Base GetVisual(Property::Index index) const;
 
@@ -175,28 +175,28 @@ public:
                                         Dali::Constraint cornerRadiusConstraint = Dali::Constraint());
 
   /**
-   * @copydoc Dali::Ui::DevelControl::EnableVisual()
+   * @copydoc Dali::Ui::Control::EnableVisual()
    */
   void EnableVisual(Property::Index index, bool enable);
 
   /**
-   * @copydoc Dali::Ui::DevelControl::IsVisualEnabled()
+   * @copydoc Dali::Ui::Control::IsVisualEnabled()
    */
   bool IsVisualEnabled(Property::Index index) const;
 
   /**
-   * @copydoc Dali::Ui::DevelControl::GetVisualResourceStatus()
+   * @copydoc Dali::Ui::Control::GetVisualResourceStatus()
    */
   Ui::Visual::ResourceStatus GetVisualResourceStatus(Property::Index index) const;
 
   /**
-   * @copydoc Dali::Ui::DevelControl::DoAction()
+   * @copydoc Dali::Ui::Control::DoAction()
    */
   void DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId,
                 const Dali::Property::Value& attributes);
 
   /**
-   * @copydoc Dali::Ui::DevelControl::DoActionExtension()
+   * @copydoc Dali::Ui::Control::DoActionExtension()
    */
   void DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId,
                          const Dali::Any& attributes);
@@ -290,7 +290,7 @@ public:
    * Attribute is added if not existed previously or updated
    * if existed.
    */
-  void AppendAccessibilityAttribute(const std::string& key, const std::string value);
+  void AppendAccessibilityAttribute(const Dali::String& key, const Dali::String& value);
 
   /**
    * @brief Removes accessibility attribute
@@ -298,7 +298,7 @@ public:
    *
    * Function does nothing if attribute doesn't exist.
    */
-  void RemoveAccessibilityAttribute(const std::string& key);
+  void RemoveAccessibilityAttribute(const Dali::String& key);
 
   /**
    * @brief Removes all accessibility attributes
@@ -320,9 +320,9 @@ public:
   Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType() const;
 
   /**
-   * @copydoc DevelControl::VisualEventSignal()
+   * @copydoc Control::VisualEventSignal()
    */
-  DevelControl::VisualEventSignalType& VisualEventSignal();
+  Ui::Control::VisualEventSignalType& VisualEventSignal();
 
   /**
    * @brief Sets the shadow with a property map.
@@ -359,7 +359,7 @@ public:
   void ClearBorderline();
 
   /**
-   * @copydoc DevelControl::GetVisualProperty()
+   * @copydoc Control::GetVisualProperty()
    */
   Dali::Property GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey);
 
@@ -388,22 +388,27 @@ public:
   /**
    * @copydoc Dali::Ui::Internal::Control::GetAccessibleObject()
    */
-  std::shared_ptr<Ui::DevelControl::ControlAccessible> GetAccessibleObject();
+  std::shared_ptr<Ui::ControlAccessible> GetAccessibleObject();
 
   /**
-   * @copydoc Dali::Ui::DevelControl::IsAccessibleCreated()
+   * @copydoc Dali::Ui::Control::IsAccessibleCreated()
    */
   bool IsAccessibleCreated() const;
 
   /**
-   * @copydoc Dali::Ui::DevelControl::EnableCreateAccessible()
+   * @copydoc Dali::Ui::Control::EnableCreateAccessible()
    */
   void EnableCreateAccessible(bool enable);
 
   /**
-   * @copydoc Dali::Ui::DevelControl::IsCreateAccessibleEnabled()
+   * @copydoc Dali::Ui::Control::IsCreateAccessibleEnabled()
    */
   bool IsCreateAccessibleEnabled() const;
+
+  /**
+   * @copydoc Dali::Ui::Control::EmitAccessibilityStateChanged()
+   */
+  void EmitAccessibilityStateChanged(Accessibility::State state, int newValue);
 
   /**
    * @brief Apply fittingMode
@@ -465,7 +470,7 @@ public:
   Control& mControlImpl;
 
   std::unique_ptr<AccessibilityData> mAccessibilityData;
-  std::unique_ptr<VisualData> mVisualData;
+  std::unique_ptr<VisualData>        mVisualData;
 
   int mLeftFocusableActorId;             ///< Actor ID of Left focusable control.
   int mRightFocusableActorId;            ///< Actor ID of Right focusable control.
@@ -474,38 +479,37 @@ public:
   int mClockwiseFocusableActorId;        ///< Actor ID of Clockwise focusable control.
   int mCounterClockwiseFocusableActorId; ///< Actor ID of Counter clockwise focusable control.
 
-  std::string mStyleName;
-  Vector4 mBackgroundColor;          ///< The color of the background visual
-  RenderEffectImplPtr mRenderEffect; ///< The render effect on this control
-  Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
-  Extents mMargin;                   ///< The margin values
-  Extents mPadding;                  ///< The padding values
-  Vector2 mSize;                     ///< The size of the control
-  Ui::Control::KeyEventSignalType mKeyEventSignal;
+  Vector4                              mBackgroundColor;    ///< The color of the background visual
+  RenderEffectImplPtr                  mRenderEffect;       ///< The render effect on this control
+  Vector3*                             mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
+  Extents                              mMargin;             ///< The margin values
+  Extents                              mPadding;            ///< The padding values
+  Vector2                              mSize;               ///< The size of the control
+  Ui::Control::KeyEventSignalType      mKeyEventSignal;
   Ui::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
   Ui::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
   Ui::Control::ResourceReadySignalType mResourceReadySignal;
 
   // Gesture Detection
-  PinchGestureDetector mPinchGestureDetector;
-  PanGestureDetector mPanGestureDetector;
-  TapGestureDetector mTapGestureDetector;
+  PinchGestureDetector     mPinchGestureDetector;
+  PanGestureDetector       mPanGestureDetector;
+  TapGestureDetector       mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
 
   // Off screen rendering context
   std::unique_ptr<OffScreenRenderingImpl> mOffScreenRenderingImpl;
-  DevelControl::OffScreenRenderingType mOffScreenRenderingType;
+  Ui::Control::OffScreenRenderingType     mOffScreenRenderingType;
   Ui::Control::OffScreenRenderingFinishedSignalType
-      mOffScreenRenderingFinishedSignal; ///< Emits only when type is REFRESH_ONCE
+    mOffScreenRenderingFinishedSignal; ///< Emits only when type is REFRESH_ONCE
 
   InputMethodContext mInputMethodContext;
-  CallbackBase* mIdleCallback; ///< The idle callback to emit the resource ready signal.
+  CallbackBase*      mIdleCallback; ///< The idle callback to emit the resource ready signal.
 
   ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT; ///< Flags passed in from constructor.
 
   // Frequencly touched accessibility relative values.
   // Keep it on Impl to avoid AccessibilityData creation.
-  int32_t mAccessibilityRole : Dali::Log<static_cast<uint32_t>(DevelControl::AccessibilityRole::MAX_COUNT)>::value + 2;
+  int32_t mAccessibilityRole : Dali::Log<static_cast<uint32_t>(AccessibilityRole::MAX_COUNT)>::value + 2;
 
   bool mIsKeyboardNavigationSupported : 1; ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup : 1;          ///< Stores whether the control is a focus group.

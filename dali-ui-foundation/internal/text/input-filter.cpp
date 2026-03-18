@@ -20,8 +20,11 @@
 #include <dali-ui-foundation/internal/text/input-filter.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 
 using namespace Dali::Ui;
+
+using Dali::Integration::GetStdString;
 
 namespace Dali
 {
@@ -33,8 +36,8 @@ const char* const PROPERTY_ACCEPTED = "accepted";
 const char* const PROPERTY_REJECTED = "rejected";
 
 InputFilter::InputFilter()
-  : mAccepted(""),
-    mRejected("")
+: mAccepted(""),
+  mRejected("")
 {
 }
 
@@ -42,19 +45,19 @@ void InputFilter::SetProperties(const Property::Map& map)
 {
   const Property::Map::SizeType count = map.Count();
 
-  for (Property::Map::SizeType position = 0; position < count; ++position)
+  for(Property::Map::SizeType position = 0; position < count; ++position)
   {
-    KeyValuePair keyValue = map.GetKeyValue(position);
-    Property::Key& key = keyValue.first;
-    Property::Value& value = keyValue.second;
+    KeyValuePair     keyValue = map.GetKeyValue(position);
+    Property::Key&   key      = keyValue.first;
+    Property::Value& value    = keyValue.second;
 
-    if (key == Ui::InputFilter::Property::ACCEPTED || key == PROPERTY_ACCEPTED)
+    if(key == Ui::InputFilter::Property::ACCEPTED || key == PROPERTY_ACCEPTED)
     {
-      value.Get(mAccepted);
+      GetStdString(value, mAccepted);
     }
-    else if (key == Ui::InputFilter::Property::REJECTED || key == PROPERTY_REJECTED)
+    else if(key == Ui::InputFilter::Property::REJECTED || key == PROPERTY_REJECTED)
     {
-      value.Get(mRejected);
+      GetStdString(value, mRejected);
     }
   }
 }
@@ -67,20 +70,20 @@ void InputFilter::GetProperties(Property::Map& map)
 
 bool InputFilter::Contains(Ui::InputFilter::Property::Type type, std::string source)
 {
-  bool match = false;
+  bool       match = false;
   std::regex pattern;
 
-  if (type == Ui::InputFilter::Property::ACCEPTED)
+  if(type == Ui::InputFilter::Property::ACCEPTED)
   {
-    if (mAccepted.empty())
+    if(mAccepted.empty())
     {
       return true;
     }
     pattern = mAccepted;
   }
-  else if (type == Ui::InputFilter::Property::REJECTED)
+  else if(type == Ui::InputFilter::Property::REJECTED)
   {
-    if (mRejected.empty())
+    if(mRejected.empty())
     {
       return false;
     }
@@ -94,29 +97,29 @@ bool InputFilter::Contains(Ui::InputFilter::Property::Type type, std::string sou
 
 bool InputFilter::Filter(Ui::InputFilter::Property::Type type, std::string& text)
 {
-  std::regex pattern;
+  std::regex  pattern;
   std::string result;
 
-  if (type == Ui::InputFilter::Property::ACCEPTED)
+  if(type == Ui::InputFilter::Property::ACCEPTED)
   {
-    if (mAccepted.empty())
+    if(mAccepted.empty())
     {
       return false;
     }
     pattern = mAccepted;
 
     auto start = std::sregex_iterator(text.begin(), text.end(), pattern);
-    auto end = std::sregex_iterator();
+    auto end   = std::sregex_iterator();
 
-    while (start != end)
+    while(start != end)
     {
       result += start->str();
       ++start;
     }
   }
-  else if (type == Ui::InputFilter::Property::REJECTED)
+  else if(type == Ui::InputFilter::Property::REJECTED)
   {
-    if (mRejected.empty())
+    if(mRejected.empty())
     {
       return false;
     }
@@ -125,7 +128,7 @@ bool InputFilter::Filter(Ui::InputFilter::Property::Type type, std::string& text
     result = std::regex_replace(text, pattern, "");
   }
 
-  if (result.compare(text) == 0)
+  if(result.compare(text) == 0)
   {
     return false;
   }

@@ -18,6 +18,8 @@
  */
 
 #include <dali-ui-foundation/internal/builder/dictionary.h>
+#include <dali/public-api/object/handle.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/ref-object.h>
 
 namespace Dali
@@ -112,9 +114,9 @@ private:
 
 public:
   // Everything must be shallow-copiable.
-  Dictionary<StylePtr> subStates; // Each named style maps to a state.
+  Dictionary<StylePtr>      subStates; // Each named style maps to a state.
   Dictionary<Property::Map> visuals;
-  Property::Map properties;
+  Property::Map             properties;
 };
 
 } // namespace Internal

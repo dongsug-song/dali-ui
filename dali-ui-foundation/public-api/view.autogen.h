@@ -138,7 +138,7 @@
   * @param[in] func Member function with signature bool (View, const InputEvent&) \
   * @return Reference to this View for fluent chaining \
   */ \
-  template <class X> \
+  template<class X> \
   ChildClass& AsClickable(X* obj, bool (X::*func)(View, const InputEvent&)) { View::AsClickable(obj, func); return *this; } \
   /** \
   * @brief Attaches the clickable trait and connects a callable to the Clicked signal. \
@@ -148,7 +148,7 @@
   * @param[in] func Callable with signature bool (View, const InputEvent&) (e.g. lambda) \
   * @return Reference to this View for fluent chaining \
   */ \
-  template <typename F> \
+  template<typename F> \
   ChildClass& AsClickable(Dali::ConnectionTrackerInterface* connectionTracker, F&& func) { View::AsClickable(connectionTracker, func); return *this; } \
   /** \
   * @brief Assigns this View instance to a target variable. \
@@ -168,4 +168,21 @@
   * \
   * @param[in] color The required background color value \
   */ \
-  ChildClass& BackgroundColor(const Vector4& color) { View::BackgroundColor(color); return *this; }
+  ChildClass& BackgroundColor(const Vector4& color) { View::BackgroundColor(color); return *this; } \
+  /** \
+  * @brief Sets layout parameters on this View. \
+  * \
+  * The params handle is stored on the View as-is, and the View's \
+  * measure cache is invalidated. \
+  * \
+  * @param[in] params The layout parameters to attach to this View \
+  * @return Reference to this View for fluent chaining \
+  * \
+  * @code \
+  * child.SetLayoutParams( \
+  *   AbsoluteLayoutParams::New() \
+  *     .SetBounds(LayoutRect(10, 20, 100, 200)) \
+  *     .SetFlags(AbsoluteLayoutFlags::POSITION_PROPORTIONAL)); \
+  * @endcode \
+  */ \
+  ChildClass& SetLayoutParams(LayoutParams params) { View::SetLayoutParams(params); return *this; }

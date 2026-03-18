@@ -52,22 +52,22 @@ const Vector2& Model::GetScrollPosition() const
   return mScrollPosition;
 }
 
-HorizontalAlignment::Type Model::GetHorizontalAlignment() const
+Alignment Model::GetHorizontalAlignment() const
 {
   return mHorizontalAlignment;
 }
 
-VerticalAlignment::Type Model::GetVerticalAlignment() const
+Alignment Model::GetVerticalAlignment() const
 {
   return mVerticalAlignment;
 }
 
-DevelText::VerticalLineAlignment::Type Model::GetVerticalLineAlignment() const
+Alignment Model::GetVerticalLineAlignment() const
 {
   return mVerticalLineAlignment;
 }
 
-DevelText::EllipsisPosition::Type Model::GetEllipsisPosition() const
+Text::EllipsisPosition::Type Model::GetEllipsisPosition() const
 {
   return mEllipsisPosition;
 }
@@ -262,11 +262,6 @@ bool Model::IsMarkupProcessorEnabled() const
   return mVisualModel->IsMarkupProcessorEnabled();
 }
 
-bool Model::IsSpannedTextPlaced() const
-{
-  return mLogicalModel->mSpannedTextPlaced;
-}
-
 const GlyphInfo* Model::GetHyphens() const
 {
   return mVisualModel->mHyphen.glyph.Begin();
@@ -393,32 +388,32 @@ const Vector<CharacterDirection>& Model::GetCharacterDirections() const
 }
 
 Model::Model()
-  : mLogicalModel(),
-    mVisualModel(),
-    mScrollPosition(),
-    mScrollPositionLast(),
-    mLayoutAlignmentOffset(),
-    mLayoutOffsetWithPadding(),
-    mHorizontalAlignment(Text::HorizontalAlignment::BEGIN),
-    mVerticalAlignment(Text::VerticalAlignment::TOP),
-    mVerticalLineAlignment(DevelText::VerticalLineAlignment::TOP),
-    mLineWrapMode(Text::LineWrap::WORD),
-    mAlignmentOffset(0.0f),
-    mElideEnabled(false),
-    mIgnoreSpacesAfterText(true),
-    mRemoveFrontInset(false),
-    mRemoveBackInset(false),
-    mMatchLayoutDirection(DevelText::MatchLayoutDirection::INHERIT),
-    mEllipsisPosition(DevelText::EllipsisPosition::END)
+: mLogicalModel(),
+  mVisualModel(),
+  mScrollPosition(),
+  mScrollPositionLast(),
+  mLayoutAlignmentOffset(),
+  mLayoutOffsetWithPadding(),
+  mHorizontalAlignment(Alignment::START),
+  mVerticalAlignment(Alignment::START),
+  mVerticalLineAlignment(Alignment::START),
+  mLineWrapMode(LineWrapMode::WORD),
+  mAlignmentOffset(0.0f),
+  mElideEnabled(false),
+  mIgnoreSpacesAfterText(true),
+  mRemoveFrontInset(false),
+  mRemoveBackInset(false),
+  mMatchLayoutDirection(LayoutDirectionMode::INHERIT),
+  mEllipsisPosition(Text::EllipsisPosition::END)
 {
   mLogicalModel = LogicalModel::New();
-  mVisualModel = VisualModel::New();
+  mVisualModel  = VisualModel::New();
 
   // Check environment variable for DALI_MATCH_SYSTEM_LANGUAGE_DIRECTION
   auto match = Dali::EnvironmentVariable::GetEnvironmentVariable(DALI_ENV_MATCH_SYSTEM_LANGUAGE_DIRECTION);
-  if (match && (std::atoi(match) == 0))
+  if(match && (std::atoi(match) == 0))
   {
-    mMatchLayoutDirection = DevelText::MatchLayoutDirection::CONTENTS;
+    mMatchLayoutDirection = LayoutDirectionMode::CONTENTS;
   }
 }
 

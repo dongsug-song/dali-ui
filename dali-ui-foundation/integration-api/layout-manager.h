@@ -18,9 +18,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali-ui-foundation/integration-api/view-impl.h>
 #include <dali-ui-foundation/public-api/dali-ui-common.h>
 #include <dali-ui-foundation/public-api/layout-types.h>
-#include <dali-ui-foundation/integration-api/view-impl.h>
 
 namespace Dali
 {
@@ -49,7 +49,7 @@ class ViewImpl;
  * @note This is an internal class. It is not intended to be used directly
  * by applications.
  */
-class LayoutManager
+class DALI_UI_API LayoutManager
 {
 public:
   /**
@@ -123,10 +123,10 @@ protected:
 
 private:
   // Not copyable or movable
-  LayoutManager(const LayoutManager&) = delete;
-  LayoutManager(LayoutManager&&) = delete;
+  LayoutManager(const LayoutManager&)            = delete;
+  LayoutManager(LayoutManager&&)                 = delete;
   LayoutManager& operator=(const LayoutManager&) = delete;
-  LayoutManager& operator=(LayoutManager&&) = delete;
+  LayoutManager& operator=(LayoutManager&&)      = delete;
 };
 
 } // namespace Ui

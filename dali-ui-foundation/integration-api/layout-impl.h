@@ -44,7 +44,7 @@ using LayoutImplPtr = IntrusivePtr<LayoutImpl>;
  *
  * @see Integration::ViewImpl for LayoutManager and child management functionality
  */
-class LayoutImpl : public ViewImpl
+class DALI_UI_API LayoutImpl : public ViewImpl
 {
 public:
   /**
@@ -91,10 +91,10 @@ protected:
 
 private:
   // Not copyable or movable
-  LayoutImpl(const LayoutImpl&) = delete;
-  LayoutImpl(LayoutImpl&&) = delete;
+  LayoutImpl(const LayoutImpl&)            = delete;
+  LayoutImpl(LayoutImpl&&)                 = delete;
   LayoutImpl& operator=(const LayoutImpl&) = delete;
-  LayoutImpl& operator=(LayoutImpl&&) = delete;
+  LayoutImpl& operator=(LayoutImpl&&)      = delete;
 };
 
 // Helpers for public-api forwarding methods

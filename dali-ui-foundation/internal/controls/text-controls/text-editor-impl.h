@@ -27,8 +27,6 @@
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/devel-api/controls/control-devel.h>
-#include <dali-ui-foundation/devel-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-ui-foundation/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-ui-foundation/internal/controls/control/control-data-impl.h>
 #include <dali-ui-foundation/internal/controls/text-controls/common-text-utils.h>
@@ -135,7 +133,7 @@ public:
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is
    * responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName,
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName,
                               FunctorDelegate* functor);
 
   /**
@@ -169,17 +167,7 @@ private: // From Control
   /**
    * @copydoc Ui::Internal::Control::CreateAccessibleObject()
    */
-  DevelControl::ControlAccessible* CreateAccessibleObject() override;
-
-  /**
-   * @copydoc Control::OnStyleChange()
-   */
-  void OnStyleChange(Ui::StyleManager styleManager, StyleChange::Type change) override;
-
-  /**
-   * @copydoc Control::OnApplyDefaultStyle()
-   */
-  void OnApplyDefaultStyle() override;
+  ControlAccessible* CreateAccessibleObject() override;
 
   /**
    * @copydoc Control::GetNaturalSize()
@@ -408,15 +396,6 @@ public:
   Rect<float> GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const;
 
   /**
-   * @brief Set the @p spannedText into current textEditor
-   * the spanned text contains content (text) and  format (spans with ranges)
-   * the text is copied into text-controller and the spans are applied on ranges
-   *
-   * @param[in] spannedText the text with spans.
-   */
-  void SetSpannedText(const Text::Spanned& spannedText);
-
-  /**
    * @copydoc Text::SelectableControlInterface::GetSelectedText()
    */
   string GetSelectedText() const override;
@@ -500,7 +479,7 @@ private: // Implementation
    * InputMethodContext::EventData& inputMethodContextEvent)
    */
   InputMethodContext::CallbackData OnInputMethodContextEvent(
-      InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
+    InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
    * @brief Get a Property Map for the image used for the required Handle Image
@@ -642,32 +621,32 @@ private: // Implementation
 
 private: // Data
   // Signals
-  Ui::TextEditor::TextChangedSignalType mTextChangedSignal;
-  Ui::TextEditor::InputStyleChangedSignalType mInputStyleChangedSignal;
-  Ui::TextEditor::ScrollStateChangedSignalType mScrollStateChangedSignal;
-  Ui::DevelTextEditor::MaxLengthReachedSignalType mMaxLengthReachedSignal;
-  Ui::DevelTextEditor::AnchorClickedSignalType mAnchorClickedSignal;
-  Ui::DevelTextEditor::InputFilteredSignalType mInputFilteredSignal;
+  Ui::TextEditor::TextChangedSignalType                mTextChangedSignal;
+  Ui::TextEditor::InputStyleChangedSignalType          mInputStyleChangedSignal;
+  Ui::TextEditor::ScrollStateChangedSignalType         mScrollStateChangedSignal;
+  Ui::DevelTextEditor::MaxLengthReachedSignalType      mMaxLengthReachedSignal;
+  Ui::DevelTextEditor::AnchorClickedSignalType         mAnchorClickedSignal;
+  Ui::DevelTextEditor::InputFilteredSignalType         mInputFilteredSignal;
   Ui::DevelTextEditor::CursorPositionChangedSignalType mCursorPositionChangedSignal;
-  Ui::DevelTextEditor::SelectionChangedSignalType mSelectionChangedSignal;
-  Ui::DevelTextEditor::SelectionClearedSignalType mSelectionClearedSignal;
-  Ui::DevelTextEditor::SelectionStartedSignalType mSelectionStartedSignal;
+  Ui::DevelTextEditor::SelectionChangedSignalType      mSelectionChangedSignal;
+  Ui::DevelTextEditor::SelectionClearedSignalType      mSelectionClearedSignal;
+  Ui::DevelTextEditor::SelectionStartedSignalType      mSelectionStartedSignal;
 
   // for Font Variations
   std::map<Dali::Property::Index, std::string> mVariationIndexMap; // Stores [CustomPropertyIndex, tag].
 
-  InputMethodContext mInputMethodContext;
-  Text::ControllerPtr mController;
-  Text::RendererPtr mRenderer;
-  Text::DecoratorPtr mDecorator;
+  InputMethodContext            mInputMethodContext;
+  Text::ControllerPtr           mController;
+  Text::RendererPtr             mRenderer;
+  Text::DecoratorPtr            mDecorator;
   Text::TextVerticalScrollerPtr mTextVerticalScroller;
-  Ui::Control mStencil;
-  Ui::ScrollBar mScrollBar;
-  Dali::Animation mAnimation; ///< Scroll indicator Show/Hide Animation.
-  Dali::TimePeriod mAnimationPeriod;
-  std::vector<Actor> mClippingDecorationActors; ///< Decoration actors which need clipping.
+  Ui::Control                   mStencil;
+  // Ui::ScrollBar mScrollBar;
+  Dali::Animation             mAnimation; ///< Scroll indicator Show/Hide Animation.
+  Dali::TimePeriod            mAnimationPeriod;
+  std::vector<Actor>          mClippingDecorationActors; ///< Decoration actors which need clipping.
   std::vector<Ui::TextAnchor> mAnchorActors;
-  Dali::InputMethodOptions mInputMethodOptions;
+  Dali::InputMethodOptions    mInputMethodOptions;
 
   Actor mRenderableActor;
   Actor mActiveLayer;
@@ -677,15 +656,15 @@ private: // Data
   float mAlignmentOffset;
   float mScrollAnimationDuration;
   float mLineSpacing;
-  int mRenderingBackend;
-  bool mHasBeenStaged : 1;
-  bool mScrollAnimationEnabled : 1;
-  bool mScrollBarEnabled : 1;
-  bool mScrollStarted : 1;
-  bool mTextChanged : 1;           ///< If true, emits TextChangedSignal in next OnRelayout().
-  bool mCursorPositionChanged : 1; ///< If true, emits CursorPositionChangedSignal at the end of OnRelayout().
-  bool mSelectionChanged : 1;      ///< If true, emits SelectionChangedSignal at the end of OnRelayout().
-  bool mSelectionCleared : 1;      ///< If true, emits SelectionClearedSignal at the end of OnRelayout().
+  int   mRenderingBackend;
+  bool  mHasBeenStaged : 1;
+  bool  mScrollAnimationEnabled : 1;
+  bool  mScrollBarEnabled : 1;
+  bool  mScrollStarted : 1;
+  bool  mTextChanged : 1;           ///< If true, emits TextChangedSignal in next OnRelayout().
+  bool  mCursorPositionChanged : 1; ///< If true, emits CursorPositionChangedSignal at the end of OnRelayout().
+  bool  mSelectionChanged : 1;      ///< If true, emits SelectionChangedSignal at the end of OnRelayout().
+  bool  mSelectionCleared : 1;      ///< If true, emits SelectionClearedSignal at the end of OnRelayout().
 
   // args for cursor PositionChanged event
   unsigned int mOldPosition;
@@ -707,7 +686,7 @@ private: // Data
     using EditableTextControlAccessible::EditableTextControlAccessible;
 
     /**
-     * @copydoc Dali::Ui::DevelControl::ControlAccessible::GetNameRaw()
+     * @copydoc Dali::Ui::ControlAccessible::GetNameRaw()
      */
     std::pair<std::string, bool> GetNameRaw() const override;
 

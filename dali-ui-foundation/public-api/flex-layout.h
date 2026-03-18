@@ -20,8 +20,8 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/public-api/layout.h>
 #include <dali-ui-foundation/public-api/layout-types.h>
+#include <dali-ui-foundation/public-api/layout.h>
 
 namespace Dali
 {
@@ -105,7 +105,6 @@ public:
   static FlexLayout DownCast(BaseHandle handle);
 
 public: // API
-
   /**
    * @brief Sets the flex direction.
    *
@@ -176,73 +175,9 @@ public: // API
    */
   FlexAlign GetAlignContent() const;
 
-public: // Static methods for attached properties
-
-  /**
-   * @brief Sets the flex grow factor for a child view.
-   *
-   * @param[in] view The child view
-   * @param[in] grow The grow factor (default 0)
-   */
-  static void SetFlexGrow(View view, float grow);
-
-  /**
-   * @brief Gets the flex grow factor for a child view.
-   *
-   * @param[in] view The child view
-   * @return The grow factor
-   */
-  static float GetFlexGrow(View view);
-
-  /**
-   * @brief Sets the flex shrink factor for a child view.
-   *
-   * @param[in] view The child view
-   * @param[in] shrink The shrink factor (default 1)
-   */
-  static void SetFlexShrink(View view, float shrink);
-
-  /**
-   * @brief Gets the flex shrink factor for a child view.
-   *
-   * @param[in] view The child view
-   * @return The shrink factor
-   */
-  static float GetFlexShrink(View view);
-
-  /**
-   * @brief Sets the flex basis for a child view.
-   *
-   * @param[in] view The child view
-   * @param[in] basis The basis value (use LayoutDimension::WrapContent for auto)
-   */
-  static void SetFlexBasis(View view, float basis);
-
-  /**
-   * @brief Gets the flex basis for a child view.
-   *
-   * @param[in] view The child view
-   * @return The basis value
-   */
-  static float GetFlexBasis(View view);
-
-  /**
-   * @brief Sets the align self for a child view.
-   *
-   * @param[in] view The child view
-   * @param[in] align The align self value
-   */
-  static void SetAlignSelf(View view, FlexAlign align);
-
-  /**
-   * @brief Gets the align self for a child view.
-   *
-   * @param[in] view The child view
-   * @return The align self value
-   */
-  static FlexAlign GetAlignSelf(View view);
-
 public: // Chaining methods
+  DALI_UI_CHAIN_LAYOUT_METHODS(FlexLayout)
+
   FlexLayout& Direction(FlexDirection direction)
   {
     SetDirection(direction);
@@ -275,7 +210,7 @@ public: // Chaining methods
 
 public: // Not intended for application developers
   /// @cond internal
-  DALI_INTERNAL FlexLayout(Integration::FlexLayoutImpl& implementation);
+  DALI_INTERNAL          FlexLayout(Integration::FlexLayoutImpl& implementation);
   explicit DALI_INTERNAL FlexLayout(Dali::Internal::CustomActor* internal);
   /// @endcond
 };

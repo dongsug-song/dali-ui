@@ -177,10 +177,24 @@ private:
    */
   void CreateMaskData();
 
+  /**
+   * @brief Emits render finished signal of the target,
+   * when mTargetMaskOnce is true and finished signal of the target render task(mMaskTargetRenderTask) is emitted.
+   * @param[in] renderTask that emits target signal.
+   */
+  void OnTargetRenderFinished(Dali::RenderTask& renderTask);
+
+  /**
+   * @brief Emits render finished signal of the source,
+   * when mSourceMaskOnce is true and finished signal of the source render task(mMaskSourceRenderTask) is emitted.
+   * @param[in] renderTask that emits source signal.
+   */
+  void OnSourceRenderFinished(Dali::RenderTask& renderTask);
+
 private:
-  MaskEffectImpl(const MaskEffectImpl&) = delete;
-  MaskEffectImpl(MaskEffectImpl&&) = delete;
-  MaskEffectImpl& operator=(MaskEffectImpl&&) = delete;      // no move()
+  MaskEffectImpl(const MaskEffectImpl&)            = delete;
+  MaskEffectImpl(MaskEffectImpl&&)                 = delete;
+  MaskEffectImpl& operator=(MaskEffectImpl&&)      = delete; // no move()
   MaskEffectImpl& operator=(const MaskEffectImpl&) = delete; // no copy()
 
 private:
@@ -190,21 +204,21 @@ private:
   WeakHandle<Ui::Control> mMaskControl;
 
   // Resource
-  RenderTask mMaskTargetRenderTask;
+  RenderTask  mMaskTargetRenderTask;
   FrameBuffer mMaskTargetFrameBuffer;
-  Texture mMaskTargetTexture;
+  Texture     mMaskTargetTexture;
 
-  RenderTask mMaskSourceRenderTask;
+  RenderTask  mMaskSourceRenderTask;
   FrameBuffer mMaskSourceFrameBuffer;
-  Texture mMaskSourceTexture;
+  Texture     mMaskSourceTexture;
 
   // Variables
   MaskEffect::MaskMode mMaskMode;
-  Vector2 mMaskPosition;
-  Vector2 mMaskScale;
-  bool mTargetMaskOnce : 1;
-  bool mSourceMaskOnce : 1;
-  bool mReverseMaskDirection : 1;
+  Vector2              mMaskPosition;
+  Vector2              mMaskScale;
+  bool                 mTargetMaskOnce : 1;
+  bool                 mSourceMaskOnce : 1;
+  bool                 mReverseMaskDirection : 1;
 
   // Cached shader
   thread_local static Dali::Shader gMaskEffectShader;

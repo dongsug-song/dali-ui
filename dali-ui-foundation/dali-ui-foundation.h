@@ -21,28 +21,14 @@
 #include <dali/dali.h>
 
 // INTERNAL INCLUDES
+#include <dali-ui-foundation/public-api/label.h>
 #include <dali-ui-foundation/public-api/ui-config.h>
-#include <dali-ui-foundation/public-api/view.h>
 #include <dali-ui-foundation/public-api/unit.h>
+#include <dali-ui-foundation/public-api/view.h>
 
-#include <dali-ui-foundation/public-api/controls/buttons/button.h>
-#include <dali-ui-foundation/public-api/controls/buttons/check-box-button.h>
-#include <dali-ui-foundation/public-api/controls/buttons/push-button.h>
-#include <dali-ui-foundation/public-api/controls/buttons/radio-button.h>
 #include <dali-ui-foundation/public-api/controls/control-impl.h>
 #include <dali-ui-foundation/public-api/controls/control.h>
 #include <dali-ui-foundation/public-api/controls/image-view/image-view.h>
-#include <dali-ui-foundation/public-api/controls/scrollable/item-view/default-item-layout-property.h>
-#include <dali-ui-foundation/public-api/controls/scrollable/item-view/default-item-layout.h>
-#include <dali-ui-foundation/public-api/controls/scrollable/item-view/item-factory.h>
-#include <dali-ui-foundation/public-api/controls/scrollable/item-view/item-layout.h>
-#include <dali-ui-foundation/public-api/controls/scrollable/item-view/item-view.h>
-#include <dali-ui-foundation/public-api/controls/scrollable/scroll-view/scroll-mode.h>
-#include <dali-ui-foundation/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
-#include <dali-ui-foundation/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
-#include <dali-ui-foundation/public-api/controls/scrollable/scroll-view/scroll-view-page-path-effect.h>
-#include <dali-ui-foundation/public-api/controls/scrollable/scroll-view/scroll-view.h>
-#include <dali-ui-foundation/public-api/controls/scrollable/scrollable.h>
 #include <dali-ui-foundation/public-api/controls/text-controls/hidden-input-properties.h>
 #include <dali-ui-foundation/public-api/controls/text-controls/input-filter-properties.h>
 #include <dali-ui-foundation/public-api/controls/text-controls/placeholder-properties.h>
@@ -56,8 +42,6 @@
 #include <dali-ui-foundation/public-api/image-loader/image-url.h>
 #include <dali-ui-foundation/public-api/image-loader/image.h>
 #include <dali-ui-foundation/public-api/image-loader/sync-image-loader.h>
-
-#include <dali-ui-foundation/public-api/styling/style-manager.h>
 
 #include <dali-ui-foundation/public-api/render-effects/background-blur-effect.h>
 #include <dali-ui-foundation/public-api/render-effects/gaussian-blur-effect.h>

@@ -23,11 +23,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/devel-api/text/rendering-backend.h>
 #include <dali-ui-foundation/internal/text/rendering/atlas/text-atlas-renderer.h>
-#ifdef ENABLE_VECTOR_BASED_TEXT_RENDERING
-#include <dali-ui-foundation/internal/text/rendering/vector-based/vector-based-renderer.h>
-#endif
 
 namespace Dali
 {
@@ -43,7 +39,7 @@ struct Backend::Impl
 };
 
 Backend::Backend()
-  : mImpl(NULL)
+: mImpl(NULL)
 {
   mImpl = new Impl();
 }
@@ -58,11 +54,11 @@ Dali::Ui::Text::Backend Backend::Get()
   Dali::Ui::Text::Backend backendHandle;
 
   Dali::SingletonService service(SingletonService::Get());
-  if (service)
+  if(service)
   {
     // Check whether the singleton is already created
     Dali::BaseHandle handle = service.GetSingleton(typeid(Dali::Ui::Text::Backend));
-    if (handle)
+    if(handle)
     {
       // If so, downcast the handle
       Backend* impl = dynamic_cast<Dali::Ui::Text::Internal::Backend*>(handle.GetObjectPtr());
@@ -78,36 +74,9 @@ Dali::Ui::Text::Backend Backend::Get()
   return backendHandle;
 }
 
-RendererPtr Backend::NewRenderer(unsigned int renderingType)
+RendererPtr Backend::NewRenderer()
 {
-  RendererPtr renderer;
-
-  switch (renderingType)
-  {
-    case Dali::Ui::DevelText::RENDERING_SHARED_ATLAS:
-    {
-      renderer = Dali::Ui::Text::AtlasRenderer::New();
-    }
-    break;
-
-    case Dali::Ui::DevelText::RENDERING_VECTOR_BASED:
-    {
-#ifdef ENABLE_VECTOR_BASED_TEXT_RENDERING
-      renderer = Dali::Ui::Text::VectorBasedRenderer::New();
-#else
-      renderer = Dali::Ui::Text::AtlasRenderer::New(); // Fallback to bitmap-based rendering
-#endif
-    }
-    break;
-
-    default:
-    {
-      DALI_LOG_ERROR("Unknown renderer type: %d\n", renderingType);
-      break;
-    }
-  }
-
-  return renderer;
+  return Dali::Ui::Text::AtlasRenderer::New();
 }
 
 } // namespace Internal

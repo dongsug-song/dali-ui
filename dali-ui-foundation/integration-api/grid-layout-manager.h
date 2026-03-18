@@ -37,7 +37,7 @@ namespace Integration
  * Can be returned from GridLayoutImpl::CreateLayoutManager().
  * Subclass to customize grid layout behaviour.
  */
-class GridLayoutManager : public LayoutManager
+class DALI_UI_API GridLayoutManager : public LayoutManager
 {
 public:
   GridLayoutManager(const std::vector<GridLength>& rows, const std::vector<GridLength>& columns, float rowSpacing,
@@ -55,8 +55,8 @@ public:
 protected:
   std::vector<GridLength> mRowDefinitions;
   std::vector<GridLength> mColumnDefinitions;
-  float mRowSpacing;
-  float mColumnSpacing;
+  float                   mRowSpacing;
+  float                   mColumnSpacing;
 };
 
 } // namespace Integration

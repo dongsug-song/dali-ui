@@ -50,14 +50,14 @@ ImageView ImageView::New()
   return Ui::Internal::ImageView::New();
 }
 
-ImageView ImageView::New(const std::string& url)
+ImageView ImageView::New(const Dali::String& url)
 {
   ImageView imageView = Internal::ImageView::New();
   imageView.SetImage(url, ImageDimensions());
   return imageView;
 }
 
-ImageView ImageView::New(const std::string& url, ImageDimensions size)
+ImageView ImageView::New(const Dali::String& url, ImageDimensions size)
 {
   ImageView imageView = Internal::ImageView::New();
   imageView.SetImage(url, size);
@@ -69,18 +69,18 @@ ImageView ImageView::New(ControlBehaviour additionalBehaviour)
   return Ui::Internal::ImageView::New(static_cast<Ui::Internal::Control::ControlBehaviour>(additionalBehaviour));
 }
 
-ImageView ImageView::New(ControlBehaviour additionalBehaviour, const std::string& url)
+ImageView ImageView::New(ControlBehaviour additionalBehaviour, const Dali::String& url)
 {
   ImageView imageView =
-      Internal::ImageView::New(static_cast<Ui::Internal::Control::ControlBehaviour>(additionalBehaviour));
+    Internal::ImageView::New(static_cast<Ui::Internal::Control::ControlBehaviour>(additionalBehaviour));
   imageView.SetImage(url, ImageDimensions());
   return imageView;
 }
 
-ImageView ImageView::New(ControlBehaviour additionalBehaviour, const std::string& url, ImageDimensions size)
+ImageView ImageView::New(ControlBehaviour additionalBehaviour, const Dali::String& url, ImageDimensions size)
 {
   ImageView imageView =
-      Internal::ImageView::New(static_cast<Ui::Internal::Control::ControlBehaviour>(additionalBehaviour));
+    Internal::ImageView::New(static_cast<Ui::Internal::Control::ControlBehaviour>(additionalBehaviour));
   imageView.SetImage(url, size);
   return imageView;
 }
@@ -90,23 +90,23 @@ ImageView ImageView::DownCast(BaseHandle handle)
   return Control::DownCast<ImageView, Internal::ImageView>(handle);
 }
 
-void ImageView::SetImage(const std::string& url)
+void ImageView::SetImage(const Dali::String& url)
 {
   Dali::Ui::GetImpl(*this).SetImage(url, ImageDimensions());
 }
 
-void ImageView::SetImage(const std::string& url, ImageDimensions size)
+void ImageView::SetImage(const Dali::String& url, ImageDimensions size)
 {
   Dali::Ui::GetImpl(*this).SetImage(url, size);
 }
 
 ImageView::ImageView(Internal::ImageView& implementation)
-  : Control(implementation)
+: Control(implementation)
 {
 }
 
 ImageView::ImageView(Dali::Internal::CustomActor* internal)
-  : Control(internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::ImageView>(internal);
 }

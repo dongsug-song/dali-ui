@@ -70,11 +70,11 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX = PROPERTY_START_INDEX + 1000,               ///< Reserve property indices @SINCE_1_0.0
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
 
     ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX, ///< @SINCE_1_2.60
     ANIMATABLE_PROPERTY_END_INDEX =
-        ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve animatable property indices @SINCE_1_2.60
+      ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve animatable property indices @SINCE_1_2.60
   };
 
   /**
@@ -399,7 +399,7 @@ public:
    * @param[in] text The text to display
    * @return A handle to the TextLabel control
    */
-  static TextLabel New(const std::string& text);
+  static TextLabel New(const Dali::String& text);
 
   /**
    * @brief Creates the TextLabel control with additional behaviour.
@@ -418,7 +418,7 @@ public:
    * @param[in] text The text to display
    * @return A handle to the TextLabel control
    */
-  static TextLabel New(ControlBehaviour additionalBehaviour, const std::string& text);
+  static TextLabel New(ControlBehaviour additionalBehaviour, const Dali::String& text);
 
   /**
    * @brief Creates an empty handle.

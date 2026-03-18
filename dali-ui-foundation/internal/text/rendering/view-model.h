@@ -23,8 +23,8 @@
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/devel-api/text/text-enumerations-devel.h>
 #include <dali-ui-foundation/internal/text/bounded-paragraph-run.h>
+#include <dali-ui-foundation/internal/text/text-enumerations-internal.h>
 #include <dali-ui-foundation/internal/text/text-model-interface.h>
 #include <dali-ui-foundation/public-api/text/text-enumerations.h>
 
@@ -75,22 +75,22 @@ public:
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  Text::HorizontalAlignment::Type GetHorizontalAlignment() const override;
+  Alignment GetHorizontalAlignment() const override;
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  Text::VerticalAlignment::Type GetVerticalAlignment() const override;
+  Alignment GetVerticalAlignment() const override;
 
   /**
    * @copydoc ModelInterface::GetVerticalLineAlignment()
    */
-  DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const override;
+  Alignment GetVerticalLineAlignment() const override;
 
   /**
    * @copydoc ModelInterface::GetEllipsisPosition()
    */
-  DevelText::EllipsisPosition::Type GetEllipsisPosition() const override;
+  Text::EllipsisPosition::Type GetEllipsisPosition() const override;
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()
@@ -283,11 +283,6 @@ public:
   bool IsMarkupProcessorEnabled() const override;
 
   /**
-   * @copydoc ModelInterface::IsSpannedTextPlaced()
-   */
-  bool IsSpannedTextPlaced() const override;
-
-  /**
    * @copydoc ModelInterface::GetHyphens()
    */
   const GlyphInfo* GetHyphens() const override;
@@ -441,18 +436,17 @@ public:
    */
   const Vector<CharacterDirection>& GetCharacterDirections() const override;
 
-
 private:
-  const ModelInterface* const mModel; ///< Pointer to the text's model.
-  Vector<GlyphInfo> mElidedGlyphs;    ///< Stores the glyphs of the elided text.
-  Vector<Vector2> mElidedLayout;      ///< Stores the positions of each glyph of the elided text.
-  bool mIsTextElided : 1;             ///< Whether the text has been elided.
-  float mElidedOffset; ///< The width of the (control - elided line). This is required for calculating the correct
-                       ///< horizontal align offset.
-  GlyphIndex mStartIndexOfElidedGlyphs; ///< The start index of elided glyphs.
-  GlyphIndex mEndIndexOfElidedGlyphs;   ///< The end index of elided glyphs.
+  const ModelInterface* const mModel;            ///< Pointer to the text's model.
+  Vector<GlyphInfo>           mElidedGlyphs;     ///< Stores the glyphs of the elided text.
+  Vector<Vector2>             mElidedLayout;     ///< Stores the positions of each glyph of the elided text.
+  bool                        mIsTextElided : 1; ///< Whether the text has been elided.
+  float                       mElidedOffset;     ///< The width of the (control - elided line). This is required for calculating the correct
+                                                 ///< horizontal align offset.
+  GlyphIndex mStartIndexOfElidedGlyphs;          ///< The start index of elided glyphs.
+  GlyphIndex mEndIndexOfElidedGlyphs;            ///< The end index of elided glyphs.
   GlyphIndex
-      mFirstMiddleIndexOfElidedGlyphs; ///< The first end index of elided glyphs, index before ellipsis of middle.
+             mFirstMiddleIndexOfElidedGlyphs;  ///< The first end index of elided glyphs, index before ellipsis of middle.
   GlyphIndex mSecondMiddleIndexOfElidedGlyphs; ///< The second end index of elided glyphs, index of ellipsis of middle.
 };
 

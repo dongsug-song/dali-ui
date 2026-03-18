@@ -22,21 +22,26 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-ui-foundation/devel-api/controls/control-devel.h>
 #include <dali-ui-foundation/devel-api/visual-factory/visual-factory.h>
 #include <dali-ui-foundation/devel-api/visuals/visual-actions-devel.h>
 #include <dali-ui-foundation/internal/controls/control/control-data-impl.h>
 #include <dali-ui-foundation/internal/visuals/visual-base-data-impl.h>
 #include <dali-ui-foundation/internal/visuals/visual-base-impl.h>
 #include <dali-ui-foundation/internal/visuals/visual-string-constants.h>
+#include <dali-ui-foundation/public-api/controls/control-depth-index-ranges.h>
 #include <dali-ui-foundation/public-api/controls/image-view/image-view.h>
 #include <dali-ui-foundation/public-api/visuals/visual-properties.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -47,11 +52,11 @@ namespace Internal
 namespace
 {
 constexpr float FULL_OPACITY = 1.0f;
-constexpr float LOW_OPACITY = 0.2f;
+constexpr float LOW_OPACITY  = 0.2f;
 
-constexpr int PLACEHOLDER_DEPTH_INDEX = -2;
+constexpr int PLACEHOLDER_DEPTH_INDEX     = -2;
 constexpr int PREVIOUS_VISUAL_DEPTH_INDEX = -1;
-constexpr int CURRENT_VISUAL_DEPTH_INDEX = 0;
+constexpr int CURRENT_VISUAL_DEPTH_INDEX  = 0;
 
 BaseHandle Create()
 {
@@ -73,7 +78,7 @@ DALI_TYPE_REGISTRATION_END()
  */
 void DiscardImageViewVisual(Dali::Ui::Visual::Base& visual)
 {
-  if (DALI_LIKELY(Dali::Adaptor::IsAvailable() && visual))
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable() && visual))
   {
     Dali::Ui::VisualFactory::Get().DiscardVisual(visual);
   }
@@ -85,9 +90,9 @@ void DiscardImageViewVisual(Dali::Ui::Visual::Base& visual)
 using namespace Dali;
 
 ImageView::ImageView(ControlBehaviour additionalBehaviour)
-  : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
-    mImageSize(),
-    mImageReplaced(false)
+: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
+  mImageSize(),
+  mImageReplaced(false)
 {
 }
 
@@ -120,12 +125,12 @@ void ImageView::OnInitialize()
   Dali::Ui::Control handle(GetOwner());
   handle.ResourceReadySignal().Connect(this, &ImageView::OnResourceReady);
 
-  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::IMAGE);
+  Self().SetProperty(Ui::Control::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::IMAGE);
 }
 
 void ImageView::SetImage(const Property::Map& map)
 {
-  if (mVisual)
+  if(mVisual)
   {
     DiscardImageViewVisual(mPreviousVisual);
     mPreviousVisual = mVisual;
@@ -137,32 +142,33 @@ void ImageView::SetImage(const Property::Map& map)
 
   mImageReplaced = true;
 
-  if (!mVisual)
+  if(!mVisual)
   {
     ShowPlaceholderImage();
   }
 
   Ui::Visual::Base visual = Ui::VisualFactory::Get().CreateVisual(mPropertyMap);
-  if (visual)
+  if(visual)
   {
     Internal::Visual::Base& visualImpl = Ui::GetImplementation(visual);
-    if (visualImpl.GetFittingMode() == Visual::FittingMode::DONT_CARE)
+    if(visualImpl.GetFittingMode() == Visual::FittingMode::DONT_CARE)
     {
       visualImpl.SetFittingMode(Visual::FittingMode::FILL);
     }
 
     // Don't set mVisual until it is ready and shown. Getters will still use current visual.
-    if (!mVisual)
+    if(!mVisual)
     {
       mVisual = visual;
     }
 
-    if (!mShaderMap.Empty())
+    if(!mShaderMap.Empty())
     {
       visualImpl.SetCustomShader(mShaderMap);
     }
 
-    DevelControl::RegisterVisual(*this, Ui::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
+    Dali::Ui::Control handle(GetOwner());
+    handle.RegisterVisual(Ui::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
     controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
@@ -170,7 +176,8 @@ void ImageView::SetImage(const Property::Map& map)
   else
   {
     // Unregister the exsiting visual
-    DevelControl::UnregisterVisual(*this, Ui::ImageView::Property::IMAGE);
+    Dali::Ui::Control handle(GetOwner());
+    handle.UnregisterVisual(Ui::ImageView::Property::IMAGE);
 
     // Trigger a size negotiation request that may be needed when unregistering a visual.
     RelayoutRequest();
@@ -178,48 +185,49 @@ void ImageView::SetImage(const Property::Map& map)
   // Signal that a Relayout may be needed
 }
 
-void ImageView::SetImage(const std::string& url, ImageDimensions size)
+void ImageView::SetImage(const Dali::String& url, ImageDimensions size)
 {
-  if (mVisual)
+  if(mVisual)
   {
     DiscardImageViewVisual(mPreviousVisual);
     mPreviousVisual = mVisual;
   }
 
   // Don't bother comparing if we had a visual previously, just drop old visual and create new one
-  mUrl = url;
+  mUrl       = ToStdString(url);
   mImageSize = size;
   mPropertyMap.Clear();
 
   mImageReplaced = true;
 
-  if (!mVisual)
+  if(!mVisual)
   {
     ShowPlaceholderImage();
   }
 
   // Don't set mVisual until it is ready and shown. Getters will still use current visual.
-  Ui::Visual::Base visual = Ui::VisualFactory::Get().CreateVisual(url, size);
-  if (visual)
+  Ui::Visual::Base visual = Ui::VisualFactory::Get().CreateVisual(mUrl, size);
+  if(visual)
   {
     Internal::Visual::Base& visualImpl = Ui::GetImplementation(visual);
-    if (visualImpl.GetFittingMode() == Visual::FittingMode::DONT_CARE)
+    if(visualImpl.GetFittingMode() == Visual::FittingMode::DONT_CARE)
     {
       visualImpl.SetFittingMode(Visual::FittingMode::FILL);
     }
 
     // Don't set mVisual until it is ready and shown. Getters will still use current visual.
-    if (!mVisual)
+    if(!mVisual)
     {
       mVisual = visual;
     }
 
-    if (!mShaderMap.Empty())
+    if(!mShaderMap.Empty())
     {
       visualImpl.SetCustomShader(mShaderMap);
     }
 
-    DevelControl::RegisterVisual(*this, Ui::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
+    Dali::Ui::Control handle(GetOwner());
+    handle.RegisterVisual(Ui::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
     controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
@@ -227,7 +235,8 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
   else
   {
     // Unregister the exsiting visual
-    DevelControl::UnregisterVisual(*this, Ui::ImageView::Property::IMAGE);
+    Dali::Ui::Control handle(GetOwner());
+    handle.UnregisterVisual(Ui::ImageView::Property::IMAGE);
 
     // Trigger a size negotiation request that may be needed when unregistering a visual.
     RelayoutRequest();
@@ -244,7 +253,8 @@ void ImageView::ClearImageVisual()
   DiscardImageViewVisual(mVisual);
 
   // Unregister the exsiting visual
-  DevelControl::UnregisterVisual(*this, Ui::ImageView::Property::IMAGE);
+  Dali::Ui::Control handle(GetOwner());
+  handle.UnregisterVisual(Ui::ImageView::Property::IMAGE);
 
   // Trigger a size negotiation request that may be needed when unregistering a visual.
   RelayoutRequest();
@@ -252,7 +262,7 @@ void ImageView::ClearImageVisual()
 
 void ImageView::EnablePreMultipliedAlpha(bool preMultipled)
 {
-  if (mVisual)
+  if(mVisual)
   {
     Ui::GetImplementation(mVisual).EnablePreMultipliedAlpha(preMultipled);
   }
@@ -260,7 +270,7 @@ void ImageView::EnablePreMultipliedAlpha(bool preMultipled)
 
 bool ImageView::IsPreMultipliedAlphaEnabled() const
 {
-  if (mVisual)
+  if(mVisual)
   {
     return Ui::GetImplementation(mVisual).IsPreMultipliedAlphaEnabled();
   }
@@ -269,42 +279,43 @@ bool ImageView::IsPreMultipliedAlphaEnabled() const
 
 void ImageView::SetDepthIndex(int depthIndex)
 {
-  if (mVisual)
+  if(mVisual)
   {
     mVisual.SetDepthIndex(depthIndex);
   }
 }
 
-void ImageView::SetPlaceholderUrl(const std::string& url)
+void ImageView::SetPlaceholderUrl(const Dali::String& url)
 {
-  mPlaceholderUrl = url;
-  if (!url.empty())
+  mPlaceholderUrl = ToStdString(url);
+  if(!mPlaceholderUrl.empty())
   {
     DiscardImageViewVisual(mPlaceholderVisual);
     CreatePlaceholderImage();
   }
   else
   {
+    Dali::Ui::Control handle(GetOwner());
     // Clear current placeholder image
-    Ui::Visual::Base visual = DevelControl::GetVisual(*this, Ui::ImageView::Property::PLACEHOLDER_IMAGE);
-    if (visual)
+    Ui::Visual::Base visual = handle.GetVisual(Ui::ImageView::Property::PLACEHOLDER_IMAGE);
+    if(visual)
     {
-      DevelControl::UnregisterVisual(*this, Ui::ImageView::Property::PLACEHOLDER_IMAGE);
+      handle.UnregisterVisual(Ui::ImageView::Property::PLACEHOLDER_IMAGE);
     }
 
     DiscardImageViewVisual(mPlaceholderVisual);
-    mPlaceholderUrl = url;
+    mPlaceholderUrl = ToStdString(url);
   }
 }
 
-std::string ImageView::GetPlaceholderUrl() const
+Dali::String ImageView::GetPlaceholderUrl() const
 {
-  return mPlaceholderUrl;
+  return ToDaliString(mPlaceholderUrl);
 }
 
 Vector3 ImageView::GetNaturalSize()
 {
-  if (mVisual)
+  if(mVisual)
   {
     Vector2 rendererNaturalSize;
     mVisual.GetNaturalSize(rendererNaturalSize);
@@ -326,7 +337,7 @@ float ImageView::GetHeightForWidth(float width)
   Extents padding;
   padding = Self().GetProperty<Extents>(Ui::Control::Property::PADDING);
 
-  if (mVisual)
+  if(mVisual)
   {
     return mVisual.GetHeightForWidth(width) + padding.top + padding.bottom;
   }
@@ -341,7 +352,7 @@ float ImageView::GetWidthForHeight(float height)
   Extents padding;
   padding = Self().GetProperty<Extents>(Ui::Control::Property::PADDING);
 
-  if (mVisual)
+  if(mVisual)
   {
     return mVisual.GetWidthForHeight(height) + padding.start + padding.end;
   }
@@ -352,19 +363,17 @@ float ImageView::GetWidthForHeight(float height)
 }
 
 void ImageView::OnUpdateVisualProperties(
-    const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
+  const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
 {
-  Ui::Visual::Base visual = DevelControl::GetVisual(*this, Ui::ImageView::Property::IMAGE);
-  if (visual)
+  Dali::Ui::Control handle(GetOwner());
+  Ui::Visual::Base  visual = handle.GetVisual(Ui::ImageView::Property::IMAGE);
+  if(visual)
   {
-    Dali::Ui::Control handle(GetOwner());
-
-    for (auto&& data : properties)
+    for(auto&& data : properties)
     {
-      if (data.first == Ui::ImageView::Property::IMAGE)
+      if(data.first == Ui::ImageView::Property::IMAGE)
       {
-        DevelControl::DoAction(handle, Ui::ImageView::Property::IMAGE, DevelVisual::Action::UPDATE_PROPERTY,
-                               data.second);
+        handle.DoAction(Ui::ImageView::Property::IMAGE, DevelVisual::Action::UPDATE_PROPERTY, data.second);
         break;
       }
     }
@@ -375,14 +384,14 @@ void ImageView::OnResourceReady(Ui::Control control)
 {
   // In case of placeholder, we need to skip this call.
   // TODO: In case of placeholder, it needs to be modified not to call OnResourceReady()
-  if (control.GetVisualResourceStatus(Ui::ImageView::Property::IMAGE) != Ui::Visual::ResourceStatus::READY)
+  if(control.GetVisualResourceStatus(Ui::ImageView::Property::IMAGE) != Ui::Visual::ResourceStatus::READY)
   {
     return;
   }
 
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
-  auto currentVisual = DevelControl::GetVisual(*this, Ui::ImageView::Property::IMAGE);
-  if (mVisual != currentVisual)
+  auto currentVisual = control.GetVisual(Ui::ImageView::Property::IMAGE);
+  if(mVisual != currentVisual)
   {
     // If the current visual is not the same as the previous holded visual, then we need to discard old one.
     DiscardImageViewVisual(mVisual);
@@ -396,29 +405,31 @@ void ImageView::CreatePlaceholderImage()
 {
   Property::Map propertyMap;
   propertyMap.Insert(Ui::Visual::Property::TYPE, Ui::Visual::IMAGE);
-  propertyMap.Insert(Ui::ImageVisual::Property::URL, mPlaceholderUrl);
+  propertyMap.Insert(Ui::ImageVisual::Property::URL, ToPropertyValue(mPlaceholderUrl));
   // propertyMap.Insert(Ui::ImageVisual::Property::LOAD_POLICY, Ui::ImageVisual::LoadPolicy::IMMEDIATE); //
   // TODO: need to enable this property
   propertyMap.Insert(Ui::ImageVisual::Property::RELEASE_POLICY, Ui::ImageVisual::ReleasePolicy::DESTROYED);
   propertyMap.Insert(Ui::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE, false);
   mPlaceholderVisual = Ui::VisualFactory::Get().CreateVisual(propertyMap);
-  if (mPlaceholderVisual)
+  if(mPlaceholderVisual)
   {
     mPlaceholderVisual.SetName("placeholder");
     mPlaceholderVisual.SetDepthIndex(mPlaceholderVisual.GetDepthIndex() + PLACEHOLDER_DEPTH_INDEX);
   }
   else
   {
-    DevelControl::UnregisterVisual(*this, Ui::ImageView::Property::PLACEHOLDER_IMAGE);
+    Dali::Ui::Control handle(GetOwner());
+    handle.UnregisterVisual(Ui::ImageView::Property::PLACEHOLDER_IMAGE);
     DiscardImageViewVisual(mPlaceholderVisual);
   }
 }
 
 void ImageView::ShowPlaceholderImage()
 {
-  if (mPlaceholderVisual)
+  if(mPlaceholderVisual)
   {
-    DevelControl::RegisterVisual(*this, Ui::ImageView::Property::PLACEHOLDER_IMAGE, mPlaceholderVisual, false);
+    Dali::Ui::Control handle(GetOwner());
+    handle.RegisterVisual(Ui::ImageView::Property::PLACEHOLDER_IMAGE, mPlaceholderVisual, false);
 
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
     controlDataImpl.EnableCornerPropertiesOverridden(mPlaceholderVisual, true);
@@ -430,9 +441,10 @@ void ImageView::ShowPlaceholderImage()
 
 void ImageView::HidePlaceholderImage()
 {
-  if (mPlaceholderVisual)
+  if(mPlaceholderVisual)
   {
-    DevelControl::UnregisterVisual(*this, Ui::ImageView::Property::PLACEHOLDER_IMAGE);
+    Dali::Ui::Control handle(GetOwner());
+    handle.UnregisterVisual(Ui::ImageView::Property::PLACEHOLDER_IMAGE);
 
     // Hide placeholder
     Actor self = Self();
@@ -449,27 +461,27 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
 {
   Ui::ImageView imageView = Ui::ImageView::DownCast(Dali::BaseHandle(object));
 
-  if (imageView)
+  if(imageView)
   {
     ImageView& impl = GetImpl(imageView);
-    switch (index)
+    switch(index)
     {
       case Ui::ImageView::Property::IMAGE:
       {
-        std::string imageUrl;
+        std::string          imageUrl;
         const Property::Map* map;
-        if (value.Get(imageUrl))
+        if(GetStdString(value, imageUrl))
         {
-          impl.SetImage(imageUrl, ImageDimensions());
+          impl.SetImage(ToDaliString(imageUrl), ImageDimensions());
         }
         // if its not a string then get a Property::Map from the property if possible.
         else
         {
           map = value.GetMap();
-          if (DALI_LIKELY(map))
+          if(DALI_LIKELY(map))
           {
             // the property map is emtpy map. Unregister visual.
-            if (DALI_UNLIKELY(map->Count() == 0u))
+            if(DALI_UNLIKELY(map->Count() == 0u))
             {
               impl.ClearImageVisual();
             }
@@ -477,23 +489,23 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
             {
               Property::Value* shaderValue = map->Find(Ui::Visual::Property::SHADER, CUSTOM_SHADER);
               // set image only if property map contains image information other than custom shader
-              if (map->Count() > 1u || !shaderValue)
+              if(map->Count() > 1u || !shaderValue)
               {
                 impl.SetImage(*map);
               }
               // the property map contains only the custom shader
-              else if ((map->Count() == 1u) && (shaderValue))
+              else if((map->Count() == 1u) && (shaderValue))
               {
                 Property::Map* shaderMap = shaderValue->GetMap();
-                if (shaderMap)
+                if(shaderMap)
                 {
                   impl.mShaderMap = *shaderMap;
 
-                  if (!impl.mUrl.empty())
+                  if(!impl.mUrl.empty())
                   {
-                    impl.SetImage(impl.mUrl, impl.mImageSize);
+                    impl.SetImage(ToDaliString(impl.mUrl), impl.mImageSize);
                   }
-                  else if (!impl.mPropertyMap.Empty())
+                  else if(!impl.mPropertyMap.Empty())
                   {
                     impl.SetImage(impl.mPropertyMap);
                   }
@@ -513,7 +525,7 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
       case Ui::ImageView::Property::PRE_MULTIPLIED_ALPHA:
       {
         bool isPre;
-        if (value.Get(isPre))
+        if(value.Get(isPre))
         {
           impl.EnablePreMultipliedAlpha(isPre);
         }
@@ -523,9 +535,9 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
       case Ui::ImageView::Property::PLACEHOLDER_IMAGE:
       {
         std::string placeholderUrl;
-        if (value.Get(placeholderUrl))
+        if(GetStdString(value, placeholderUrl))
         {
-          impl.SetPlaceholderUrl(placeholderUrl);
+          impl.SetPlaceholderUrl(ToDaliString(placeholderUrl));
         }
         break;
       }
@@ -539,22 +551,22 @@ Property::Value ImageView::GetProperty(BaseObject* object, Property::Index prope
 
   Ui::ImageView imageview = Ui::ImageView::DownCast(Dali::BaseHandle(object));
 
-  if (imageview)
+  if(imageview)
   {
     ImageView& impl = GetImpl(imageview);
-    switch (propertyIndex)
+    switch(propertyIndex)
     {
       case Ui::ImageView::Property::IMAGE:
       {
-        if (!impl.mUrl.empty())
+        if(!impl.mUrl.empty())
         {
-          value = impl.mUrl;
+          value = ToPropertyValue(impl.mUrl);
         }
         else
         {
-          Property::Map map;
-          Ui::Visual::Base visual = DevelControl::GetVisual(impl, Ui::ImageView::Property::IMAGE);
-          if (visual)
+          Property::Map    map;
+          Ui::Visual::Base visual = imageview.GetVisual(Ui::ImageView::Property::IMAGE);
+          if(visual)
           {
             visual.CreatePropertyMap(map);
           }

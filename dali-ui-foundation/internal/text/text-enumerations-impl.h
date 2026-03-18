@@ -22,10 +22,9 @@
 #include <dali/public-api/object/property-value.h>
 
 // INTERNAL INCLUDES
+#include <dali-ui-foundation/internal/text/text-enumerations-internal.h>
 #include <dali-ui-foundation/public-api/text/text-enumerations.h>
 
-// DEVEL INCLUDES
-#include <dali-ui-foundation/devel-api/text/text-enumerations-devel.h>
 namespace Dali
 {
 namespace Ui
@@ -39,7 +38,7 @@ namespace Text
  * @return true if the resulting alignment has been updated
  */
 bool GetHorizontalAlignmentEnumeration(const Property::Value& propertyValue,
-                                       Ui::Text::HorizontalAlignment::Type& alignment);
+                                       Alignment&             alignment);
 
 /**
  * @brief Get the alignment from the provided property value.
@@ -48,7 +47,7 @@ bool GetHorizontalAlignmentEnumeration(const Property::Value& propertyValue,
  * @return true if the resulting alignment has been updated
  */
 bool GetVerticalAlignmentEnumeration(const Property::Value& propertyValue,
-                                     Ui::Text::VerticalAlignment::Type& alignment);
+                                     Alignment&             alignment);
 
 /**
  * @brief Get the line-wrap-mode from the provided property value.
@@ -56,21 +55,21 @@ bool GetVerticalAlignmentEnumeration(const Property::Value& propertyValue,
  * @param[out] alignment The resulting lineWrapMode from the given source
  * @return true if the resulting lineWrapMode has been updated
  */
-bool GetLineWrapModeEnumeration(const Property::Value& propertyValue, Ui::Text::LineWrap::Mode& lineWrapMode);
+bool GetLineWrapModeEnumeration(const Property::Value& propertyValue, LineWrapMode& lineWrapMode);
 
 /**
  * @brief Get the alignment string from the provided alignment string.
  * @param[in] alignment the Text::HORIZONTAL enum source
  * @return the string equivalent
  */
-const char* GetHorizontalAlignmentString(const Ui::Text::HorizontalAlignment::Type& alignment);
+const char* GetHorizontalAlignmentString(const Alignment& alignment);
 
 /**
  * @brief Get the alignment string from the provided alignment string.
  * @param[in] alignment the Text::VerticalAlignment enum source
  * @return the string equivalent
  */
-const char* GetVerticalAlignmentString(const Ui::Text::VerticalAlignment::Type& alignment);
+const char* GetVerticalAlignmentString(const Alignment& alignment);
 
 /**
  * @brief Get the ellipsis-location-type from the provided property value.
@@ -78,15 +77,15 @@ const char* GetVerticalAlignmentString(const Ui::Text::VerticalAlignment::Type& 
  * @param[out] ellipsisPositionType The resulting ellipsisPositionType from the given source
  * @return true if the resulting ellipsisPositionType has been updated
  */
-bool GetEllipsisPositionTypeEnumeration(const Property::Value& propertyValue,
-                                        Ui::DevelText::EllipsisPosition::Type& ellipsisPositionType);
+bool GetEllipsisPositionTypeEnumeration(const Property::Value&  propertyValue,
+                                        EllipsisPosition::Type& ellipsisPositionType);
 
 /**
  * @brief Converts the underline type to string format.
  * @param[in] type the Ui::Text::Underline::Type enum source
  * @return the string equivalent
  */
-const char* GetUnderlineTypeToString(const Ui::Text::Underline::Type& type);
+const char* GetUnderlineTypeToString(const Underline::Type& type);
 
 } // namespace Text
 

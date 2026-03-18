@@ -21,11 +21,13 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <cmath>
 
 // INTERNAL INCLUDES
+#include <dali-ui-foundation/integration-api/ui-config-manager.h>
 #include <dali-ui-foundation/internal/controls/text-controls/common-text-utils.h>
 #include <dali-ui-foundation/internal/text/character-set-conversion.h>
 #include <dali-ui-foundation/internal/text/controller/text-controller-impl-data-clearer.h>
@@ -44,6 +46,8 @@
 
 using namespace Dali;
 
+using Dali::Integration::ToPropertyValue;
+
 namespace
 {
 #if defined(DEBUG_ENABLED)
@@ -52,9 +56,9 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 
 constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
-const char* EMPTY_STRING = "";
+const char* EMPTY_STRING         = "";
 const char* MIME_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
-const char* MIME_TYPE_HTML = "application/xhtml+xml";
+const char* MIME_TYPE_HTML       = "application/xhtml+xml";
 
 } // namespace
 
@@ -65,14 +69,14 @@ namespace
 void SetDefaultInputStyle(InputStyle& inputStyle, const FontDefaults* const fontDefaults, const Vector4& textColor)
 {
   // Sets the default text's color.
-  inputStyle.textColor = textColor;
+  inputStyle.textColor      = textColor;
   inputStyle.isDefaultColor = true;
 
   inputStyle.familyName.clear();
   inputStyle.weight = TextAbstraction::FontWeight::NORMAL;
-  inputStyle.width = TextAbstraction::FontWidth::NORMAL;
-  inputStyle.slant = TextAbstraction::FontSlant::NORMAL;
-  inputStyle.size = 0.f;
+  inputStyle.width  = TextAbstraction::FontWidth::NORMAL;
+  inputStyle.slant  = TextAbstraction::FontSlant::NORMAL;
+  inputStyle.size   = 0.f;
 
   inputStyle.lineSpacing = 0.f;
 
@@ -83,47 +87,47 @@ void SetDefaultInputStyle(InputStyle& inputStyle, const FontDefaults* const font
 
   inputStyle.isFamilyDefined = false;
   inputStyle.isWeightDefined = false;
-  inputStyle.isWidthDefined = false;
-  inputStyle.isSlantDefined = false;
-  inputStyle.isSizeDefined = false;
+  inputStyle.isWidthDefined  = false;
+  inputStyle.isSlantDefined  = false;
+  inputStyle.isSizeDefined   = false;
 
   inputStyle.isLineSpacingDefined = false;
 
   inputStyle.isUnderlineDefined = false;
-  inputStyle.isShadowDefined = false;
-  inputStyle.isEmbossDefined = false;
-  inputStyle.isOutlineDefined = false;
+  inputStyle.isShadowDefined    = false;
+  inputStyle.isEmbossDefined    = false;
+  inputStyle.isOutlineDefined   = false;
 
   // Sets the default font's family name, weight, width, slant and size.
-  if (fontDefaults)
+  if(fontDefaults)
   {
-    if (fontDefaults->familyDefined)
+    if(fontDefaults->familyDefined)
     {
-      inputStyle.familyName = fontDefaults->mFontDescription.family;
+      inputStyle.familyName      = fontDefaults->mFontDescription.family;
       inputStyle.isFamilyDefined = true;
     }
 
-    if (fontDefaults->weightDefined)
+    if(fontDefaults->weightDefined)
     {
-      inputStyle.weight = fontDefaults->mFontDescription.weight;
+      inputStyle.weight          = fontDefaults->mFontDescription.weight;
       inputStyle.isWeightDefined = true;
     }
 
-    if (fontDefaults->widthDefined)
+    if(fontDefaults->widthDefined)
     {
-      inputStyle.width = fontDefaults->mFontDescription.width;
+      inputStyle.width          = fontDefaults->mFontDescription.width;
       inputStyle.isWidthDefined = true;
     }
 
-    if (fontDefaults->slantDefined)
+    if(fontDefaults->slantDefined)
     {
-      inputStyle.slant = fontDefaults->mFontDescription.slant;
+      inputStyle.slant          = fontDefaults->mFontDescription.slant;
       inputStyle.isSlantDefined = true;
     }
 
-    if (fontDefaults->sizeDefined)
+    if(fontDefaults->sizeDefined)
     {
-      inputStyle.size = fontDefaults->mDefaultPointSize;
+      inputStyle.size          = fontDefaults->mDefaultPointSize;
       inputStyle.isSizeDefined = true;
     }
   }
@@ -133,14 +137,14 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
 {
   EventData* eventData = impl.mEventData;
 
-  if (nullptr == eventData)
+  if(nullptr == eventData)
   {
     // Nothing to do if there is no text input.
     return;
   }
 
   DecoratorPtr& decorator = eventData->mDecorator;
-  if (!decorator)
+  if(!decorator)
   {
     // Nothing to do if there is no decorator.
     return;
@@ -148,12 +152,12 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
 
   DALI_LOG_INFO(gLogFilter, Debug::General, "ChangeState state:%d  newstate:%d\n", eventData->mState, newState);
 
-  if (eventData->mState != newState)
+  if(eventData->mState != newState)
   {
     eventData->mPreviousState = eventData->mState;
-    eventData->mState = newState;
+    eventData->mState         = newState;
 
-    switch (eventData->mState)
+    switch(eventData->mState)
     {
       case EventData::INACTIVE:
       {
@@ -184,13 +188,13 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
         decorator->SetActiveCursor(ACTIVE_CURSOR_NONE);
         decorator->StopCursorBlink();
         decorator->SetHandleActive(GRAB_HANDLE, false);
-        if (eventData->mGrabHandleEnabled)
+        if(eventData->mGrabHandleEnabled)
         {
           decorator->SetHandleActive(LEFT_SELECTION_HANDLE, true);
           decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, true);
         }
         decorator->SetHighlightActive(true);
-        if (eventData->mGrabHandlePopupEnabled)
+        if(eventData->mGrabHandlePopupEnabled)
         {
           impl.SetPopupButtons();
           decorator->SetPopupActive(true);
@@ -202,7 +206,7 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
       case EventData::EDITING:
       {
         decorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
-        if (eventData->mCursorBlinkEnabled)
+        if(eventData->mCursorBlinkEnabled)
         {
           decorator->StartCursorBlink();
         }
@@ -211,7 +215,7 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
         decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
         decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
         decorator->SetHighlightActive(false);
-        if (eventData->mGrabHandlePopupEnabled)
+        if(eventData->mGrabHandlePopupEnabled)
         {
           decorator->SetPopupActive(false);
         }
@@ -223,21 +227,21 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "EDITING_WITH_POPUP \n", newState);
 
         decorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
-        if (eventData->mCursorBlinkEnabled)
+        if(eventData->mCursorBlinkEnabled)
         {
           decorator->StartCursorBlink();
         }
-        if (eventData->mSelectionEnabled)
+        if(eventData->mSelectionEnabled)
         {
           decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
           decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
           decorator->SetHighlightActive(false);
         }
-        else if (eventData->mGrabHandleEnabled)
+        else if(eventData->mGrabHandleEnabled)
         {
           decorator->SetHandleActive(GRAB_HANDLE, true);
         }
-        if (eventData->mGrabHandlePopupEnabled)
+        if(eventData->mGrabHandlePopupEnabled)
         {
           impl.SetPopupButtons();
           decorator->SetPopupActive(true);
@@ -250,19 +254,19 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "EDITING_WITH_GRAB_HANDLE \n", newState);
 
         decorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
-        if (eventData->mCursorBlinkEnabled)
+        if(eventData->mCursorBlinkEnabled)
         {
           decorator->StartCursorBlink();
         }
         // Grab handle is not shown until a tap is received whilst EDITING
-        if (eventData->mGrabHandleEnabled)
+        if(eventData->mGrabHandleEnabled)
         {
           decorator->SetHandleActive(GRAB_HANDLE, true);
         }
         decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
         decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
         decorator->SetHighlightActive(false);
-        if (eventData->mGrabHandlePopupEnabled)
+        if(eventData->mGrabHandlePopupEnabled)
         {
           decorator->SetPopupActive(false);
         }
@@ -275,13 +279,13 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
         decorator->SetActiveCursor(ACTIVE_CURSOR_NONE);
         decorator->StopCursorBlink();
         decorator->SetHandleActive(GRAB_HANDLE, false);
-        if (eventData->mGrabHandleEnabled)
+        if(eventData->mGrabHandleEnabled)
         {
           decorator->SetHandleActive(LEFT_SELECTION_HANDLE, true);
           decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, true);
         }
         decorator->SetHighlightActive(true);
-        if (eventData->mGrabHandlePopupEnabled)
+        if(eventData->mGrabHandlePopupEnabled)
         {
           decorator->SetPopupActive(false);
         }
@@ -294,18 +298,18 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "GRAB_HANDLE_PANNING \n", newState);
 
         decorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
-        if (eventData->mCursorBlinkEnabled)
+        if(eventData->mCursorBlinkEnabled)
         {
           decorator->StartCursorBlink();
         }
-        if (eventData->mGrabHandleEnabled)
+        if(eventData->mGrabHandleEnabled)
         {
           decorator->SetHandleActive(GRAB_HANDLE, true);
         }
         decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
         decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
         decorator->SetHighlightActive(false);
-        if (eventData->mGrabHandlePopupEnabled)
+        if(eventData->mGrabHandlePopupEnabled)
         {
           decorator->SetPopupActive(false);
         }
@@ -318,12 +322,12 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "EDITING_WITH_PASTE_POPUP \n", newState);
 
         decorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
-        if (eventData->mCursorBlinkEnabled)
+        if(eventData->mCursorBlinkEnabled)
         {
           decorator->StartCursorBlink();
         }
 
-        if (eventData->mGrabHandleEnabled)
+        if(eventData->mGrabHandleEnabled)
         {
           decorator->SetHandleActive(GRAB_HANDLE, true);
         }
@@ -331,7 +335,7 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
         decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
         decorator->SetHighlightActive(false);
 
-        if (eventData->mGrabHandlePopupEnabled)
+        if(eventData->mGrabHandlePopupEnabled)
         {
           impl.SetPopupButtons();
           decorator->SetPopupActive(true);
@@ -345,15 +349,15 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
         decorator->SetActiveCursor(ACTIVE_CURSOR_NONE);
         decorator->StopCursorBlink();
         decorator->SetHandleActive(GRAB_HANDLE, false);
-        if (eventData->mDecorator->IsHandleActive(LEFT_SELECTION_HANDLE) ||
-            decorator->IsHandleActive(RIGHT_SELECTION_HANDLE))
+        if(eventData->mDecorator->IsHandleActive(LEFT_SELECTION_HANDLE) ||
+           decorator->IsHandleActive(RIGHT_SELECTION_HANDLE))
         {
           decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
           decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
           decorator->SetHighlightActive(true);
         }
 
-        if (eventData->mGrabHandlePopupEnabled)
+        if(eventData->mGrabHandlePopupEnabled)
         {
           decorator->SetPopupActive(false);
         }
@@ -371,15 +375,15 @@ void UpdateCursorPositionForAlignment(Controller::Impl& impl, bool needFullAlign
 
   // Set the flag to redo the alignment operation
   impl.mOperationsPending =
-      static_cast<Controller::OperationsMask>(impl.mOperationsPending | Controller::OperationsMask::ALIGN);
+    static_cast<Controller::OperationsMask>(impl.mOperationsPending | Controller::OperationsMask::ALIGN);
 
-  if (eventData)
+  if(eventData)
   {
     // Note: mUpdateAlignment is currently only needed for horizontal alignment
     eventData->mUpdateAlignment = needFullAlignment;
 
     // Update the cursor if it's in editing mode
-    if (EventData::IsEditingState(eventData->mState))
+    if(EventData::IsEditingState(eventData->mState))
     {
       impl.ChangeState(EventData::EDITING);
       eventData->mUpdateCursorPosition = true;
@@ -390,52 +394,52 @@ void UpdateCursorPositionForAlignment(Controller::Impl& impl, bool needFullAlign
 } // unnamed Namespace
 
 EventData::EventData(DecoratorPtr decorator, InputMethodContext& inputMethodContext)
-  : mDecorator(decorator),
-    mInputMethodContext(inputMethodContext),
-    mPlaceholderFont(nullptr),
-    mPlaceholderTextActive(),
-    mPlaceholderTextInactive(),
-    mPlaceholderTextColor(0.8f, 0.8f, 0.8f,
-                          0.8f), // This color has been published in the Public API (placeholder-properties.h).
-    mEventQueue(),
-    mInputStyleChangedQueue(),
-    mPreviousState(INACTIVE),
-    mState(INACTIVE),
-    mPrimaryCursorPosition(0u),
-    mLeftSelectionPosition(0u),
-    mRightSelectionPosition(0u),
-    mPreEditStartPosition(0u),
-    mPreEditLength(0u),
-    mCursorHookPositionX(0.f),
-    mDoubleTapAction(Controller::NoTextTap::NO_ACTION),
-    mLongPressAction(Controller::NoTextTap::SHOW_SELECTION_POPUP),
-    mIsShowingPlaceholderText(false),
-    mPreEditFlag(false),
-    mDecoratorUpdated(false),
-    mCursorBlinkEnabled(true),
-    mGrabHandleEnabled(true),
-    mGrabHandlePopupEnabled(true),
-    mSelectionEnabled(true),
-    mUpdateCursorHookPosition(false),
-    mUpdateCursorPosition(false),
-    mUpdateGrabHandlePosition(false),
-    mUpdateLeftSelectionPosition(false),
-    mUpdateRightSelectionPosition(false),
-    mIsLeftHandleSelected(false),
-    mIsRightHandleSelected(false),
-    mUpdateHighlightBox(false),
-    mScrollAfterUpdatePosition(false),
-    mScrollAfterDelete(false),
-    mAllTextSelected(false),
-    mUpdateInputStyle(false),
-    mPasswordInput(false),
-    mCheckScrollAmount(false),
-    mIsPlaceholderPixelSize(false),
-    mIsPlaceholderElideEnabled(false),
-    mPlaceholderEllipsisFlag(false),
-    mShiftSelectionFlag(true),
-    mUpdateAlignment(false),
-    mEditingEnabled(true)
+: mDecorator(decorator),
+  mInputMethodContext(inputMethodContext),
+  mPlaceholderFont(nullptr),
+  mPlaceholderTextActive(),
+  mPlaceholderTextInactive(),
+  mPlaceholderTextColor(0.8f, 0.8f, 0.8f,
+                        0.8f), // This color has been published in the Public API (placeholder-properties.h).
+  mEventQueue(),
+  mInputStyleChangedQueue(),
+  mPreviousState(INACTIVE),
+  mState(INACTIVE),
+  mPrimaryCursorPosition(0u),
+  mLeftSelectionPosition(0u),
+  mRightSelectionPosition(0u),
+  mPreEditStartPosition(0u),
+  mPreEditLength(0u),
+  mCursorHookPositionX(0.f),
+  mDoubleTapAction(Controller::NoTextTap::NO_ACTION),
+  mLongPressAction(Controller::NoTextTap::SHOW_SELECTION_POPUP),
+  mIsShowingPlaceholderText(false),
+  mPreEditFlag(false),
+  mDecoratorUpdated(false),
+  mCursorBlinkEnabled(true),
+  mGrabHandleEnabled(true),
+  mGrabHandlePopupEnabled(true),
+  mSelectionEnabled(true),
+  mUpdateCursorHookPosition(false),
+  mUpdateCursorPosition(false),
+  mUpdateGrabHandlePosition(false),
+  mUpdateLeftSelectionPosition(false),
+  mUpdateRightSelectionPosition(false),
+  mIsLeftHandleSelected(false),
+  mIsRightHandleSelected(false),
+  mUpdateHighlightBox(false),
+  mScrollAfterUpdatePosition(false),
+  mScrollAfterDelete(false),
+  mAllTextSelected(false),
+  mUpdateInputStyle(false),
+  mPasswordInput(false),
+  mCheckScrollAmount(false),
+  mIsPlaceholderPixelSize(false),
+  mIsPlaceholderElideEnabled(false),
+  mPlaceholderEllipsisFlag(false),
+  mShiftSelectionFlag(true),
+  mUpdateAlignment(false),
+  mEditingEnabled(true)
 {
 }
 
@@ -468,8 +472,8 @@ const Vector4& Controller::Impl::GetAnchorClickedColor() const
 
 void Controller::Impl::UpdateAnchorColor()
 {
-  if (!mAnchorControlInterface || !mMarkupProcessorEnabled || !mModel->mLogicalModel->mAnchors.Count() ||
-      !IsShowingRealText())
+  if(!mAnchorControlInterface || !mMarkupProcessorEnabled || !mModel->mLogicalModel->mAnchors.Count() ||
+     !IsShowingRealText())
   {
     return;
   }
@@ -477,43 +481,43 @@ void Controller::Impl::UpdateAnchorColor()
   bool updateNeeded = false;
 
   // The anchor color & clicked color needs to be updated with the property's color.
-  for (auto& anchor : mModel->mLogicalModel->mAnchors)
+  for(auto& anchor : mModel->mLogicalModel->mAnchors)
   {
-    if (!anchor.isMarkupColorSet && !anchor.isClicked)
+    if(!anchor.isMarkupColorSet && !anchor.isClicked)
     {
-      if (mModel->mLogicalModel->mColorRuns.Count() > anchor.colorRunIndex)
+      if(mModel->mLogicalModel->mColorRuns.Count() > anchor.colorRunIndex)
       {
         ColorRun& colorRun = *(mModel->mLogicalModel->mColorRuns.Begin() + anchor.colorRunIndex);
-        colorRun.color = mAnchorColor;
-        updateNeeded = true;
+        colorRun.color     = mAnchorColor;
+        updateNeeded       = true;
       }
-      if (mModel->mLogicalModel->mUnderlinedCharacterRuns.Count() > anchor.underlinedCharacterRunIndex)
+      if(mModel->mLogicalModel->mUnderlinedCharacterRuns.Count() > anchor.underlinedCharacterRunIndex)
       {
         UnderlinedCharacterRun& underlineRun =
-            *(mModel->mLogicalModel->mUnderlinedCharacterRuns.Begin() + anchor.underlinedCharacterRunIndex);
+          *(mModel->mLogicalModel->mUnderlinedCharacterRuns.Begin() + anchor.underlinedCharacterRunIndex);
         underlineRun.properties.color = mAnchorColor;
-        updateNeeded = true;
+        updateNeeded                  = true;
       }
     }
-    else if (!anchor.isMarkupClickedColorSet && anchor.isClicked)
+    else if(!anchor.isMarkupClickedColorSet && anchor.isClicked)
     {
-      if (mModel->mLogicalModel->mColorRuns.Count() > anchor.colorRunIndex)
+      if(mModel->mLogicalModel->mColorRuns.Count() > anchor.colorRunIndex)
       {
         ColorRun& colorRun = *(mModel->mLogicalModel->mColorRuns.Begin() + anchor.colorRunIndex);
-        colorRun.color = mAnchorClickedColor;
-        updateNeeded = true;
+        colorRun.color     = mAnchorClickedColor;
+        updateNeeded       = true;
       }
-      if (mModel->mLogicalModel->mUnderlinedCharacterRuns.Count() > anchor.underlinedCharacterRunIndex)
+      if(mModel->mLogicalModel->mUnderlinedCharacterRuns.Count() > anchor.underlinedCharacterRunIndex)
       {
         UnderlinedCharacterRun& underlineRun =
-            *(mModel->mLogicalModel->mUnderlinedCharacterRuns.Begin() + anchor.underlinedCharacterRunIndex);
+          *(mModel->mLogicalModel->mUnderlinedCharacterRuns.Begin() + anchor.underlinedCharacterRunIndex);
         underlineRun.properties.color = mAnchorClickedColor;
-        updateNeeded = true;
+        updateNeeded                  = true;
       }
     }
   }
 
-  if (updateNeeded)
+  if(updateNeeded)
   {
     ClearFontData();
     mOperationsPending = static_cast<OperationsMask>(mOperationsPending | COLOR);
@@ -523,7 +527,7 @@ void Controller::Impl::UpdateAnchorColor()
 
 void Controller::Impl::NotifyInputMethodContext()
 {
-  if (mEventData && mEventData->mInputMethodContext)
+  if(mEventData && mEventData->mInputMethodContext)
   {
     CharacterIndex cursorPosition = GetLogicalCursorPosition();
     mEventData->mInputMethodContext.SetCursorPosition(cursorPosition);
@@ -533,7 +537,7 @@ void Controller::Impl::NotifyInputMethodContext()
 
 void Controller::Impl::NotifyInputMethodContextMultiLineStatus()
 {
-  if (mEventData && mEventData->mInputMethodContext)
+  if(mEventData && mEventData->mInputMethodContext)
   {
     Text::Layout::Engine::Type layout = mLayoutEngine.GetLayout();
     mEventData->mInputMethodContext.NotifyTextInputMultiLine(layout == Text::Layout::Engine::MULTI_LINE_BOX);
@@ -544,9 +548,9 @@ CharacterIndex Controller::Impl::GetLogicalCursorPosition() const
 {
   CharacterIndex cursorPosition = 0u;
 
-  if (mEventData)
+  if(mEventData)
   {
-    if ((EventData::SELECTING == mEventData->mState) || (EventData::SELECTION_HANDLE_PANNING == mEventData->mState))
+    if((EventData::SELECTING == mEventData->mState) || (EventData::SELECTION_HANDLE_PANNING == mEventData->mState))
     {
       cursorPosition = std::min(mEventData->mRightSelectionPosition, mEventData->mLeftSelectionPosition);
     }
@@ -567,9 +571,9 @@ Length Controller::Impl::GetNumberOfWhiteSpaces(CharacterIndex index) const
   Character* utf32CharacterBuffer = mModel->mLogicalModel->mText.Begin();
 
   const Length totalNumberOfCharacters = mModel->mLogicalModel->mText.Count();
-  for (; index < totalNumberOfCharacters; ++index, ++numberOfWhiteSpaces)
+  for(; index < totalNumberOfCharacters; ++index, ++numberOfWhiteSpaces)
   {
-    if (!TextAbstraction::IsWhiteSpace(*(utf32CharacterBuffer + index)))
+    if(!TextAbstraction::IsWhiteSpace(*(utf32CharacterBuffer + index)))
     {
       break;
     }
@@ -580,7 +584,7 @@ Length Controller::Impl::GetNumberOfWhiteSpaces(CharacterIndex index) const
 
 void Controller::Impl::GetText(std::string& text) const
 {
-  if (!IsShowingPlaceholderText())
+  if(!IsShowingPlaceholderText())
   {
     // Retrieves the text string.
     GetText(0u, text);
@@ -593,7 +597,7 @@ void Controller::Impl::GetText(std::string& text) const
 
 Length Controller::Impl::GetNumberOfCharacters() const
 {
-  if (!IsShowingPlaceholderText())
+  if(!IsShowingPlaceholderText())
   {
     return mModel->GetNumberOfCharacters();
   }
@@ -611,7 +615,7 @@ void Controller::Impl::GetText(CharacterIndex index, std::string& text) const
   Length numberOfCharacters = mModel->mLogicalModel->mText.Count();
 
   // Retrieve the text.
-  if (0u != numberOfCharacters)
+  if(0u != numberOfCharacters)
   {
     Utf32ToUtf8(mModel->mLogicalModel->mText.Begin() + index, numberOfCharacters - index, text);
   }
@@ -619,31 +623,31 @@ void Controller::Impl::GetText(CharacterIndex index, std::string& text) const
 
 Dali::LayoutDirection::Type Controller::Impl::GetLayoutDirection(Dali::Actor& actor) const
 {
-  if (mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::LOCALE ||
-      (mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::INHERIT && !mIsLayoutDirectionChanged))
+  if(mModel->mMatchLayoutDirection == LayoutDirectionMode::LOCALE ||
+     (mModel->mMatchLayoutDirection == LayoutDirectionMode::INHERIT && !mIsLayoutDirectionChanged))
   {
     Dali::Integration::SceneHolder sceneHolder = Dali::Integration::SceneHolder::Get(actor);
     return static_cast<Dali::LayoutDirection::Type>(
-        sceneHolder ? sceneHolder.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>()
-                    : LayoutDirection::LEFT_TO_RIGHT);
+      sceneHolder ? sceneHolder.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>()
+                  : LayoutDirection::LEFT_TO_RIGHT);
   }
   else
   {
     return static_cast<Dali::LayoutDirection::Type>(
-        actor.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+      actor.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
   }
 }
 
-Ui::DevelText::TextDirection::Type Controller::Impl::GetTextDirection()
+Direction Controller::Impl::GetTextDirection()
 {
-  if (mUpdateTextDirection)
+  if(mUpdateTextDirection)
   {
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>(
-        CONVERT_TO_UTF32 | GET_SCRIPTS | VALIDATE_FONTS | GET_LINE_BREAKS | BIDI_INFO | SHAPE_TEXT | GET_GLYPH_METRICS);
+      CONVERT_TO_UTF32 | GET_SCRIPTS | VALIDATE_FONTS | GET_LINE_BREAKS | BIDI_INFO | SHAPE_TEXT | GET_GLYPH_METRICS);
 
     // Set the update info to relayout the whole text.
-    mTextUpdateInfo.mParagraphCharacterIndex = 0u;
+    mTextUpdateInfo.mParagraphCharacterIndex     = 0u;
     mTextUpdateInfo.mRequestedNumberOfCharacters = mModel->mLogicalModel->mText.Count();
 
     // Make sure the model is up-to-date before layouting
@@ -666,25 +670,24 @@ Ui::DevelText::TextDirection::Type Controller::Impl::GetTextDirection()
     mUpdateTextDirection = false;
   }
 
-  return mIsTextDirectionRTL ? Ui::DevelText::TextDirection::RIGHT_TO_LEFT
-                             : Ui::DevelText::TextDirection::LEFT_TO_RIGHT;
+  return mIsTextDirectionRTL ? Direction::RIGHT_TO_LEFT : Direction::LEFT_TO_RIGHT;
 }
 
 void Controller::Impl::CalculateTextUpdateIndices(Length& numberOfCharacters)
 {
   mTextUpdateInfo.mParagraphCharacterIndex = 0u;
-  mTextUpdateInfo.mStartGlyphIndex = 0u;
-  mTextUpdateInfo.mStartLineIndex = 0u;
-  numberOfCharacters = 0u;
+  mTextUpdateInfo.mStartGlyphIndex         = 0u;
+  mTextUpdateInfo.mStartLineIndex          = 0u;
+  numberOfCharacters                       = 0u;
 
   const Length numberOfParagraphs = mModel->mLogicalModel->mParagraphInfo.Count();
-  if (0u == numberOfParagraphs)
+  if(0u == numberOfParagraphs)
   {
     mTextUpdateInfo.mParagraphCharacterIndex = 0u;
-    numberOfCharacters = 0u;
+    numberOfCharacters                       = 0u;
 
     mTextUpdateInfo.mRequestedNumberOfCharacters =
-        mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
+      mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
 
     // Nothing else to do if there are no paragraphs.
     return;
@@ -692,20 +695,20 @@ void Controller::Impl::CalculateTextUpdateIndices(Length& numberOfCharacters)
 
   // Find the paragraphs to be updated.
   Vector<ParagraphRunIndex> paragraphsToBeUpdated;
-  if (mTextUpdateInfo.mCharacterIndex >= mTextUpdateInfo.mPreviousNumberOfCharacters)
+  if(mTextUpdateInfo.mCharacterIndex >= mTextUpdateInfo.mPreviousNumberOfCharacters)
   {
     // Text is being added at the end of the current text.
-    if (mTextUpdateInfo.mIsLastCharacterNewParagraph)
+    if(mTextUpdateInfo.mIsLastCharacterNewParagraph)
     {
       // Text is being added in a new paragraph after the last character of the text.
       mTextUpdateInfo.mParagraphCharacterIndex = mTextUpdateInfo.mPreviousNumberOfCharacters;
-      numberOfCharacters = 0u;
+      numberOfCharacters                       = 0u;
       mTextUpdateInfo.mRequestedNumberOfCharacters =
-          mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
+        mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
 
       mTextUpdateInfo.mStartGlyphIndex = mModel->mVisualModel->mGlyphs.Count();
       mTextUpdateInfo.mStartLineIndex =
-          (mModel->mVisualModel->mLines.Count() > 0u) ? mModel->mVisualModel->mLines.Count() - 1u : 0u;
+        (mModel->mVisualModel->mLines.Count() > 0u) ? mModel->mVisualModel->mLines.Count() - 1u : 0u;
 
       // Nothing else to do;
       return;
@@ -716,34 +719,34 @@ void Controller::Impl::CalculateTextUpdateIndices(Length& numberOfCharacters)
   else
   {
     Length numberOfCharactersToUpdate = 0u;
-    if (mTextUpdateInfo.mFullRelayoutNeeded)
+    if(mTextUpdateInfo.mFullRelayoutNeeded)
     {
       numberOfCharactersToUpdate = mTextUpdateInfo.mPreviousNumberOfCharacters;
     }
     else
     {
       numberOfCharactersToUpdate =
-          (mTextUpdateInfo.mNumberOfCharactersToRemove > 0u) ? mTextUpdateInfo.mNumberOfCharactersToRemove : 1u;
+        (mTextUpdateInfo.mNumberOfCharactersToRemove > 0u) ? mTextUpdateInfo.mNumberOfCharactersToRemove : 1u;
     }
     mModel->mLogicalModel->FindParagraphs(mTextUpdateInfo.mCharacterIndex, numberOfCharactersToUpdate,
                                           paragraphsToBeUpdated);
   }
 
-  if (0u != paragraphsToBeUpdated.Count())
+  if(0u != paragraphsToBeUpdated.Count())
   {
     const ParagraphRunIndex firstParagraphIndex = *(paragraphsToBeUpdated.Begin());
-    const ParagraphRun& firstParagraph = *(mModel->mLogicalModel->mParagraphInfo.Begin() + firstParagraphIndex);
-    mTextUpdateInfo.mParagraphCharacterIndex = firstParagraph.characterRun.characterIndex;
+    const ParagraphRun&     firstParagraph      = *(mModel->mLogicalModel->mParagraphInfo.Begin() + firstParagraphIndex);
+    mTextUpdateInfo.mParagraphCharacterIndex    = firstParagraph.characterRun.characterIndex;
 
-    ParagraphRunIndex lastParagraphIndex = *(paragraphsToBeUpdated.End() - 1u);
-    const ParagraphRun& lastParagraph = *(mModel->mLogicalModel->mParagraphInfo.Begin() + lastParagraphIndex);
+    ParagraphRunIndex   lastParagraphIndex = *(paragraphsToBeUpdated.End() - 1u);
+    const ParagraphRun& lastParagraph      = *(mModel->mLogicalModel->mParagraphInfo.Begin() + lastParagraphIndex);
 
-    if ((mTextUpdateInfo.mNumberOfCharactersToRemove > 0u) && // Some character are removed.
-        (lastParagraphIndex < numberOfParagraphs - 1u) &&     // There is a next paragraph.
-        ((lastParagraph.characterRun.characterIndex +
-          lastParagraph.characterRun
-              .numberOfCharacters) == // The last removed character is the new paragraph character.
-         (mTextUpdateInfo.mCharacterIndex + mTextUpdateInfo.mNumberOfCharactersToRemove)))
+    if((mTextUpdateInfo.mNumberOfCharactersToRemove > 0u) && // Some character are removed.
+       (lastParagraphIndex < numberOfParagraphs - 1u) &&     // There is a next paragraph.
+       ((lastParagraph.characterRun.characterIndex +
+         lastParagraph.characterRun
+           .numberOfCharacters) == // The last removed character is the new paragraph character.
+        (mTextUpdateInfo.mCharacterIndex + mTextUpdateInfo.mNumberOfCharactersToRemove)))
     {
       // The new paragraph character of the last updated paragraph has been removed so is going to be merged with the
       // next one.
@@ -760,9 +763,9 @@ void Controller::Impl::CalculateTextUpdateIndices(Length& numberOfCharacters)
   }
 
   mTextUpdateInfo.mRequestedNumberOfCharacters =
-      numberOfCharacters + mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
+    numberOfCharacters + mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
   mTextUpdateInfo.mStartGlyphIndex =
-      *(mModel->mVisualModel->mCharactersToGlyph.Begin() + mTextUpdateInfo.mParagraphCharacterIndex);
+    *(mModel->mVisualModel->mCharactersToGlyph.Begin() + mTextUpdateInfo.mParagraphCharacterIndex);
 }
 
 void Controller::Impl::ClearModelData(CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations)
@@ -783,7 +786,7 @@ void Controller::Impl::RetrieveDefaultInputStyle(InputStyle& inputStyle)
 float Controller::Impl::GetDefaultFontLineHeight()
 {
   FontId defaultFontId = 0u;
-  if (nullptr == mFontDefaults)
+  if(nullptr == mFontDefaults)
   {
     TextAbstraction::FontDescription fontDescription;
     defaultFontId = GetFontClient().GetFontId(fontDescription,
@@ -802,7 +805,7 @@ float Controller::Impl::GetDefaultFontLineHeight()
 
 bool Controller::Impl::SetDefaultLineSpacing(float lineSpacing)
 {
-  if (std::fabs(lineSpacing - mLayoutEngine.GetDefaultLineSpacing()) > Math::MACHINE_EPSILON_1000)
+  if(std::fabs(lineSpacing - mLayoutEngine.GetDefaultLineSpacing()) > Math::MACHINE_EPSILON_1000)
   {
     mLayoutEngine.SetDefaultLineSpacing(lineSpacing);
 
@@ -814,7 +817,7 @@ bool Controller::Impl::SetDefaultLineSpacing(float lineSpacing)
 
 bool Controller::Impl::SetDefaultLineSize(float lineSize)
 {
-  if (std::fabs(lineSize - mLayoutEngine.GetDefaultLineSize()) > Math::MACHINE_EPSILON_1000)
+  if(std::fabs(lineSize - mLayoutEngine.GetDefaultLineSize()) > Math::MACHINE_EPSILON_1000)
   {
     mLayoutEngine.SetDefaultLineSize(lineSize);
 
@@ -826,7 +829,7 @@ bool Controller::Impl::SetDefaultLineSize(float lineSize)
 
 bool Controller::Impl::SetRelativeLineSize(float relativeLineSize)
 {
-  if (std::fabs(relativeLineSize - GetRelativeLineSize()) > Math::MACHINE_EPSILON_1000)
+  if(std::fabs(relativeLineSize - GetRelativeLineSize()) > Math::MACHINE_EPSILON_1000)
   {
     mLayoutEngine.SetRelativeLineSize(relativeLineSize);
 
@@ -844,7 +847,7 @@ float Controller::Impl::GetRelativeLineSize()
 string Controller::Impl::GetSelectedText()
 {
   string text;
-  if (EventData::SELECTING == mEventData->mState)
+  if(EventData::SELECTING == mEventData->mState)
   {
     RetrieveSelection(text, false);
   }
@@ -869,7 +872,7 @@ string Controller::Impl::CutText()
   string text;
   RetrieveSelection(text, false);
 
-  if (!IsEditable())
+  if(!IsEditable())
   {
     return EMPTY_STRING;
   }
@@ -877,7 +880,7 @@ string Controller::Impl::CutText()
   SendSelectionToClipboard(true); // Synchronous call to modify text
   mOperationsPending = ALL_OPERATIONS;
 
-  if ((0u != mModel->mLogicalModel->mText.Count()) || !IsPlaceholderAvailable())
+  if((0u != mModel->mLogicalModel->mText.Count()) || !IsPlaceholderAvailable())
   {
     QueueModifyEvent(ModifyEvent::TEXT_DELETED);
   }
@@ -887,11 +890,11 @@ string Controller::Impl::CutText()
   }
 
   mEventData->mUpdateCursorPosition = true;
-  mEventData->mScrollAfterDelete = true;
+  mEventData->mScrollAfterDelete    = true;
 
   RequestRelayout();
 
-  if (nullptr != mEditableControlInterface)
+  if(nullptr != mEditableControlInterface)
   {
     mEditableControlInterface->TextChanged(true);
   }
@@ -900,42 +903,42 @@ string Controller::Impl::CutText()
 
 void Controller::Impl::SetTextSelectionRange(const uint32_t* pStart, const uint32_t* pEnd)
 {
-  if (nullptr == mEventData)
+  if(nullptr == mEventData)
   {
     // Nothing to do if there is no text.
     return;
   }
 
-  if (mEventData->mSelectionEnabled && (pStart || pEnd))
+  if(mEventData->mSelectionEnabled && (pStart || pEnd))
   {
-    uint32_t length = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
+    uint32_t length   = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
     uint32_t oldStart = mEventData->mLeftSelectionPosition;
-    uint32_t oldEnd = mEventData->mRightSelectionPosition;
+    uint32_t oldEnd   = mEventData->mRightSelectionPosition;
 
-    if (pStart)
+    if(pStart)
     {
       mEventData->mLeftSelectionPosition = std::min(*pStart, length);
     }
-    if (pEnd)
+    if(pEnd)
     {
       mEventData->mRightSelectionPosition = std::min(*pEnd, length);
     }
 
-    if (mEventData->mLeftSelectionPosition == mEventData->mRightSelectionPosition)
+    if(mEventData->mLeftSelectionPosition == mEventData->mRightSelectionPosition)
     {
       ChangeState(EventData::EDITING);
       mEventData->mPrimaryCursorPosition = mEventData->mLeftSelectionPosition = mEventData->mRightSelectionPosition;
-      mEventData->mUpdateCursorPosition = true;
+      mEventData->mUpdateCursorPosition                                       = true;
     }
     else
     {
       ChangeState(EventData::SELECTING);
-      mEventData->mUpdateHighlightBox = true;
-      mEventData->mUpdateLeftSelectionPosition = true;
+      mEventData->mUpdateHighlightBox           = true;
+      mEventData->mUpdateLeftSelectionPosition  = true;
       mEventData->mUpdateRightSelectionPosition = true;
     }
 
-    if (mSelectableControlInterface != nullptr)
+    if(mSelectableControlInterface != nullptr)
     {
       mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, mEventData->mLeftSelectionPosition,
                                                     mEventData->mRightSelectionPosition);
@@ -945,7 +948,7 @@ void Controller::Impl::SetTextSelectionRange(const uint32_t* pStart, const uint3
 
 CharacterIndex Controller::Impl::GetPrimaryCursorPosition() const
 {
-  if (nullptr == mEventData)
+  if(nullptr == mEventData)
   {
     return 0;
   }
@@ -954,32 +957,32 @@ CharacterIndex Controller::Impl::GetPrimaryCursorPosition() const
 
 bool Controller::Impl::SetPrimaryCursorPosition(CharacterIndex index, bool focused)
 {
-  if (nullptr == mEventData)
+  if(nullptr == mEventData)
   {
     // Nothing to do if there is no text.
     return false;
   }
 
-  if (mEventData->mPrimaryCursorPosition == index && mEventData->mState != EventData::SELECTING)
+  if(mEventData->mPrimaryCursorPosition == index && mEventData->mState != EventData::SELECTING)
   {
     // Nothing for same cursor position.
     return false;
   }
 
-  uint32_t length = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
-  uint32_t oldCursorPos = mEventData->mPrimaryCursorPosition;
+  uint32_t length                    = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
+  uint32_t oldCursorPos              = mEventData->mPrimaryCursorPosition;
   mEventData->mPrimaryCursorPosition = std::min(index, length);
   // If there is no focus, only the value is updated.
-  if (focused)
+  if(focused)
   {
-    bool wasInSelectingState = mEventData->mState == EventData::SELECTING;
-    uint32_t oldStart = mEventData->mLeftSelectionPosition;
-    uint32_t oldEnd = mEventData->mRightSelectionPosition;
+    bool     wasInSelectingState = mEventData->mState == EventData::SELECTING;
+    uint32_t oldStart            = mEventData->mLeftSelectionPosition;
+    uint32_t oldEnd              = mEventData->mRightSelectionPosition;
     ChangeState(EventData::EDITING);
     mEventData->mLeftSelectionPosition = mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
-    mEventData->mUpdateCursorPosition = true;
+    mEventData->mUpdateCursorPosition                                        = true;
 
-    if (mSelectableControlInterface != nullptr && wasInSelectingState)
+    if(mSelectableControlInterface != nullptr && wasInSelectingState)
     {
       mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, mEventData->mLeftSelectionPosition,
                                                     mEventData->mRightSelectionPosition);
@@ -988,7 +991,7 @@ bool Controller::Impl::SetPrimaryCursorPosition(CharacterIndex index, bool focus
     ScrollTextToMatchCursor();
   }
 
-  if (nullptr != mEditableControlInterface)
+  if(nullptr != mEditableControlInterface)
   {
     mEditableControlInterface->CursorPositionChanged(oldCursorPos, mEventData->mPrimaryCursorPosition);
   }
@@ -1000,9 +1003,9 @@ Uint32Pair Controller::Impl::GetTextSelectionRange() const
 {
   Uint32Pair range;
 
-  if (mEventData)
+  if(mEventData)
   {
-    range.first = mEventData->mLeftSelectionPosition;
+    range.first  = mEventData->mLeftSelectionPosition;
     range.second = mEventData->mRightSelectionPosition;
   }
 
@@ -1016,11 +1019,11 @@ bool Controller::Impl::IsEditable() const
 
 void Controller::Impl::SetEditable(bool editable)
 {
-  if (mEventData)
+  if(mEventData)
   {
     mEventData->mEditingEnabled = editable;
 
-    if (mEventData->mDecorator)
+    if(mEventData->mDecorator)
     {
       bool decoratorEditable = editable && mIsUserInteractionEnabled;
       mEventData->mDecorator->SetEditable(decoratorEditable);
@@ -1034,7 +1037,7 @@ void Controller::Impl::UpdateAfterFontChange(const std::string& newDefaultFont)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::UpdateAfterFontChange\n");
 
-  if (!mFontDefaults->familyDefined) // If user defined font then should not update when system font changes
+  if(!mFontDefaults->familyDefined) // If user defined font then should not update when system font changes
   {
     DALI_LOG_INFO(gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n",
                   newDefaultFont.c_str());
@@ -1048,7 +1051,7 @@ void Controller::Impl::UpdateAfterFontChange(const std::string& newDefaultFont)
 
 void Controller::Impl::RetrieveSelection(std::string& selectedText, bool deleteAfterRetrieval)
 {
-  if (mEventData->mLeftSelectionPosition == mEventData->mRightSelectionPosition)
+  if(mEventData->mLeftSelectionPosition == mEventData->mRightSelectionPosition)
   {
     // Nothing to select if handles are in the same place.
     selectedText.clear();
@@ -1059,20 +1062,20 @@ void Controller::Impl::RetrieveSelection(std::string& selectedText, bool deleteA
 
   // Get start and end position of selection
   const CharacterIndex startOfSelectedText =
-      handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
+    handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
   const Length lengthOfSelectedText =
-      (handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition) - startOfSelectedText;
+    (handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition) - startOfSelectedText;
 
-  Vector<Character>& utf32Characters = mModel->mLogicalModel->mText;
-  const Length numberOfCharacters = utf32Characters.Count();
+  Vector<Character>& utf32Characters    = mModel->mLogicalModel->mText;
+  const Length       numberOfCharacters = utf32Characters.Count();
 
   // Validate the start and end selection points
-  if ((startOfSelectedText + lengthOfSelectedText) <= numberOfCharacters)
+  if((startOfSelectedText + lengthOfSelectedText) <= numberOfCharacters)
   {
     // Get text as a UTF8 string
     Utf32ToUtf8(&utf32Characters[startOfSelectedText], lengthOfSelectedText, selectedText);
 
-    if (deleteAfterRetrieval) // Only delete text if copied successfully
+    if(deleteAfterRetrieval) // Only delete text if copied successfully
     {
       // Keep a copy of the current input style.
       InputStyle currentInputStyle;
@@ -1084,7 +1087,7 @@ void Controller::Impl::RetrieveSelection(std::string& selectedText, bool deleteA
       // Compare if the input style has changed.
       const bool hasInputStyleChanged = !currentInputStyle.Equal(mEventData->mInputStyle);
 
-      if (hasInputStyleChanged)
+      if(hasInputStyleChanged)
       {
         const InputStyle::Mask styleChangedMask = currentInputStyle.GetInputStyleChangeMask(mEventData->mInputStyle);
         // Queue the input style changed signal.
@@ -1094,33 +1097,33 @@ void Controller::Impl::RetrieveSelection(std::string& selectedText, bool deleteA
       mModel->mLogicalModel->UpdateTextStyleRuns(startOfSelectedText, -static_cast<int>(lengthOfSelectedText));
 
       // Mark the paragraphs to be updated.
-      if (Layout::Engine::SINGLE_LINE_BOX == mLayoutEngine.GetLayout())
+      if(Layout::Engine::SINGLE_LINE_BOX == mLayoutEngine.GetLayout())
       {
-        mTextUpdateInfo.mCharacterIndex = 0;
+        mTextUpdateInfo.mCharacterIndex             = 0;
         mTextUpdateInfo.mNumberOfCharactersToRemove = mTextUpdateInfo.mPreviousNumberOfCharacters;
-        mTextUpdateInfo.mNumberOfCharactersToAdd = mTextUpdateInfo.mPreviousNumberOfCharacters - lengthOfSelectedText;
-        mTextUpdateInfo.mClearAll = true;
+        mTextUpdateInfo.mNumberOfCharactersToAdd    = mTextUpdateInfo.mPreviousNumberOfCharacters - lengthOfSelectedText;
+        mTextUpdateInfo.mClearAll                   = true;
       }
       else
       {
-        mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        mTextUpdateInfo.mCharacterIndex             = startOfSelectedText;
         mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
       }
 
       // Delete text between handles
       Vector<Character>::Iterator first = utf32Characters.Begin() + startOfSelectedText;
-      Vector<Character>::Iterator last = first + lengthOfSelectedText;
+      Vector<Character>::Iterator last  = first + lengthOfSelectedText;
       utf32Characters.Erase(first, last);
 
       // Will show the cursor at the first character of the selection.
       mEventData->mPrimaryCursorPosition =
-          handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
+        handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
     }
     else
     {
       // Will show the cursor at the last character of the selection.
       mEventData->mPrimaryCursorPosition =
-          handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition;
+        handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition;
     }
 
     mEventData->mDecoratorUpdated = true;
@@ -1130,13 +1133,13 @@ void Controller::Impl::RetrieveSelection(std::string& selectedText, bool deleteA
 void Controller::Impl::SetSelection(int start, int end)
 {
   uint32_t oldStart = mEventData->mLeftSelectionPosition;
-  uint32_t oldEnd = mEventData->mRightSelectionPosition;
+  uint32_t oldEnd   = mEventData->mRightSelectionPosition;
 
-  mEventData->mLeftSelectionPosition = start;
+  mEventData->mLeftSelectionPosition  = start;
   mEventData->mRightSelectionPosition = end;
-  mEventData->mUpdateCursorPosition = true;
+  mEventData->mUpdateCursorPosition   = true;
 
-  if (mSelectableControlInterface != nullptr)
+  if(mSelectableControlInterface != nullptr)
   {
     mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, start, end);
   }
@@ -1149,7 +1152,7 @@ std::pair<int, int> Controller::Impl::GetSelectionIndexes() const
 
 void Controller::Impl::ShowClipboard()
 {
-  if (EnsureClipboardCreated())
+  if(EnsureClipboardCreated())
   {
     mClipboard.ShowClipboard();
   }
@@ -1157,7 +1160,7 @@ void Controller::Impl::ShowClipboard()
 
 void Controller::Impl::HideClipboard()
 {
-  if (EnsureClipboardCreated() && mClipboardHideEnabled)
+  if(EnsureClipboardCreated() && mClipboardHideEnabled)
   {
     mClipboard.HideClipboard();
   }
@@ -1170,7 +1173,7 @@ void Controller::Impl::SetClipboardHideEnable(bool enable)
 
 bool Controller::Impl::CopyStringToClipboard(const std::string& source)
 {
-  if (EnsureClipboardCreated())
+  if(EnsureClipboardCreated())
   {
     Dali::Clipboard::ClipData data(MIME_TYPE_TEXT_PLAIN, source.c_str());
     return mClipboard.SetData(data); // Send clipboard data to clipboard.
@@ -1205,68 +1208,6 @@ void Controller::Impl::RepositionSelectionHandles(float visualX, float visualY, 
 
 void Controller::Impl::SetPopupButtons()
 {
-  /**
-   *  Sets the Popup buttons to be shown depending on State.
-   *
-   *  If SELECTING :  CUT & COPY + ( PASTE & CLIPBOARD if content available to paste )
-   *
-   *  If EDITING_WITH_POPUP : SELECT & SELECT_ALL
-   */
-
-  bool isEditable = IsEditable();
-  TextSelectionPopup::Buttons buttonsToShow = TextSelectionPopup::NONE;
-
-  if (EventData::SELECTING == mEventData->mState)
-  {
-    buttonsToShow = TextSelectionPopup::Buttons(TextSelectionPopup::COPY);
-    if (isEditable)
-    {
-      buttonsToShow = TextSelectionPopup::Buttons(buttonsToShow | TextSelectionPopup::CUT);
-    }
-
-    if (!IsClipboardEmpty())
-    {
-      if (isEditable)
-      {
-        buttonsToShow = TextSelectionPopup::Buttons((buttonsToShow | TextSelectionPopup::PASTE));
-      }
-      buttonsToShow = TextSelectionPopup::Buttons((buttonsToShow | TextSelectionPopup::CLIPBOARD));
-    }
-
-    if (!mEventData->mAllTextSelected)
-    {
-      buttonsToShow = TextSelectionPopup::Buttons((buttonsToShow | TextSelectionPopup::SELECT_ALL));
-    }
-  }
-  else if (EventData::EDITING_WITH_POPUP == mEventData->mState)
-  {
-    if (mModel->mLogicalModel->mText.Count() && !IsShowingPlaceholderText())
-    {
-      buttonsToShow = TextSelectionPopup::Buttons(TextSelectionPopup::SELECT | TextSelectionPopup::SELECT_ALL);
-    }
-
-    if (!IsClipboardEmpty())
-    {
-      if (isEditable)
-      {
-        buttonsToShow = TextSelectionPopup::Buttons((buttonsToShow | TextSelectionPopup::PASTE));
-      }
-      buttonsToShow = TextSelectionPopup::Buttons((buttonsToShow | TextSelectionPopup::CLIPBOARD));
-    }
-  }
-  else if (EventData::EDITING_WITH_PASTE_POPUP == mEventData->mState)
-  {
-    if (!IsClipboardEmpty())
-    {
-      if (isEditable)
-      {
-        buttonsToShow = TextSelectionPopup::Buttons((buttonsToShow | TextSelectionPopup::PASTE));
-      }
-      buttonsToShow = TextSelectionPopup::Buttons((buttonsToShow | TextSelectionPopup::CLIPBOARD));
-    }
-  }
-
-  mEventData->mDecorator->SetEnabledPopupButtons(buttonsToShow);
 }
 
 void Controller::Impl::ChangeState(EventData::State newState)
@@ -1276,7 +1217,7 @@ void Controller::Impl::ChangeState(EventData::State newState)
 
 void Controller::Impl::GetCursorPosition(CharacterIndex logical, CursorInfo& cursorInfo)
 {
-  if (!IsShowingRealText())
+  if(!IsShowingRealText())
   {
     // Do not want to use the place-holder text to set the cursor position.
 
@@ -1284,24 +1225,24 @@ void Controller::Impl::GetCursorPosition(CharacterIndex logical, CursorInfo& cur
     // If there is no font's family set, use the default font.
     // Use the current alignment to place the cursor at the beginning, center or end of the box.
 
-    cursorInfo.lineOffset = 0.f;
-    cursorInfo.lineHeight = GetDefaultFontLineHeight();
+    cursorInfo.lineOffset          = 0.f;
+    cursorInfo.lineHeight          = GetDefaultFontLineHeight();
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
     bool isRTL = false;
-    if (mModel->mMatchLayoutDirection != DevelText::MatchLayoutDirection::CONTENTS)
+    if(mModel->mMatchLayoutDirection != LayoutDirectionMode::CONTENTS)
     {
       isRTL = mLayoutDirection == LayoutDirection::RIGHT_TO_LEFT;
     }
 
-    switch (mModel->mHorizontalAlignment)
+    switch(mModel->mHorizontalAlignment)
     {
-      case Text::HorizontalAlignment::BEGIN:
+      case Alignment::START:
       {
-        if (isRTL)
+        if(isRTL)
         {
           cursorInfo.primaryPosition.x =
-              mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
+            mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
         }
         else
         {
@@ -1309,21 +1250,21 @@ void Controller::Impl::GetCursorPosition(CharacterIndex logical, CursorInfo& cur
         }
         break;
       }
-      case Text::HorizontalAlignment::CENTER:
+      case Alignment::CENTER:
       {
         cursorInfo.primaryPosition.x = floorf(0.5f * mModel->mVisualModel->mControlSize.width);
         break;
       }
-      case Text::HorizontalAlignment::END:
+      case Alignment::END:
       {
-        if (isRTL)
+        if(isRTL)
         {
           cursorInfo.primaryPosition.x = 0.f;
         }
         else
         {
           cursorInfo.primaryPosition.x =
-              mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
+            mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
         }
         break;
       }
@@ -1333,13 +1274,13 @@ void Controller::Impl::GetCursorPosition(CharacterIndex logical, CursorInfo& cur
     return;
   }
 
-  const bool isMultiLine = (Layout::Engine::MULTI_LINE_BOX == mLayoutEngine.GetLayout());
+  const bool                  isMultiLine = (Layout::Engine::MULTI_LINE_BOX == mLayoutEngine.GetLayout());
   GetCursorPositionParameters parameters;
-  parameters.visualModel = mModel->mVisualModel;
+  parameters.visualModel  = mModel->mVisualModel;
   parameters.logicalModel = mModel->mLogicalModel;
-  parameters.metrics = mMetrics;
-  parameters.logical = logical;
-  parameters.isMultiline = isMultiLine;
+  parameters.metrics      = mMetrics;
+  parameters.logical      = logical;
+  parameters.isMultiline  = isMultiLine;
 
   float defaultFontLineHeight = GetDefaultFontLineHeight();
 
@@ -1352,7 +1293,7 @@ void Controller::Impl::GetCursorPosition(CharacterIndex logical, CursorInfo& cur
   cursorInfo.secondaryPosition.x += outlineWidth;
   cursorInfo.secondaryPosition.y += outlineWidth;
 
-  if (isMultiLine)
+  if(isMultiLine)
   {
     // If the text is editable and multi-line, the cursor position after a white space shouldn't exceed the boundaries
     // of the text control.
@@ -1360,14 +1301,14 @@ void Controller::Impl::GetCursorPosition(CharacterIndex logical, CursorInfo& cur
     // Note the white spaces laid-out at the end of the line might exceed the boundaries of the control.
     // The reason is a wrapped line must not start with a white space so they are laid-out at the end of the line.
 
-    if (0.f > cursorInfo.primaryPosition.x)
+    if(0.f > cursorInfo.primaryPosition.x)
     {
       cursorInfo.primaryPosition.x = 0.f;
     }
 
     const float edgeWidth =
-        mModel->mVisualModel->mControlSize.width - static_cast<float>(mEventData->mDecorator->GetCursorWidth());
-    if (cursorInfo.primaryPosition.x > edgeWidth)
+      mModel->mVisualModel->mControlSize.width - static_cast<float>(mEventData->mDecorator->GetCursorWidth());
+    if(cursorInfo.primaryPosition.x > edgeWidth)
     {
       cursorInfo.primaryPosition.x = edgeWidth;
     }
@@ -1376,7 +1317,7 @@ void Controller::Impl::GetCursorPosition(CharacterIndex logical, CursorInfo& cur
 
 CharacterIndex Controller::Impl::CalculateNewCursorIndex(CharacterIndex index) const
 {
-  if (nullptr == mEventData)
+  if(nullptr == mEventData)
   {
     // Nothing to do if there is no text input.
     return 0u;
@@ -1384,28 +1325,28 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex(CharacterIndex index) c
 
   CharacterIndex cursorIndex = mEventData->mPrimaryCursorPosition;
 
-  const GlyphIndex* const charactersToGlyphBuffer = mModel->mVisualModel->mCharactersToGlyph.Begin();
-  const Length* const charactersPerGlyphBuffer = mModel->mVisualModel->mCharactersPerGlyph.Begin();
+  const GlyphIndex* const charactersToGlyphBuffer  = mModel->mVisualModel->mCharactersToGlyph.Begin();
+  const Length* const     charactersPerGlyphBuffer = mModel->mVisualModel->mCharactersPerGlyph.Begin();
 
-  GlyphIndex glyphIndex = *(charactersToGlyphBuffer + index);
-  Length numberOfCharacters = *(charactersPerGlyphBuffer + glyphIndex);
+  GlyphIndex glyphIndex         = *(charactersToGlyphBuffer + index);
+  Length     numberOfCharacters = *(charactersPerGlyphBuffer + glyphIndex);
 
-  if (numberOfCharacters > 1u)
+  if(numberOfCharacters > 1u)
   {
     const Script script = mModel->mLogicalModel->GetScript(index);
-    if (HasLigatureMustBreak(script))
+    if(HasLigatureMustBreak(script))
     {
-      if (numberOfCharacters == 2u)
+      if(numberOfCharacters == 2u)
       {
         const Character* const textBuffer = mModel->mLogicalModel->mText.Begin();
-        Character character = *(textBuffer + index);
+        Character              character  = *(textBuffer + index);
 
-        CharacterIndex nextIndex = index + 1u;
-        bool isCurrentCombining = TextAbstraction::IsCombiningDiacriticalMarks(character);
-        bool isNextValid = nextIndex < mModel->mLogicalModel->mText.Count();
-        bool isNextCombining = isNextValid && TextAbstraction::IsCombiningDiacriticalMarks(*(textBuffer + nextIndex));
+        CharacterIndex nextIndex          = index + 1u;
+        bool           isCurrentCombining = TextAbstraction::IsCombiningDiacriticalMarks(character);
+        bool           isNextValid        = nextIndex < mModel->mLogicalModel->mText.Count();
+        bool           isNextCombining    = isNextValid && TextAbstraction::IsCombiningDiacriticalMarks(*(textBuffer + nextIndex));
 
-        if (!isCurrentCombining && !isNextCombining)
+        if(!isCurrentCombining && !isNextCombining)
         {
           numberOfCharacters = 1u;
         }
@@ -1419,21 +1360,21 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex(CharacterIndex index) c
   }
   else
   {
-    while (0u == numberOfCharacters)
+    while(0u == numberOfCharacters)
     {
       ++glyphIndex;
       numberOfCharacters = *(charactersPerGlyphBuffer + glyphIndex);
     }
   }
 
-  if (index < mEventData->mPrimaryCursorPosition)
+  if(index < mEventData->mPrimaryCursorPosition)
   {
     cursorIndex = cursorIndex < numberOfCharacters ? 0u : cursorIndex - numberOfCharacters;
   }
   else
   {
     Length textLength = mModel->mVisualModel->mCharactersToGlyph.Count();
-    cursorIndex = cursorIndex + numberOfCharacters > textLength ? textLength : cursorIndex + numberOfCharacters;
+    cursorIndex       = cursorIndex + numberOfCharacters > textLength ? textLength : cursorIndex + numberOfCharacters;
   }
 
   // Will update the cursor hook position.
@@ -1445,7 +1386,7 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex(CharacterIndex index) c
 void Controller::Impl::UpdateCursorPosition(const CursorInfo& cursorInfo)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::UpdateCursorPosition %p\n", this);
-  if (nullptr == mEventData)
+  if(nullptr == mEventData)
   {
     // Nothing to do if there is no text input.
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::UpdateCursorPosition no event data\n");
@@ -1461,14 +1402,14 @@ void Controller::Impl::UpdateCursorPosition(const CursorInfo& cursorInfo)
                                       cursorInfo.primaryCursorHeight, cursorInfo.lineHeight);
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Primary cursor position: %f,%f\n", cursorPosition.x, cursorPosition.y);
 
-  if (mEventData->mUpdateGrabHandlePosition)
+  if(mEventData->mUpdateGrabHandlePosition)
   {
     // Sets the grab handle position.
     mEventData->mDecorator->SetPosition(GRAB_HANDLE, cursorPosition.x,
                                         cursorInfo.lineOffset + mModel->mScrollPosition.y, cursorInfo.lineHeight);
   }
 
-  if (cursorInfo.isSecondaryCursor)
+  if(cursorInfo.isSecondaryCursor)
   {
     mEventData->mDecorator->SetPosition(SECONDARY_CURSOR, cursorInfo.secondaryPosition.x + mModel->mScrollPosition.x,
                                         cursorInfo.secondaryPosition.y + mModel->mScrollPosition.y,
@@ -1479,9 +1420,9 @@ void Controller::Impl::UpdateCursorPosition(const CursorInfo& cursorInfo)
   }
 
   // Set which cursors are active according the state.
-  if (EventData::IsEditingState(mEventData->mState) || (EventData::GRAB_HANDLE_PANNING == mEventData->mState))
+  if(EventData::IsEditingState(mEventData->mState) || (EventData::GRAB_HANDLE_PANNING == mEventData->mState))
   {
-    if (cursorInfo.isSecondaryCursor)
+    if(cursorInfo.isSecondaryCursor)
     {
       mEventData->mDecorator->SetActiveCursor(ACTIVE_CURSOR_BOTH);
     }
@@ -1507,12 +1448,12 @@ void Controller::Impl::ClampHorizontalScroll(const Vector2& layoutSize)
 {
   // Clamp between -space & -alignment offset.
 
-  if (layoutSize.width > mModel->mVisualModel->mControlSize.width)
+  if(layoutSize.width > mModel->mVisualModel->mControlSize.width)
   {
-    const float space = (layoutSize.width - mModel->mVisualModel->mControlSize.width) + mModel->mAlignmentOffset;
+    const float space         = (layoutSize.width - mModel->mVisualModel->mControlSize.width) + mModel->mAlignmentOffset;
     mModel->mScrollPosition.x = (mModel->mScrollPosition.x < -space) ? -space : mModel->mScrollPosition.x;
     mModel->mScrollPosition.x =
-        (mModel->mScrollPosition.x > -mModel->mAlignmentOffset) ? -mModel->mAlignmentOffset : mModel->mScrollPosition.x;
+      (mModel->mScrollPosition.x > -mModel->mAlignmentOffset) ? -mModel->mAlignmentOffset : mModel->mScrollPosition.x;
 
     mEventData->mDecoratorUpdated = true;
   }
@@ -1524,16 +1465,16 @@ void Controller::Impl::ClampHorizontalScroll(const Vector2& layoutSize)
 
 void Controller::Impl::ClampVerticalScroll(const Vector2& layoutSize)
 {
-  if (Layout::Engine::SINGLE_LINE_BOX == mLayoutEngine.GetLayout())
+  if(Layout::Engine::SINGLE_LINE_BOX == mLayoutEngine.GetLayout())
   {
     // Nothing to do if the text is single line.
     return;
   }
 
   // Clamp between -space & 0.
-  if (layoutSize.height > mModel->mVisualModel->mControlSize.height)
+  if(layoutSize.height > mModel->mVisualModel->mControlSize.height)
   {
-    const float space = (layoutSize.height - mModel->mVisualModel->mControlSize.height);
+    const float space         = (layoutSize.height - mModel->mVisualModel->mControlSize.height);
     mModel->mScrollPosition.y = (mModel->mScrollPosition.y < -space) ? -space : mModel->mScrollPosition.y;
     mModel->mScrollPosition.y = (mModel->mScrollPosition.y > 0.f) ? 0.f : mModel->mScrollPosition.y;
 
@@ -1555,31 +1496,31 @@ void Controller::Impl::ScrollToMakePositionVisible(const Vector2& position, floa
 
   // Transform the position to decorator coords.
   const float decoratorPositionBeginX = position.x + mModel->mScrollPosition.x;
-  const float decoratorPositionEndX = positionEndX + mModel->mScrollPosition.x;
+  const float decoratorPositionEndX   = positionEndX + mModel->mScrollPosition.x;
 
   const float decoratorPositionBeginY = position.y + mModel->mScrollPosition.y;
-  const float decoratorPositionEndY = positionEndY + mModel->mScrollPosition.y;
+  const float decoratorPositionEndY   = positionEndY + mModel->mScrollPosition.y;
 
-  if (decoratorPositionBeginX < 0.f)
+  if(decoratorPositionBeginX < 0.f)
   {
     mModel->mScrollPosition.x = -position.x;
   }
-  else if (decoratorPositionEndX > mModel->mVisualModel->mControlSize.width)
+  else if(decoratorPositionEndX > mModel->mVisualModel->mControlSize.width)
   {
     mModel->mScrollPosition.x = mModel->mVisualModel->mControlSize.width - positionEndX;
   }
 
-  if (Layout::Engine::MULTI_LINE_BOX == mLayoutEngine.GetLayout())
+  if(Layout::Engine::MULTI_LINE_BOX == mLayoutEngine.GetLayout())
   {
-    if (decoratorPositionBeginY < 0.f)
+    if(decoratorPositionBeginY < 0.f)
     {
       mModel->mScrollPosition.y = -position.y;
     }
-    else if (decoratorPositionEndY > mModel->mVisualModel->mControlSize.height)
+    else if(decoratorPositionEndY > mModel->mVisualModel->mControlSize.height)
     {
       mModel->mScrollPosition.y = mModel->mVisualModel->mControlSize.height - positionEndY;
     }
-    else if (mModel->mLogicalModel->mText.Count() == 0u)
+    else if(mModel->mLogicalModel->mText.Count() == 0u)
     {
       Relayouter::CalculateVerticalOffset(*this, mModel->mVisualModel->mControlSize);
     }
@@ -1597,10 +1538,10 @@ void Controller::Impl::ScrollTextToMatchCursor(const CursorInfo& cursorInfo)
   mModel->mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x;
 
   // If text control has more than two lines and current line index is not last, calculate scrollpositionY
-  if (mModel->mVisualModel->mLines.Count() > 1u && lineIndex != mModel->mVisualModel->mLines.Count() - 1u)
+  if(mModel->mVisualModel->mLines.Count() > 1u && lineIndex != mModel->mVisualModel->mLines.Count() - 1u)
   {
     const float currentCursorGlyphOffset = mEventData->mDecorator->GetGlyphOffset(PRIMARY_CURSOR);
-    mModel->mScrollPosition.y = currentCursorPosition.y - cursorInfo.lineOffset - currentCursorGlyphOffset;
+    mModel->mScrollPosition.y            = currentCursorPosition.y - cursorInfo.lineOffset - currentCursorGlyphOffset;
   }
 
   ClampHorizontalScroll(mModel->mVisualModel->GetLayoutSize());
@@ -1619,7 +1560,7 @@ void Controller::Impl::ScrollTextToMatchCursor()
 
 void Controller::Impl::RequestRelayout()
 {
-  if (nullptr != mControlInterface)
+  if(nullptr != mControlInterface)
   {
     mControlInterface->RequestTextRelayout();
   }
@@ -1628,19 +1569,19 @@ void Controller::Impl::RequestRelayout()
 void Controller::Impl::RelayoutAllCharacters()
 {
   // relayout all characters
-  mTextUpdateInfo.mCharacterIndex = 0;
+  mTextUpdateInfo.mCharacterIndex             = 0;
   mTextUpdateInfo.mNumberOfCharactersToRemove = mTextUpdateInfo.mPreviousNumberOfCharacters;
-  mTextUpdateInfo.mNumberOfCharactersToAdd = mModel->mLogicalModel->mText.Count();
-  mOperationsPending = static_cast<OperationsMask>(mOperationsPending | LAYOUT);
+  mTextUpdateInfo.mNumberOfCharactersToAdd    = mModel->mLogicalModel->mText.Count();
+  mOperationsPending                          = static_cast<OperationsMask>(mOperationsPending | LAYOUT);
 
   mTextUpdateInfo.mFullRelayoutNeeded = true;
 
   // Need to recalculate natural size
   mRecalculateNaturalSize = true;
-  mRecalculateLayoutSize = true;
+  mRecalculateLayoutSize  = true;
 
   // remove selection
-  if ((mEventData != nullptr) && (mEventData->mState == EventData::SELECTING))
+  if((mEventData != nullptr) && (mEventData->mState == EventData::SELECTING))
   {
     ChangeState(EventData::EDITING);
   }
@@ -1655,13 +1596,14 @@ bool Controller::Impl::IsInputStyleChangedSignalsQueueEmpty()
 
 void Controller::Impl::ProcessInputStyleChangedSignals()
 {
-  if (mEventData)
+  if(mEventData)
   {
-    if (mEditableControlInterface)
+    if(mEditableControlInterface)
     {
       // Emit the input style changed signal for each mask
       std::for_each(mEventData->mInputStyleChangedQueue.begin(), mEventData->mInputStyleChangedQueue.end(),
-                    [&](const auto mask) { mEditableControlInterface->InputStyleChanged(mask); });
+                    [&](const auto mask)
+      { mEditableControlInterface->InputStyleChanged(mask); });
     }
 
     mEventData->mInputStyleChangedQueue.Clear();
@@ -1670,27 +1612,27 @@ void Controller::Impl::ProcessInputStyleChangedSignals()
 
 void Controller::Impl::ScrollBy(Vector2 scroll)
 {
-  if (mEventData && (fabs(scroll.x) > Math::MACHINE_EPSILON_0 || fabs(scroll.y) > Math::MACHINE_EPSILON_0))
+  if(mEventData && (fabs(scroll.x) > Math::MACHINE_EPSILON_0 || fabs(scroll.y) > Math::MACHINE_EPSILON_0))
   {
-    const Vector2& layoutSize = mModel->mVisualModel->GetLayoutSize();
-    const Vector2 currentScroll = mModel->mScrollPosition;
+    const Vector2& layoutSize    = mModel->mVisualModel->GetLayoutSize();
+    const Vector2  currentScroll = mModel->mScrollPosition;
 
     scroll.x = -scroll.x;
     scroll.y = -scroll.y;
 
-    if (fabs(scroll.x) > Math::MACHINE_EPSILON_0)
+    if(fabs(scroll.x) > Math::MACHINE_EPSILON_0)
     {
       mModel->mScrollPosition.x += scroll.x;
       ClampHorizontalScroll(layoutSize);
     }
 
-    if (fabs(scroll.y) > Math::MACHINE_EPSILON_0)
+    if(fabs(scroll.y) > Math::MACHINE_EPSILON_0)
     {
       mModel->mScrollPosition.y += scroll.y;
       ClampVerticalScroll(layoutSize);
     }
 
-    if (mModel->mScrollPosition != currentScroll)
+    if(mModel->mScrollPosition != currentScroll)
     {
       mEventData->mDecorator->UpdatePositions(mModel->mScrollPosition - currentScroll);
       RequestRelayout();
@@ -1701,31 +1643,31 @@ void Controller::Impl::ScrollBy(Vector2 scroll)
 bool Controller::Impl::IsScrollable(const Vector2& displacement)
 {
   bool isScrollable = false;
-  if (mEventData)
+  if(mEventData)
   {
     const bool isHorizontalScrollEnabled = mEventData->mDecorator->IsHorizontalScrollEnabled();
-    const bool isVerticalScrollEnabled = mEventData->mDecorator->IsVerticalScrollEnabled();
-    if (isHorizontalScrollEnabled || isVerticalScrollEnabled)
+    const bool isVerticalScrollEnabled   = mEventData->mDecorator->IsVerticalScrollEnabled();
+    if(isHorizontalScrollEnabled || isVerticalScrollEnabled)
     {
       const Vector2& targetSize = mModel->mVisualModel->mControlSize;
       const Vector2& layoutSize = mModel->mVisualModel->GetLayoutSize();
 
-      if (isHorizontalScrollEnabled)
+      if(isHorizontalScrollEnabled)
       {
         const float scrollPositionX = std::max(mModel->mScrollPosition.x, -(layoutSize.width - targetSize.width));
-        const float positionX = scrollPositionX + displacement.x;
-        if (layoutSize.width > targetSize.width && -positionX > 0.f && -positionX < layoutSize.width - targetSize.width)
+        const float positionX       = scrollPositionX + displacement.x;
+        if(layoutSize.width > targetSize.width && -positionX > 0.f && -positionX < layoutSize.width - targetSize.width)
         {
           isScrollable = true;
         }
       }
 
-      if (isVerticalScrollEnabled)
+      if(isVerticalScrollEnabled)
       {
         const float scrollPositionY = std::max(mModel->mScrollPosition.y, -(layoutSize.height - targetSize.height));
-        const float positionY = scrollPositionY + displacement.y;
-        if (layoutSize.height > targetSize.height && -positionY > 0.f &&
-            -positionY < layoutSize.height - targetSize.height)
+        const float positionY       = scrollPositionY + displacement.y;
+        if(layoutSize.height > targetSize.height && -positionY > 0.f &&
+           -positionY < layoutSize.height - targetSize.height)
         {
           isScrollable = true;
         }
@@ -1753,23 +1695,23 @@ Ui::TextAnchor Controller::Impl::CreateAnchorActor(Anchor anchor)
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
 
-  auto rect = Ui::Internal::CommonTextUtils::GetTextBoundingRectangle(mModel, anchor.startIndex, anchor.endIndex - 1);
+  auto    rect   = Ui::Internal::CommonTextUtils::GetTextBoundingRectangle(mModel, anchor.startIndex, anchor.endIndex - 1);
   Vector2 offset = mModel->mLayoutOffsetWithPadding;
   actor.SetProperty(Actor::Property::POSITION, Vector2(rect.x + offset.x, rect.y + offset.y));
   actor.SetProperty(Actor::Property::SIZE, Vector2(rect.width, rect.height));
 
   std::string anchorText;
-  std::string anchorHref = anchor.href ? anchor.href : "";
-  Length numberOfAnchorCharacters = anchor.endIndex - anchor.startIndex;
-  if (numberOfAnchorCharacters > 0u && mModel->mLogicalModel->mText.Size() >= numberOfAnchorCharacters)
+  std::string anchorHref               = anchor.href ? anchor.href : "";
+  Length      numberOfAnchorCharacters = anchor.endIndex - anchor.startIndex;
+  if(numberOfAnchorCharacters > 0u && mModel->mLogicalModel->mText.Size() >= numberOfAnchorCharacters)
   {
     Utf32ToUtf8(mModel->mLogicalModel->mText.Begin() + anchor.startIndex, numberOfAnchorCharacters, anchorText);
   }
   DALI_LOG_INFO(gLogFilter, Debug::General, "CreateAnchorActor NAME:%s, URI:%s\n", anchorText.c_str(),
                 anchorHref.c_str());
 
-  actor.SetProperty(Actor::Property::NAME, anchorText);
-  actor.SetProperty(Ui::TextAnchor::Property::URI, anchorHref);
+  actor.SetProperty(Actor::Property::NAME, ToPropertyValue(anchorText));
+  actor.SetProperty(Ui::TextAnchor::Property::URI, ToPropertyValue(anchorHref));
   actor.SetProperty(Ui::TextAnchor::Property::START_CHARACTER_INDEX, static_cast<int>(anchor.startIndex));
   actor.SetProperty(Ui::TextAnchor::Property::END_CHARACTER_INDEX, static_cast<int>(anchor.endIndex));
   return actor;
@@ -1781,7 +1723,7 @@ void Controller::Impl::GetAnchorActors(std::vector<Ui::TextAnchor>& anchorActors
            we need to create and destroy potentially many actors. Some optimization can be considered here.
            Maybe a "dirty" flag in mLogicalModel? */
   anchorActors.clear();
-  for (auto& anchor : mModel->mLogicalModel->mAnchors)
+  for(auto& anchor : mModel->mLogicalModel->mAnchors)
   {
     auto actor = CreateAnchorActor(anchor);
     anchorActors.push_back(actor);
@@ -1792,8 +1734,8 @@ int32_t Controller::Impl::GetAnchorIndex(size_t characterOffset) const
 {
   Vector<Anchor>::Iterator it = mModel->mLogicalModel->mAnchors.Begin();
 
-  while (it != mModel->mLogicalModel->mAnchors.End() &&
-         (it->startIndex > characterOffset || it->endIndex <= characterOffset))
+  while(it != mModel->mLogicalModel->mAnchors.End() &&
+        (it->startIndex > characterOffset || it->endIndex <= characterOffset))
   {
     it++;
   }
@@ -1803,20 +1745,14 @@ int32_t Controller::Impl::GetAnchorIndex(size_t characterOffset) const
 
 bool Controller::Impl::ShouldClearFocusOnEscape() const
 {
-  if (DALI_UNLIKELY(mShouldClearFocusOnEscape == ClearFocusOnEscapeState::UNKNOWN))
+  if(DALI_UNLIKELY(mShouldClearFocusOnEscape == ClearFocusOnEscapeState::UNKNOWN))
   {
-    mShouldClearFocusOnEscape = ClearFocusOnEscapeState::ENABLE;
-
-    Ui::StyleManager styleManager = Ui::StyleManager::Get();
-    if (styleManager)
+    auto& uiConfigManager = Integration::UiConfigManager::Get();
+    if(uiConfigManager.IsInitialized())
     {
-      const auto clearFocusOnEscapeValue =
-          Ui::DevelStyleManager::GetConfigurations(styleManager).Find("clearFocusOnEscape", Property::Type::BOOLEAN);
-
-      // Default is ENABLE. If config don't have "clearFocusOnEscape" property, make it ENABLE.
-      mShouldClearFocusOnEscape = (!clearFocusOnEscapeValue || clearFocusOnEscapeValue->Get<bool>())
-                                      ? ClearFocusOnEscapeState::ENABLE
-                                      : ClearFocusOnEscapeState::DISABLE;
+      mShouldClearFocusOnEscape = uiConfigManager.IsFocusClearOnEscapeEnabled()
+                                    ? ClearFocusOnEscapeState::ENABLE
+                                    : ClearFocusOnEscapeState::DISABLE;
     }
   }
   DALI_ASSERT_DEBUG(mShouldClearFocusOnEscape != ClearFocusOnEscapeState::UNKNOWN &&
@@ -1829,22 +1765,22 @@ void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearP
 {
   // Underlined character runs for markup-processor
   const Vector<UnderlinedCharacterRun>& underlinedCharacterRuns = mModel->mLogicalModel->mUnderlinedCharacterRuns;
-  const Vector<GlyphIndex>& charactersToGlyph = mModel->mVisualModel->mCharactersToGlyph;
-  const Vector<Length>& glyphsPerCharacter = mModel->mVisualModel->mGlyphsPerCharacter;
+  const Vector<GlyphIndex>&             charactersToGlyph       = mModel->mVisualModel->mCharactersToGlyph;
+  const Vector<Length>&                 glyphsPerCharacter      = mModel->mVisualModel->mGlyphsPerCharacter;
 
-  if (shouldClearPreUnderlineRuns)
+  if(shouldClearPreUnderlineRuns)
   {
     mModel->mVisualModel->mUnderlineRuns.Clear();
   }
 
-  for (Vector<UnderlinedCharacterRun>::ConstIterator it = underlinedCharacterRuns.Begin(),
-                                                     endIt = underlinedCharacterRuns.End();
-       it != endIt; ++it)
+  for(Vector<UnderlinedCharacterRun>::ConstIterator it    = underlinedCharacterRuns.Begin(),
+                                                    endIt = underlinedCharacterRuns.End();
+      it != endIt; ++it)
   {
-    CharacterIndex characterIndex = it->characterRun.characterIndex;
-    Length numberOfCharacters = it->characterRun.numberOfCharacters;
+    CharacterIndex characterIndex     = it->characterRun.characterIndex;
+    Length         numberOfCharacters = it->characterRun.numberOfCharacters;
 
-    if (numberOfCharacters == 0)
+    if(numberOfCharacters == 0)
     {
       continue;
     }
@@ -1852,110 +1788,103 @@ void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearP
     // Create one run for all glyphs of all run's characters that has same properties
     // This enhance performance and reduce the needed memory to store glyphs-runs
     UnderlinedGlyphRun underlineGlyphRun;
-    underlineGlyphRun.glyphRun.glyphIndex = charactersToGlyph[characterIndex];
+    underlineGlyphRun.glyphRun.glyphIndex     = charactersToGlyph[characterIndex];
     underlineGlyphRun.glyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex];
     // Copy properties (attributes)
     underlineGlyphRun.properties = it->properties;
 
-    for (Length index = 1u; index < numberOfCharacters; index++)
+    for(Length index = 1u; index < numberOfCharacters; index++)
     {
       underlineGlyphRun.glyphRun.numberOfGlyphs += glyphsPerCharacter[characterIndex + index];
     }
 
     mModel->mVisualModel->mUnderlineRuns.PushBack(underlineGlyphRun);
   }
-
-  // Reset flag. The updates have been applied from logical to visual.
-  mModel->mLogicalModel->mUnderlineRunsUpdated = false;
 }
 
 void Controller::Impl::CopyStrikethroughFromLogicalToVisualModels()
 {
   // Strikethrough character runs from markup-processor
   const Vector<StrikethroughCharacterRun>& strikethroughCharacterRuns =
-      mModel->mLogicalModel->mStrikethroughCharacterRuns;
-  const Vector<GlyphIndex>& charactersToGlyph = mModel->mVisualModel->mCharactersToGlyph;
-  const Vector<Length>& glyphsPerCharacter = mModel->mVisualModel->mGlyphsPerCharacter;
+    mModel->mLogicalModel->mStrikethroughCharacterRuns;
+  const Vector<GlyphIndex>& charactersToGlyph  = mModel->mVisualModel->mCharactersToGlyph;
+  const Vector<Length>&     glyphsPerCharacter = mModel->mVisualModel->mGlyphsPerCharacter;
 
   mModel->mVisualModel->mStrikethroughRuns.Clear();
 
-  for (Vector<StrikethroughCharacterRun>::ConstIterator it = strikethroughCharacterRuns.Begin(),
-                                                        endIt = strikethroughCharacterRuns.End();
-       it != endIt; ++it)
+  for(Vector<StrikethroughCharacterRun>::ConstIterator it    = strikethroughCharacterRuns.Begin(),
+                                                       endIt = strikethroughCharacterRuns.End();
+      it != endIt; ++it)
   {
-    CharacterIndex characterIndex = it->characterRun.characterIndex;
-    Length numberOfCharacters = it->characterRun.numberOfCharacters;
+    CharacterIndex characterIndex     = it->characterRun.characterIndex;
+    Length         numberOfCharacters = it->characterRun.numberOfCharacters;
 
-    if (numberOfCharacters == 0)
+    if(numberOfCharacters == 0)
     {
       continue;
     }
 
     StrikethroughGlyphRun strikethroughGlyphRun;
-    strikethroughGlyphRun.properties = it->properties;
-    strikethroughGlyphRun.glyphRun.glyphIndex = charactersToGlyph[characterIndex];
+    strikethroughGlyphRun.properties              = it->properties;
+    strikethroughGlyphRun.glyphRun.glyphIndex     = charactersToGlyph[characterIndex];
     strikethroughGlyphRun.glyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex];
 
-    for (Length index = 1u; index < numberOfCharacters; index++)
+    for(Length index = 1u; index < numberOfCharacters; index++)
     {
       strikethroughGlyphRun.glyphRun.numberOfGlyphs += glyphsPerCharacter[characterIndex + index];
     }
 
     mModel->mVisualModel->mStrikethroughRuns.PushBack(strikethroughGlyphRun);
   }
-
-  // Reset flag. The updates have been applied from logical to visual.
-  mModel->mLogicalModel->mStrikethroughRunsUpdated = false;
 }
 
 void Controller::Impl::CopyCharacterSpacingFromLogicalToVisualModels()
 {
   // CharacterSpacing character runs from markup-processor
   const Vector<CharacterSpacingCharacterRun>& characterSpacingCharacterRuns =
-      mModel->mLogicalModel->mCharacterSpacingCharacterRuns;
-  const Vector<GlyphIndex>& charactersToGlyph = mModel->mVisualModel->mCharactersToGlyph;
-  const Vector<Length>& glyphsPerCharacter = mModel->mVisualModel->mGlyphsPerCharacter;
+    mModel->mLogicalModel->mCharacterSpacingCharacterRuns;
+  const Vector<GlyphIndex>& charactersToGlyph  = mModel->mVisualModel->mCharactersToGlyph;
+  const Vector<Length>&     glyphsPerCharacter = mModel->mVisualModel->mGlyphsPerCharacter;
 
   mModel->mVisualModel->mCharacterSpacingRuns.Clear();
 
-  for (Vector<CharacterSpacingCharacterRun>::ConstIterator it = characterSpacingCharacterRuns.Begin(),
-                                                           endIt = characterSpacingCharacterRuns.End();
-       it != endIt; ++it)
+  for(Vector<CharacterSpacingCharacterRun>::ConstIterator it    = characterSpacingCharacterRuns.Begin(),
+                                                          endIt = characterSpacingCharacterRuns.End();
+      it != endIt; ++it)
   {
-    const CharacterIndex& characterIndex = it->characterRun.characterIndex;
-    const Length& numberOfCharacters = it->characterRun.numberOfCharacters;
+    const CharacterIndex& characterIndex     = it->characterRun.characterIndex;
+    const Length&         numberOfCharacters = it->characterRun.numberOfCharacters;
 
-    if (numberOfCharacters == 0)
+    if(numberOfCharacters == 0)
     {
       continue;
     }
 
     CharacterSpacingGlyphRun characterSpacingGlyphRun;
-    characterSpacingGlyphRun.value = it->value;
-    characterSpacingGlyphRun.glyphRun.glyphIndex = charactersToGlyph[characterIndex];
+    characterSpacingGlyphRun.value                   = it->value;
+    characterSpacingGlyphRun.glyphRun.glyphIndex     = charactersToGlyph[characterIndex];
     characterSpacingGlyphRun.glyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex];
 
-    for (Length index = 1u; index < numberOfCharacters; index++)
+    for(Length index = 1u; index < numberOfCharacters; index++)
     {
       characterSpacingGlyphRun.glyphRun.numberOfGlyphs += glyphsPerCharacter[characterIndex + index];
     }
 
     mModel->mVisualModel->mCharacterSpacingRuns.PushBack(characterSpacingGlyphRun);
   }
-  mModel->mLogicalModel->mCharacterSpacingRunsUpdated = false;
 }
 
 void Controller::Impl::SetAutoScrollEnabled(bool enable, bool requestRelayout,
-                                            DevelText::AutoScroll::Direction direction)
+                                            AutoScroll::Direction direction)
 {
-  if ((mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX &&
-       direction == DevelText::AutoScroll::HORIZONTAL) ||
-      (mLayoutEngine.GetLayout() == Layout::Engine::MULTI_LINE_BOX && direction == DevelText::AutoScroll::VERTICAL))
+  if((mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX &&
+      direction == AutoScroll::HORIZONTAL) ||
+     (mLayoutEngine.GetLayout() == Layout::Engine::MULTI_LINE_BOX && direction == AutoScroll::VERTICAL))
   {
     mOperationsPending =
-        static_cast<OperationsMask>(mOperationsPending | LAYOUT | ALIGN | UPDATE_LAYOUT_SIZE | REORDER);
+      static_cast<OperationsMask>(mOperationsPending | LAYOUT | ALIGN | UPDATE_LAYOUT_SIZE | REORDER);
 
-    if (enable)
+    if(enable)
     {
       DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled\n");
       mOperationsPending = static_cast<OperationsMask>(mOperationsPending | UPDATE_DIRECTION);
@@ -1966,7 +1895,7 @@ void Controller::Impl::SetAutoScrollEnabled(bool enable, bool requestRelayout,
     }
 
     mIsAutoScrollEnabled = enable;
-    if (requestRelayout)
+    if(requestRelayout)
     {
       RequestRelayout();
     }
@@ -1982,11 +1911,11 @@ void Controller::Impl::SetEnableCursorBlink(bool enable)
 {
   DALI_ASSERT_DEBUG(NULL != mEventData && "TextInput disabled");
 
-  if (mEventData)
+  if(mEventData)
   {
     mEventData->mCursorBlinkEnabled = enable;
 
-    if (!enable && mEventData->mDecorator)
+    if(!enable && mEventData->mDecorator)
     {
       mEventData->mDecorator->StopCursorBlink();
     }
@@ -1997,7 +1926,7 @@ void Controller::Impl::SetMultiLineEnabled(bool enable)
 {
   const Layout::Engine::Type layout = enable ? Layout::Engine::MULTI_LINE_BOX : Layout::Engine::SINGLE_LINE_BOX;
 
-  if (layout != mLayoutEngine.GetLayout())
+  if(layout != mLayoutEngine.GetLayout())
   {
     // Set the layout type.
     mLayoutEngine.SetLayout(layout);
@@ -2006,19 +1935,19 @@ void Controller::Impl::SetMultiLineEnabled(bool enable)
     const OperationsMask layoutOperations = static_cast<OperationsMask>(LAYOUT | UPDATE_LAYOUT_SIZE | ALIGN | REORDER);
 
     mTextUpdateInfo.mFullRelayoutNeeded = true;
-    mOperationsPending = static_cast<OperationsMask>(mOperationsPending | layoutOperations);
+    mOperationsPending                  = static_cast<OperationsMask>(mOperationsPending | layoutOperations);
 
     // Need to recalculate natural size
     mRecalculateNaturalSize = true;
-    mRecalculateLayoutSize = true;
+    mRecalculateLayoutSize  = true;
 
     RequestRelayout();
   }
 }
 
-void Controller::Impl::SetHorizontalAlignment(Text::HorizontalAlignment::Type alignment)
+void Controller::Impl::SetHorizontalAlignment(Alignment alignment)
 {
-  if (alignment != mModel->mHorizontalAlignment)
+  if(alignment != mModel->mHorizontalAlignment)
   {
     // Set the alignment.
     mModel->mHorizontalAlignment = alignment;
@@ -2027,9 +1956,9 @@ void Controller::Impl::SetHorizontalAlignment(Text::HorizontalAlignment::Type al
   }
 }
 
-void Controller::Impl::SetVerticalAlignment(VerticalAlignment::Type alignment)
+void Controller::Impl::SetVerticalAlignment(Alignment alignment)
 {
-  if (alignment != mModel->mVerticalAlignment)
+  if(alignment != mModel->mVerticalAlignment)
   {
     // Set the alignment.
     mModel->mVerticalAlignment = alignment;
@@ -2038,18 +1967,18 @@ void Controller::Impl::SetVerticalAlignment(VerticalAlignment::Type alignment)
   }
 }
 
-void Controller::Impl::SetLineWrapMode(Text::LineWrap::Mode lineWrapMode)
+void Controller::Impl::SetLineWrapMode(LineWrapMode lineWrapMode)
 {
-  if (lineWrapMode != mModel->mLineWrapMode)
+  if(lineWrapMode != mModel->mLineWrapMode)
   {
     // Update Text layout for applying wrap mode
     mOperationsPending =
-        static_cast<OperationsMask>(mOperationsPending | ALIGN | LAYOUT | UPDATE_LAYOUT_SIZE | REORDER);
+      static_cast<OperationsMask>(mOperationsPending | ALIGN | LAYOUT | UPDATE_LAYOUT_SIZE | REORDER);
 
-    if ((mModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
-        (lineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
-        (mModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::MIXED) ||
-        (lineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::MIXED)) // hyphen is treated as line break
+    if((mModel->mLineWrapMode == LineWrapMode::HYPHENATION) ||
+       (lineWrapMode == LineWrapMode::HYPHENATION) ||
+       (mModel->mLineWrapMode == LineWrapMode::MIXED) ||
+       (lineWrapMode == LineWrapMode::MIXED)) // hyphen is treated as line break
     {
       mOperationsPending = static_cast<OperationsMask>(mOperationsPending | GET_LINE_BREAKS);
     }
@@ -2057,9 +1986,9 @@ void Controller::Impl::SetLineWrapMode(Text::LineWrap::Mode lineWrapMode)
     // Set the text wrap mode.
     mModel->mLineWrapMode = lineWrapMode;
 
-    mTextUpdateInfo.mCharacterIndex = 0u;
+    mTextUpdateInfo.mCharacterIndex             = 0u;
     mTextUpdateInfo.mNumberOfCharactersToRemove = mTextUpdateInfo.mPreviousNumberOfCharacters;
-    mTextUpdateInfo.mNumberOfCharactersToAdd = mModel->mLogicalModel->mText.Count();
+    mTextUpdateInfo.mNumberOfCharactersToAdd    = mModel->mLogicalModel->mText.Count();
 
     // Request relayout
     RequestRelayout();
@@ -2070,7 +1999,7 @@ void Controller::Impl::SetDefaultColor(const Vector4& color)
 {
   mTextColor = color;
 
-  if (!IsShowingPlaceholderText())
+  if(!IsShowingPlaceholderText())
   {
     mModel->mVisualModel->SetTextColor(color);
     mOperationsPending = static_cast<OperationsMask>(mOperationsPending | COLOR);
@@ -2082,7 +2011,7 @@ void Controller::Impl::SetUserInteractionEnabled(bool enabled)
 {
   mIsUserInteractionEnabled = enabled;
 
-  if (mEventData && mEventData->mDecorator)
+  if(mEventData && mEventData->mDecorator)
   {
     bool editable = mEventData->mEditingEnabled && enabled;
     mEventData->mDecorator->SetEditable(editable);
@@ -2093,20 +2022,20 @@ void Controller::Impl::SetUserInteractionEnabled(bool enabled)
 
 void Controller::Impl::ClearFontData()
 {
-  if (mFontDefaults)
+  if(mFontDefaults)
   {
     mFontDefaults->mFontId = 0u; // Remove old font ID
   }
 
   // Set flags to update the model.
-  mTextUpdateInfo.mCharacterIndex = 0u;
+  mTextUpdateInfo.mCharacterIndex             = 0u;
   mTextUpdateInfo.mNumberOfCharactersToRemove = mTextUpdateInfo.mPreviousNumberOfCharacters;
-  mTextUpdateInfo.mNumberOfCharactersToAdd = mModel->mLogicalModel->mText.Count();
+  mTextUpdateInfo.mNumberOfCharactersToAdd    = mModel->mLogicalModel->mText.Count();
 
-  mTextUpdateInfo.mClearAll = true;
+  mTextUpdateInfo.mClearAll           = true;
   mTextUpdateInfo.mFullRelayoutNeeded = true;
-  mRecalculateNaturalSize = true;
-  mRecalculateLayoutSize = true;
+  mRecalculateNaturalSize             = true;
+  mRecalculateLayoutSize              = true;
 
   mOperationsPending = static_cast<OperationsMask>(mOperationsPending | VALIDATE_FONTS | SHAPE_TEXT | BIDI_INFO |
                                                    GET_GLYPH_METRICS | LAYOUT | UPDATE_LAYOUT_SIZE | REORDER | ALIGN);
@@ -2123,10 +2052,10 @@ void Controller::Impl::ClearStyleData()
 
 void Controller::Impl::ResetScrollPosition()
 {
-  if (mEventData)
+  if(mEventData)
   {
     // Reset the scroll position.
-    mModel->mScrollPosition = Vector2::ZERO;
+    mModel->mScrollPosition                = Vector2::ZERO;
     mEventData->mScrollAfterUpdatePosition = true;
   }
 }

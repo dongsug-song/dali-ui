@@ -1,8 +1,7 @@
-#ifndef DALI_UI_TEXT_ENUMERATIONS_H
-#define DALI_UI_TEXT_ENUMERATIONS_H
+#pragma once
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,123 +17,102 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint>
+
 namespace Dali
 {
+
 namespace Ui
 {
-/**
- * @addtogroup dali_toolkit_controls_text_controls
- * @{
- */
 
 namespace Text
 {
+
 /**
- * @brief The available Horizontal alignments for text.
- *
- * @SINCE_1_2.60
+ * @brief Enumeration for text alignment options.
  */
-namespace HorizontalAlignment
+enum class Alignment : uint8_t
 {
-/**
- * @brief Enumerations for Horizontal alignment.
- *
- * @SINCE_1_2.60
- */
-enum Type
-{
-  BEGIN,  ///< @SINCE_1_2.60
-  CENTER, ///< @SINCE_1_2.60
-  END     ///< @SINCE_1_2.60
+  /**
+   * @brief Align to the start (left/top)
+   */
+  START = 0,
+  /**
+   * @brief Align to the center
+   */
+  CENTER = 1,
+  /**
+   * @brief Align to the end (right/bottom)
+   */
+  END = 2
 };
 
-} // namespace HorizontalAlignment
-
 /**
- * @brief The available Vertical alignments for text.
+ * @brief Enumeration for line wrapping strategies.
  *
- * @SINCE_1_2.60
+ * Specifies how text is wrapped when the available layout width
+ * is insufficient to display the entire text on a single line.
  */
-namespace VerticalAlignment
+enum class LineWrapMode : uint8_t
 {
-/**
- * @brief Enumerations for Vertical alignment.
- *
- * @SINCE_1_2.60
- */
-enum Type
-{
-  TOP,    ///< @SINCE_1_2.60
-  CENTER, ///< @SINCE_1_2.60
-  BOTTOM  ///< @SINCE_1_2.60
+  /**
+   * @brief Wraps at word boundaries.
+   */
+  WORD = 0,
+  /**
+   * @brief Wraps at individual characters.
+   */
+  CHARACTER = 1,
+  /**
+   * @brief Wraps using hyphenation when possible.
+   */
+  HYPHENATION = 2,
+  /**
+   * @brief Tries WORD wrapping first, then HYPHENATION, and falls back to CHARACTER.
+   */
+  MIXED = 3
 };
 
-} // namespace VerticalAlignment
-
 /**
- * @brief Contains modes which specify how lines are wrapped.
- *
- * If the layout width is too short to show the full text, then a wrapping mode can be specified.
- *
- * LineWrap::WORD mode will move an entire word to the next line:
- * @code
- * +---------+
- * |HELLO    |
- * |WORLD    |
- * +---------+
- * @endcode
- *
- * LineWrap::CHARACTER mode will move character by character to the next line:
- * @code
- * +---------+
- * |HELLO WOR|
- * |LD       |
- * +---------+
- * @endcode
- *
- * @SINCE_1_2.60
+ * @brief Enumeration for text layout direction.
  */
-namespace LineWrap
+enum class Direction : uint8_t
 {
-/**
- * @brief Enumerations specifying how a line is wrapped.
- * @SINCE_1_2.60
- * @see LineWrap
- */
-enum Mode
-{
-  WORD,     ///< @SINCE_1_2.60
-  CHARACTER ///< @SINCE_1_2.60
+  /**
+   * @brief Left-to-right text direction.
+   */
+  LEFT_TO_RIGHT = 0,
+  /**
+   * @brief Right-to-left text direction.
+   */
+  RIGHT_TO_LEFT = 1
 };
 
-} // namespace LineWrap
-
 /**
- * @brief The available underline types for text.
- * @SINCE_1_2.60
+ * @brief Enumeration for determining how the text layout direction is resolved.
  */
-namespace Underline
+enum class LayoutDirectionMode : uint8_t
 {
-/**
- * @brief Enumerations specifying the underline type.
- */
-enum Type
-{
-  SOLID,
-  DASHED,
-  DOUBLE
+  /**
+   * @brief Inherits the layout direction from the parent.
+   */
+  INHERIT = 0,
+  /**
+   * @brief Determines the layout direction based on the system locale.
+   * Uses the default script of the current system language.
+   */
+  LOCALE = 1,
+  /**
+   * @brief Determines the layout direction from the text content itself.
+   *
+   * Uses the bidirectional properties of the text.
+   */
+  CONTENTS = 2
 };
-
-} // namespace Underline
 
 } // namespace Text
-
-/**
- * @}
- */
 
 } // namespace Ui
 
 } // namespace Dali
-
-#endif // DALI_UI_TEXT_ENUMERATIONS_H

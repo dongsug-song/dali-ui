@@ -15,10 +15,17 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
+
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/internal/builder/builder-get-is.inl.h>
 #include <dali-ui-foundation/internal/builder/builder-impl.h>
 #include <dali-ui-foundation/internal/builder/replacement.h>
+
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -31,11 +38,13 @@ namespace // anon
 Property::Value* FindReplacement(const std::string& str, const Property::Map& overrideMap,
                                  const Property::Map& defaultMap)
 {
-  Property::Value* ret = overrideMap.Find(str);
+  Dali::StringView strStringView = ToDaliStringView(str);
 
-  if (!ret)
+  Property::Value* ret = overrideMap.Find(strStringView);
+
+  if(!ret)
   {
-    ret = defaultMap.Find(str);
+    ret = defaultMap.Find(strStringView);
 
     // @ todo
     // try localized text ie dgettext. Look for colon  {DOMAIN:TEXT} {LC_MESSAGE:ID_XXXX}
@@ -48,11 +57,11 @@ std::size_t FirstUnescapedChar(const std::string& initialValue, const std::size_
 {
   std::size_t pos = initialValue.find(c, startPos);
 
-  if (pos > 0)
+  if(pos > 0)
   {
-    while (pos != std::string::npos)
+    while(pos != std::string::npos)
     {
-      if ('\\' == initialValue.at(pos - 1))
+      if('\\' == initialValue.at(pos - 1))
       {
         pos = initialValue.find(c, pos);
       }
@@ -70,7 +79,7 @@ bool GetSubstitutionPosition(const std::string& initialValue, std::size_t& start
 {
   std::size_t pos = FirstUnescapedChar(initialValue, 0, '{');
 
-  if (std::string::npos == pos)
+  if(std::string::npos == pos)
   {
     startPos = std::string::npos;
     return false;
@@ -82,7 +91,7 @@ bool GetSubstitutionPosition(const std::string& initialValue, std::size_t& start
 
   pos = FirstUnescapedChar(initialValue, startPos, '}');
 
-  if (std::string::npos == pos)
+  if(std::string::npos == pos)
   {
     size = std::string::npos;
     return false;
@@ -98,18 +107,18 @@ bool GetSubstitutionPosition(const std::string& initialValue, std::size_t& start
 bool ResolvePartialReplacement(const std::string& initialValue, Property::Value& out, const Property::Map& overrideMap,
                                const Property::Map& defaultMap)
 {
-  if (initialValue.size() >= 2)
+  if(initialValue.size() >= 2)
   {
     // eg '{"constants": { "IMAGE_DIR": "/share/images" },
     //      ...
     //        "filename":"{IMAGE_DIR}/theme/header.png",
     //
     std::size_t startPos = 0;
-    std::size_t size = std::string::npos;
+    std::size_t size     = std::string::npos;
 
-    if (!GetSubstitutionPosition(initialValue, startPos, size))
+    if(!GetSubstitutionPosition(initialValue, startPos, size))
     {
-      out = initialValue;
+      out = ToPropertyValue(initialValue);
       return true;
     }
     else
@@ -120,20 +129,22 @@ bool ResolvePartialReplacement(const std::string& initialValue, Property::Value&
 
       Property::Value* value = FindReplacement(str, overrideMap, defaultMap);
 
-      if (!value)
+      if(!value)
       {
         DALI_SCRIPT_WARNING("Cannot find replacement for '%s'\n", str.c_str());
       }
       else
       {
-        if (Property::STRING != value->GetType())
+        if(Property::STRING != value->GetType())
         {
           DALI_SCRIPT_WARNING("Cannot replace substring in non string property type='%s'. Initial value '%s'\n",
                               PropertyTypes::GetName(out.GetType()), initialValue.c_str());
         }
         else
         {
-          std::string newString = initialValue.substr(0, startPos - 1) + value->Get<std::string>() +
+          Dali::String valueString;
+          value->Get(valueString);
+          std::string newString = initialValue.substr(0, startPos - 1) + ToStdString(valueString) +
                                   initialValue.substr(startPos + size + 1);
 
           return ResolvePartialReplacement(newString, out, overrideMap, defaultMap);
@@ -149,8 +160,8 @@ bool ResolvePartialReplacement(const std::string& initialValue, Property::Value&
 } // namespace
 
 Replacement::Replacement(const Property::Map& overrideMap, const Property::Map& defaultMap)
-  : mOverrideMap(&overrideMap),
-    mDefaultMap(&defaultMap)
+: mOverrideMap(&overrideMap),
+  mDefaultMap(&defaultMap)
 {
 }
 
@@ -160,14 +171,14 @@ Property::Map noMap;
 }
 
 Replacement::Replacement(const Property::Map& defaultMap)
-  : mOverrideMap(&noMap),
-    mDefaultMap(&defaultMap)
+: mOverrideMap(&noMap),
+  mDefaultMap(&defaultMap)
 {
 }
 
 Replacement::Replacement()
-  : mOverrideMap(&noMap),
-    mDefaultMap(&noMap)
+: mOverrideMap(&noMap),
+  mDefaultMap(&noMap)
 {
 }
 
@@ -175,13 +186,13 @@ OptionalString Replacement::HasFullReplacement(const TreeNode& node) const
 {
   OptionalString ret;
 
-  if (node.HasSubstitution() && ((*mOverrideMap).Count() || (*mDefaultMap).Count()))
+  if(node.HasSubstitution() && ((*mOverrideMap).Count() || (*mDefaultMap).Count()))
   {
     OptionalString v = ::IsString(node);
-    if (v)
+    if(v)
     {
       const std::string& initialValue = *v;
-      if ((initialValue[0] == '{') && (initialValue[initialValue.size() - 1] == '}'))
+      if((initialValue[0] == '{') && (initialValue[initialValue.size() - 1] == '}'))
       {
         ret = initialValue.substr(1, initialValue.size() - 2);
       }
@@ -198,7 +209,7 @@ Property::Value Replacement::GetFullReplacement(const std::string& replacementSt
 
   Property::Value* value = FindReplacement(replacementString, *mOverrideMap, *mDefaultMap);
 
-  if (!value)
+  if(!value)
   {
     DALI_SCRIPT_WARNING("Cannot find replacement for '%s'\n", replacementString.c_str());
   }
@@ -217,10 +228,10 @@ Property::Value Replacement::GetFullReplacement(const std::string& replacementSt
 OptionalBoolean Replacement::IsBoolean(const TreeNode& node) const
 {
   OptionalBoolean ret;
-  if (OptionalString replace = HasFullReplacement(node))
+  if(OptionalString replace = HasFullReplacement(node))
   {
     Property::Value value = GetFullReplacement(*replace);
-    if (Property::BOOLEAN == value.GetType())
+    if(Property::BOOLEAN == value.GetType())
     {
       ret = value.Get<bool>();
     }
@@ -234,7 +245,7 @@ OptionalBoolean Replacement::IsBoolean(const TreeNode& node) const
 
 OptionalBoolean Replacement::IsBoolean(OptionalChild child) const
 {
-  if (child)
+  if(child)
   {
     return IsBoolean(*child);
   }
@@ -247,10 +258,10 @@ OptionalBoolean Replacement::IsBoolean(OptionalChild child) const
 OptionalFloat Replacement::IsFloat(const TreeNode& node) const
 {
   OptionalFloat ret;
-  if (OptionalString replace = HasFullReplacement(node))
+  if(OptionalString replace = HasFullReplacement(node))
   {
     Property::Value value = GetFullReplacement(*replace);
-    if (Property::FLOAT == value.GetType())
+    if(Property::FLOAT == value.GetType())
     {
       ret = value.Get<float>();
     }
@@ -269,16 +280,16 @@ OptionalString Replacement::IsString(const TreeNode& node) const
   DALI_ASSERT_DEBUG(mOverrideMap && "missing map");
   DALI_ASSERT_DEBUG(mDefaultMap && "missing map");
 
-  if (node.HasSubstitution() && ((*mOverrideMap).Count() || (*mDefaultMap).Count()))
+  if(node.HasSubstitution() && ((*mOverrideMap).Count() || (*mDefaultMap).Count()))
   {
-    if (OptionalString v = ::IsString(node))
+    if(OptionalString v = ::IsString(node))
     {
       Property::Value value;
-      if (ResolvePartialReplacement(*v, value, *mOverrideMap, *mDefaultMap))
+      if(ResolvePartialReplacement(*v, value, *mOverrideMap, *mDefaultMap))
       {
-        if (Property::STRING == value.GetType())
+        if(Property::STRING == value.GetType())
         {
-          ret = value.Get<std::string>();
+          ret = ToStdString(value.Get<Dali::String>());
 #if defined(DEBUG_ENABLED)
           DALI_SCRIPT_VERBOSE("  Resolved substring replacement for '%s' => '%s'\n", (*v).c_str(), (*ret).c_str());
 #endif
@@ -300,10 +311,10 @@ OptionalString Replacement::IsString(const TreeNode& node) const
 OptionalInteger Replacement::IsInteger(const TreeNode& node) const
 {
   OptionalInteger ret;
-  if (OptionalString replace = HasFullReplacement(node))
+  if(OptionalString replace = HasFullReplacement(node))
   {
     Property::Value value = GetFullReplacement(*replace);
-    if (Property::INTEGER == value.GetType())
+    if(Property::INTEGER == value.GetType())
     {
       ret = value.Get<int>();
     }
@@ -318,10 +329,10 @@ OptionalInteger Replacement::IsInteger(const TreeNode& node) const
 OptionalVector2 Replacement::IsVector2(const TreeNode& node) const
 {
   OptionalVector2 ret;
-  if (OptionalString replace = HasFullReplacement(node))
+  if(OptionalString replace = HasFullReplacement(node))
   {
     Property::Value value = GetFullReplacement(*replace);
-    if (Property::VECTOR2 == value.GetType())
+    if(Property::VECTOR2 == value.GetType())
     {
       ret = value.Get<Vector2>();
     }
@@ -336,10 +347,10 @@ OptionalVector2 Replacement::IsVector2(const TreeNode& node) const
 OptionalVector3 Replacement::IsVector3(const TreeNode& node) const
 {
   OptionalVector3 ret;
-  if (OptionalString replace = HasFullReplacement(node))
+  if(OptionalString replace = HasFullReplacement(node))
   {
     Property::Value value = GetFullReplacement(*replace);
-    if (Property::VECTOR3 == value.GetType())
+    if(Property::VECTOR3 == value.GetType())
     {
       ret = value.Get<Vector3>();
     }
@@ -354,10 +365,10 @@ OptionalVector3 Replacement::IsVector3(const TreeNode& node) const
 OptionalVector4 Replacement::IsVector4(const TreeNode& node) const
 {
   OptionalVector4 ret;
-  if (OptionalString replace = HasFullReplacement(node))
+  if(OptionalString replace = HasFullReplacement(node))
   {
     Property::Value value = GetFullReplacement(*replace);
-    if (Property::VECTOR4 == value.GetType())
+    if(Property::VECTOR4 == value.GetType())
     {
       ret = value.Get<Vector4>();
     }
@@ -372,10 +383,10 @@ OptionalVector4 Replacement::IsVector4(const TreeNode& node) const
 OptionalMatrix Replacement::IsMatrix(const TreeNode& node) const
 {
   OptionalMatrix ret;
-  if (OptionalString replace = HasFullReplacement(node))
+  if(OptionalString replace = HasFullReplacement(node))
   {
     Property::Value value = GetFullReplacement(*replace);
-    if (Property::MATRIX == value.GetType())
+    if(Property::MATRIX == value.GetType())
     {
       ret = value.Get<Matrix>();
     }
@@ -390,10 +401,10 @@ OptionalMatrix Replacement::IsMatrix(const TreeNode& node) const
 OptionalMatrix3 Replacement::IsMatrix3(const TreeNode& node) const
 {
   OptionalMatrix3 ret;
-  if (OptionalString replace = HasFullReplacement(node))
+  if(OptionalString replace = HasFullReplacement(node))
   {
     Property::Value value = GetFullReplacement(*replace);
-    if (Property::MATRIX3 == value.GetType())
+    if(Property::MATRIX3 == value.GetType())
     {
       ret = value.Get<Matrix3>();
     }
@@ -408,10 +419,10 @@ OptionalMatrix3 Replacement::IsMatrix3(const TreeNode& node) const
 OptionalRect Replacement::IsRect(const TreeNode& node) const
 {
   OptionalRect ret;
-  if (OptionalString replace = HasFullReplacement(node))
+  if(OptionalString replace = HasFullReplacement(node))
   {
     Property::Value value = GetFullReplacement(*replace);
-    if (Property::RECTANGLE == value.GetType())
+    if(Property::RECTANGLE == value.GetType())
     {
       ret = value.Get<Rect<int>>();
     }
@@ -426,10 +437,10 @@ OptionalRect Replacement::IsRect(const TreeNode& node) const
 OptionalExtents Replacement::IsExtents(const TreeNode& node) const
 {
   OptionalExtents extents;
-  if (OptionalString replace = HasFullReplacement(node))
+  if(OptionalString replace = HasFullReplacement(node))
   {
     Property::Value value = GetFullReplacement(*replace);
-    if (Property::EXTENTS == value.GetType())
+    if(Property::EXTENTS == value.GetType())
     {
       extents = value.Get<Extents>();
     }
@@ -443,7 +454,7 @@ OptionalExtents Replacement::IsExtents(const TreeNode& node) const
 
 OptionalFloat Replacement::IsFloat(OptionalChild child) const
 {
-  if (child)
+  if(child)
   {
     return IsFloat(*child);
   }
@@ -455,7 +466,7 @@ OptionalFloat Replacement::IsFloat(OptionalChild child) const
 
 OptionalString Replacement::IsString(OptionalChild child) const
 {
-  if (child)
+  if(child)
   {
     return IsString(*child);
   }
@@ -467,7 +478,7 @@ OptionalString Replacement::IsString(OptionalChild child) const
 
 OptionalInteger Replacement::IsInteger(OptionalChild child) const
 {
-  if (child)
+  if(child)
   {
     return IsInteger(*child);
   }
@@ -479,7 +490,7 @@ OptionalInteger Replacement::IsInteger(OptionalChild child) const
 
 OptionalVector2 Replacement::IsVector2(OptionalChild child) const
 {
-  if (child)
+  if(child)
   {
     return IsVector2(*child);
   }
@@ -491,7 +502,7 @@ OptionalVector2 Replacement::IsVector2(OptionalChild child) const
 
 OptionalVector3 Replacement::IsVector3(OptionalChild child) const
 {
-  if (child)
+  if(child)
   {
     return IsVector3(*child);
   }
@@ -503,7 +514,7 @@ OptionalVector3 Replacement::IsVector3(OptionalChild child) const
 
 OptionalVector4 Replacement::IsVector4(OptionalChild child) const
 {
-  if (child)
+  if(child)
   {
     return IsVector4(*child);
   }
@@ -515,7 +526,7 @@ OptionalVector4 Replacement::IsVector4(OptionalChild child) const
 
 OptionalMatrix Replacement::IsMatrix(OptionalChild child) const
 {
-  if (child)
+  if(child)
   {
     return IsMatrix(*child);
   }
@@ -527,7 +538,7 @@ OptionalMatrix Replacement::IsMatrix(OptionalChild child) const
 
 OptionalMatrix3 Replacement::IsMatrix3(OptionalChild child) const
 {
-  if (child)
+  if(child)
   {
     return IsMatrix3(*child);
   }
@@ -539,7 +550,7 @@ OptionalMatrix3 Replacement::IsMatrix3(OptionalChild child) const
 
 OptionalRect Replacement::IsRect(OptionalChild child) const
 {
-  if (child)
+  if(child)
   {
     return IsRect(*child);
   }
@@ -553,12 +564,12 @@ bool Replacement::IsMap(OptionalChild child, Property::Value& out) const
 {
   bool ret = false;
 
-  if (child)
+  if(child)
   {
-    if (OptionalString replace = HasFullReplacement(*child))
+    if(OptionalString replace = HasFullReplacement(*child))
     {
       out = GetFullReplacement(*replace);
-      if (Property::MAP == out.GetType())
+      if(Property::MAP == out.GetType())
       {
         ret = true;
       }
@@ -572,12 +583,12 @@ bool Replacement::IsArray(OptionalChild child, Property::Value& out) const
 {
   bool ret = false;
 
-  if (child)
+  if(child)
   {
-    if (OptionalString replace = HasFullReplacement(*child))
+    if(OptionalString replace = HasFullReplacement(*child))
     {
       out = GetFullReplacement(*replace);
-      if (Property::ARRAY == out.GetType())
+      if(Property::ARRAY == out.GetType())
       {
         ret = true;
       }
@@ -589,7 +600,7 @@ bool Replacement::IsArray(OptionalChild child, Property::Value& out) const
 
 OptionalExtents Replacement::IsExtents(OptionalChild child) const
 {
-  if (child)
+  if(child)
   {
     return IsExtents(*child);
   }

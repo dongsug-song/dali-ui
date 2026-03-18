@@ -22,14 +22,15 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/devel-api/asset-manager/asset-manager.h>
-#include <dali-ui-foundation/devel-api/styling/style-manager-devel.h>
 #include <dali-ui-foundation/devel-api/visuals/visual-properties-devel.h>
+#include <dali-ui-foundation/integration-api/ui-config-manager.h>
 #include <dali-ui-foundation/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-ui-foundation/internal/visuals/animated-image/animated-image-visual.h>
 #include <dali-ui-foundation/internal/visuals/animated-vector-image/animated-vector-image-visual.h>
@@ -55,6 +56,9 @@
 #include <dali-ui-foundation/public-api/visuals/image-visual-properties.h>
 #include <dali-ui-foundation/public-api/visuals/text-visual-properties.h>
 #include <dali-ui-foundation/public-api/visuals/visual-properties.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -82,20 +86,20 @@ const char* const BROKEN_IMAGE_FILE_NAME = "broken.png"; ///< The file name of t
 } // namespace
 
 VisualFactory::VisualFactory(bool debugEnabled)
-  : mFactoryCache(),
-    mImageVisualShaderFactory(),
-    mTextVisualShaderFactory(),
-    mColorVisualShaderFactory(),
-    mSlotDelegate(this),
-    mIdleCallback(nullptr),
-    mDefaultCreationOptions(Ui::VisualFactory::CreationOptions::NONE),
-    mAdaptorInitialized(false),
-    mDebugEnabled(debugEnabled),
-    mPreMultiplyOnLoad(true),
-    mPrecompiledShaderRequested(false)
+: mFactoryCache(),
+  mImageVisualShaderFactory(),
+  mTextVisualShaderFactory(),
+  mColorVisualShaderFactory(),
+  mSlotDelegate(this),
+  mIdleCallback(nullptr),
+  mDefaultCreationOptions(Ui::VisualFactory::CreationOptions::NONE),
+  mAdaptorInitialized(false),
+  mDebugEnabled(debugEnabled),
+  mPreMultiplyOnLoad(true),
+  mPrecompiledShaderRequested(false)
 {
   Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
-  if (DALI_LIKELY(lifecycleController))
+  if(DALI_LIKELY(lifecycleController))
   {
     lifecycleController.PreInitSignal().Connect(this, &VisualFactory::OnAdaptorInitialized);
     lifecycleController.TerminateSignal().Connect(this, &VisualFactory::OnAdaptorTerminated);
@@ -104,9 +108,9 @@ VisualFactory::VisualFactory(bool debugEnabled)
 
 VisualFactory::~VisualFactory()
 {
-  if (Adaptor::IsAvailable())
+  if(Adaptor::IsAvailable())
   {
-    if (mIdleCallback)
+    if(mIdleCallback)
     {
       // Removes the callback from the callback manager in case the control is destroyed before the callback is
       // executed.
@@ -116,37 +120,24 @@ VisualFactory::~VisualFactory()
   }
 }
 
-void VisualFactory::OnStyleChangedSignal(Ui::StyleManager styleManager, StyleChange::Type type)
-{
-  if (type == StyleChange::THEME_CHANGE)
-  {
-    SetBrokenImageUrl(styleManager);
-  }
-}
-
-void VisualFactory::OnBrokenImageChangedSignal(Ui::StyleManager styleManager)
-{
-  SetBrokenImageUrl(styleManager);
-}
-
 Ui::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap)
 {
   return CreateVisual(propertyMap, mDefaultCreationOptions);
 }
 
-Ui::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap,
+Ui::Visual::Base VisualFactory::CreateVisual(const Property::Map&               propertyMap,
                                              Ui::VisualFactory::CreationOptions creationOptions)
 {
   Visual::BasePtr visualPtr;
 
-  Property::Value* typeValue = propertyMap.Find(Ui::Visual::Property::TYPE, VISUAL_TYPE);
+  Property::Value*      typeValue  = propertyMap.Find(Ui::Visual::Property::TYPE, VISUAL_TYPE);
   Ui::DevelVisual::Type visualType = Ui::DevelVisual::IMAGE; // Default to IMAGE type.
-  if (typeValue)
+  if(typeValue)
   {
     Scripting::GetEnumerationProperty(*typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType);
   }
 
-  switch (visualType)
+  switch(visualType)
   {
     case Ui::Visual::BORDER:
     {
@@ -170,16 +161,16 @@ Ui::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap,
     case Ui::Visual::ANIMATED_IMAGE:
     {
       Property::Value* imageURLValue = propertyMap.Find(Ui::ImageVisual::Property::URL, IMAGE_URL_NAME);
-      std::string imageUrl;
-      if (imageURLValue)
+      std::string      imageUrl;
+      if(imageURLValue)
       {
-        if (imageURLValue->Get(imageUrl))
+        if(GetStdString(*imageURLValue, imageUrl))
         {
-          if (!imageUrl.empty())
+          if(!imageUrl.empty())
           {
             VisualUrl visualUrl(imageUrl);
 
-            switch (visualUrl.GetType())
+            switch(visualUrl.GetType())
             {
               case VisualUrl::N_PATCH:
               {
@@ -201,8 +192,8 @@ Ui::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap,
               case VisualUrl::GIF:
               case VisualUrl::WEBP:
               {
-                if (visualType == Ui::DevelVisual::ANIMATED_IMAGE ||
-                    !(creationOptions & Ui::VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY))
+                if(visualType == Ui::DevelVisual::ANIMATED_IMAGE ||
+                   !(creationOptions & Ui::VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY))
                 {
                   visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl,
                                                        propertyMap);
@@ -221,7 +212,7 @@ Ui::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap,
         else
         {
           Property::Array* array = imageURLValue->GetArray();
-          if (array && array->Count() > 0)
+          if(array && array->Count() > 0)
           {
             visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), *array, propertyMap);
           }
@@ -257,10 +248,10 @@ Ui::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap,
     case Ui::Visual::N_PATCH:
     {
       Property::Value* imageURLValue = propertyMap.Find(Ui::ImageVisual::Property::URL, IMAGE_URL_NAME);
-      std::string imageUrl;
-      if (imageURLValue && imageURLValue->Get(imageUrl))
+      std::string      imageUrl;
+      if(imageURLValue && GetStdString(*imageURLValue, imageUrl))
       {
-        if (!imageUrl.empty())
+        if(!imageUrl.empty())
         {
           visualPtr = NPatchVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
         }
@@ -271,10 +262,10 @@ Ui::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap,
     case Ui::Visual::SVG:
     {
       Property::Value* imageURLValue = propertyMap.Find(Ui::ImageVisual::Property::URL, IMAGE_URL_NAME);
-      std::string imageUrl;
-      if (imageURLValue && imageURLValue->Get(imageUrl))
+      std::string      imageUrl;
+      if(imageURLValue && GetStdString(*imageURLValue, imageUrl))
       {
-        if (!imageUrl.empty())
+        if(!imageUrl.empty())
         {
           visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
         }
@@ -285,13 +276,13 @@ Ui::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap,
     case Ui::DevelVisual::ANIMATED_VECTOR_IMAGE:
     {
       Property::Value* imageURLValue = propertyMap.Find(Ui::ImageVisual::Property::URL, IMAGE_URL_NAME);
-      std::string imageUrl;
-      if (imageURLValue && imageURLValue->Get(imageUrl))
+      std::string      imageUrl;
+      if(imageURLValue && GetStdString(*imageURLValue, imageUrl))
       {
-        if (!imageUrl.empty())
+        if(!imageUrl.empty())
         {
           visualPtr =
-              AnimatedVectorImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
+            AnimatedVectorImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
         }
       }
       break;
@@ -310,28 +301,28 @@ Ui::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap,
   }
 
   DALI_LOG_INFO(
-      gLogFilter, Debug::Concise, "VisualFactory::CreateVisual( VisualType:%s %s%s)\n",
-      Scripting::GetEnumerationName<Ui::DevelVisual::Type>(visualType, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT),
-      (visualType == Ui::DevelVisual::IMAGE) ? "url:" : "",
-      ((visualType == Ui::DevelVisual::IMAGE)
-           ? ((
-                 [&]()
-                 {
-                   // Return URL if present in PropertyMap else return "not
-                   // found message"
-                   Property::Value* imageURLValue = propertyMap.Find(Ui::ImageVisual::Property::URL, IMAGE_URL_NAME);
-                   return (imageURLValue) ? imageURLValue->Get<std::string>()
-                                          : std::string("url not found in PropertyMap");
-                 })())
-           : std::string(""))
-          .c_str());
+    gLogFilter, Debug::Concise, "VisualFactory::CreateVisual( VisualType:%s %s%s)\n",
+    Scripting::GetEnumerationName<Ui::DevelVisual::Type>(visualType, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT),
+    (visualType == Ui::DevelVisual::IMAGE) ? "url:" : "",
+    ((visualType == Ui::DevelVisual::IMAGE)
+       ? ((
+           [&]()
+  {
+    // Return URL if present in PropertyMap else return "not
+    // found message"
+    Property::Value* imageURLValue = propertyMap.Find(Ui::ImageVisual::Property::URL, IMAGE_URL_NAME);
+    return (imageURLValue) ? ToStdString(*imageURLValue)
+                           : std::string("url not found in PropertyMap");
+  })())
+       : std::string(""))
+      .c_str());
 
-  if (!visualPtr)
+  if(!visualPtr)
   {
     DALI_LOG_ERROR("VisualType unknown\n");
   }
 
-  if (mDebugEnabled && visualType != Ui::DevelVisual::WIREFRAME)
+  if(mDebugEnabled && visualType != Ui::DevelVisual::WIREFRAME)
   {
     // Create a WireframeVisual if we have debug enabled
     visualPtr = WireframeVisual::New(GetFactoryCache(), visualPtr, propertyMap);
@@ -350,11 +341,11 @@ Ui::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimens
 {
   Visual::BasePtr visualPtr;
 
-  if (!url.empty())
+  if(!url.empty())
   {
     // first resolve url type to know which visual to create
     VisualUrl visualUrl(url);
-    switch (visualUrl.GetType())
+    switch(visualUrl.GetType())
     {
       case VisualUrl::N_PATCH:
       {
@@ -375,7 +366,7 @@ Ui::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimens
       case VisualUrl::GIF:
       case VisualUrl::WEBP:
       {
-        if (!(creationOptions & Ui::VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY))
+        if(!(creationOptions & Ui::VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY))
         {
           visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, size);
           break;
@@ -390,7 +381,7 @@ Ui::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimens
     }
   }
 
-  if (mDebugEnabled)
+  if(mDebugEnabled)
   {
     // Create a WireframeVisual if we have debug enabled
     visualPtr = WireframeVisual::New(GetFactoryCache(), visualPtr);
@@ -406,7 +397,7 @@ Dali::Geometry VisualFactory::GetDefaultQuadGeometry()
 
 void VisualFactory::SetPreMultiplyOnLoad(bool preMultiply)
 {
-  if (mPreMultiplyOnLoad != preMultiply)
+  if(mPreMultiplyOnLoad != preMultiply)
   {
     GetFactoryCache().SetPreMultiplyOnLoad(preMultiply);
   }
@@ -438,8 +429,8 @@ void VisualFactory::DiscardVisual(Ui::Visual::Base visual)
 bool VisualFactory::AddPrecompileShader(const Property::Map& map)
 {
   PrecompileShaderOption shaderOption(map);
-  auto type = shaderOption.GetShaderType();
-  if (type == PrecompileShaderOption::ShaderType::UNKNOWN)
+  auto                   type = shaderOption.GetShaderType();
+  if(type == PrecompileShaderOption::ShaderType::UNKNOWN)
   {
     DALI_LOG_ERROR("AddPrecompileShader is failed. we can't find shader type\n");
     return false;
@@ -450,7 +441,7 @@ bool VisualFactory::AddPrecompileShader(const Property::Map& map)
 
 void VisualFactory::UsePreCompiledShader()
 {
-  if (mPrecompiledShaderRequested)
+  if(mPrecompiledShaderRequested)
   {
     return;
   }
@@ -460,7 +451,7 @@ void VisualFactory::UsePreCompiledShader()
 
   // Get image shader
   ShaderPreCompiler::RawShaderDataList rawShaderList;
-  ShaderPreCompiler::RawShaderData imageShaderData;
+  ShaderPreCompiler::RawShaderData     imageShaderData;
   GetImageVisualShaderFactory().GetPreCompiledShader(imageShaderData);
   rawShaderList.emplace_back(std::move(imageShaderData));
 
@@ -501,40 +492,25 @@ Internal::SvgLoader& VisualFactory::GetSvgLoader()
   return GetFactoryCache().GetSvgLoader();
 }
 
-void VisualFactory::SetBrokenImageUrl(Ui::StyleManager& styleManager)
-{
-  const std::string imageDirPath = AssetManager::GetDaliImagePath();
-  std::string brokenImageUrl = imageDirPath + BROKEN_IMAGE_FILE_NAME;
-  std::vector<std::string> customBrokenImageUrlList;
-
-  if (styleManager)
-  {
-    customBrokenImageUrlList = Ui::DevelStyleManager::GetBrokenImageUrlList(styleManager);
-    const auto brokenImageUrlValue =
-        Ui::DevelStyleManager::GetConfigurations(styleManager).Find("brokenImageUrl", Property::Type::STRING);
-    if (brokenImageUrlValue)
-    {
-      brokenImageUrlValue->Get(brokenImageUrl);
-    }
-  }
-
-  // Add default image
-  mFactoryCache->SetBrokenImageUrl(brokenImageUrl, customBrokenImageUrlList);
-}
-
 Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
 {
-  if (!mFactoryCache)
+  if(!mFactoryCache)
   {
     mFactoryCache = std::unique_ptr<VisualFactoryCache>(new VisualFactoryCache(mPreMultiplyOnLoad));
-    Ui::StyleManager styleManager = Ui::StyleManager::Get();
-    if (styleManager)
+
+    // Get broken image urls
+    auto imageDirPath   = AssetManager::GetDaliImagePath();
+    auto brokenImageUrl = imageDirPath + BROKEN_IMAGE_FILE_NAME;
+
+    std::vector<std::string> customBrokenImageUrlList{};
+    auto&                    uiConfigManager = Integration::UiConfigManager::Get();
+    if(uiConfigManager.IsInitialized())
     {
-      styleManager.StyleChangedSignal().Connect(mSlotDelegate, &VisualFactory::OnStyleChangedSignal);
-      Ui::DevelStyleManager::BrokenImageChangedSignal(styleManager)
-          .Connect(mSlotDelegate, &VisualFactory::OnBrokenImageChangedSignal);
+      customBrokenImageUrlList = Integration::UiConfigManager::Get().GetBrokenImageUrlList();
     }
-    SetBrokenImageUrl(styleManager);
+
+    // Add default image
+    mFactoryCache->SetBrokenImageUrl(brokenImageUrl, customBrokenImageUrlList);
   }
 
   return *mFactoryCache;
@@ -542,7 +518,7 @@ Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
 
 ImageVisualShaderFactory& VisualFactory::GetImageVisualShaderFactory()
 {
-  if (!mImageVisualShaderFactory)
+  if(!mImageVisualShaderFactory)
   {
     mImageVisualShaderFactory = std::unique_ptr<ImageVisualShaderFactory>(new ImageVisualShaderFactory());
   }
@@ -551,7 +527,7 @@ ImageVisualShaderFactory& VisualFactory::GetImageVisualShaderFactory()
 
 TextVisualShaderFactory& VisualFactory::GetTextVisualShaderFactory()
 {
-  if (!mTextVisualShaderFactory)
+  if(!mTextVisualShaderFactory)
   {
     mTextVisualShaderFactory = std::unique_ptr<TextVisualShaderFactory>(new TextVisualShaderFactory());
   }
@@ -560,7 +536,7 @@ TextVisualShaderFactory& VisualFactory::GetTextVisualShaderFactory()
 
 ColorVisualShaderFactory& VisualFactory::GetColorVisualShaderFactory()
 {
-  if (!mColorVisualShaderFactory)
+  if(!mColorVisualShaderFactory)
   {
     mColorVisualShaderFactory = std::unique_ptr<ColorVisualShaderFactory>(new ColorVisualShaderFactory());
   }
@@ -569,7 +545,7 @@ ColorVisualShaderFactory& VisualFactory::GetColorVisualShaderFactory()
 
 NpatchShaderFactory& VisualFactory::GetNpatchShaderFactory()
 {
-  if (!mNpatchShaderFactory)
+  if(!mNpatchShaderFactory)
   {
     mNpatchShaderFactory = std::unique_ptr<NpatchShaderFactory>(new NpatchShaderFactory());
   }
@@ -578,7 +554,7 @@ NpatchShaderFactory& VisualFactory::GetNpatchShaderFactory()
 
 CustomShaderFactory& VisualFactory::GetCustomShaderFactory()
 {
-  if (!mCustomShaderFactory)
+  if(!mCustomShaderFactory)
   {
     mCustomShaderFactory = std::unique_ptr<CustomShaderFactory>(new CustomShaderFactory());
   }
@@ -588,8 +564,8 @@ CustomShaderFactory& VisualFactory::GetCustomShaderFactory()
 bool VisualFactory::AddPrecompileShader(PrecompileShaderOption& option)
 {
   auto type = option.GetShaderType();
-  bool ret = false;
-  switch (type)
+  bool ret  = false;
+  switch(type)
   {
     case PrecompileShaderOption::ShaderType::COLOR:
     {
@@ -648,12 +624,12 @@ void VisualFactory::OnAdaptorTerminated()
 {
   mAdaptorInitialized = false;
 
-  if (DALI_UNLIKELY(mIdleCallback))
+  if(DALI_UNLIKELY(mIdleCallback))
   {
     OnDiscardCallback();
   }
 
-  if (mFactoryCache)
+  if(mFactoryCache)
   {
     mFactoryCache->FinalizeVectorAnimationManager();
   }
@@ -661,20 +637,20 @@ void VisualFactory::OnAdaptorTerminated()
 
 void VisualFactory::RegisterDiscardCallback()
 {
-  if (!mAdaptorInitialized)
+  if(!mAdaptorInitialized)
   {
     // If the adaptor is not initialized, we cannot add idle. Discard visuals immediately.
     OnDiscardCallback();
     return;
   }
-  if (!mIdleCallback && Adaptor::IsAvailable())
+  if(!mIdleCallback && Adaptor::IsAvailable())
   {
     // The callback manager takes the ownership of the callback object.
     mIdleCallback = MakeCallback(this, &VisualFactory::OnDiscardCallback);
 
     Adaptor& adaptor = Adaptor::Get();
 
-    if (DALI_UNLIKELY(!adaptor.AddIdle(mIdleCallback, false)))
+    if(DALI_UNLIKELY(!adaptor.AddIdle(mIdleCallback, false)))
     {
       DALI_LOG_ERROR("Fail to add idle callback for visual factory. Call it synchronously.\n");
       OnDiscardCallback();

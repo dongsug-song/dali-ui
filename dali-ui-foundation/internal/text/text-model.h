@@ -72,22 +72,22 @@ public:
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  HorizontalAlignment::Type GetHorizontalAlignment() const override;
+  Alignment GetHorizontalAlignment() const override;
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  VerticalAlignment::Type GetVerticalAlignment() const override;
+  Alignment GetVerticalAlignment() const override;
 
   /**
    * @copydoc ModelInterface::GetVerticalLineAlignment()
    */
-  DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const override;
+  Alignment GetVerticalLineAlignment() const override;
 
   /**
    * @copydoc ModelInterface::GetEllipsisPosition()
    */
-  DevelText::EllipsisPosition::Type GetEllipsisPosition() const override;
+  Text::EllipsisPosition::Type GetEllipsisPosition() const override;
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()
@@ -280,11 +280,6 @@ public:
   bool IsMarkupProcessorEnabled() const override;
 
   /**
-   * @copydoc ModelInterface::IsSpannedTextPlaced()
-   */
-  bool IsSpannedTextPlaced() const override;
-
-  /**
    * @copydoc ModelInterface::GetHyphens()
    */
   const GlyphInfo* GetHyphens() const override;
@@ -410,7 +405,6 @@ public:
    */
   const Vector<CharacterDirection>& GetCharacterDirections() const override;
 
-
 private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.
@@ -431,27 +425,26 @@ protected:
 
 public:
   LogicalModelPtr mLogicalModel; ///< Pointer to the logical model.
-  VisualModelPtr mVisualModel;   ///< Pointer to the visual model.
+  VisualModelPtr  mVisualModel;  ///< Pointer to the visual model.
   /**
    * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
    * Typically this will have a negative value with scrolling occurs.
    */
-  Vector2 mScrollPosition;          ///< The text is offset by this position when scrolling.
-  Vector2 mScrollPositionLast;      ///< The last offset value of mScrollPosition
-  Vector2 mLayoutAlignmentOffset;   ///< The offset of the layout based on the controller due to alignment.
-  Vector2 mLayoutOffsetWithPadding; ///< The offset that includes padding in the layout alignment offset.
-  HorizontalAlignment::Type mHorizontalAlignment;                ///< The layout's horizontal alignment.
-  VerticalAlignment::Type mVerticalAlignment;                    ///< The layout's vertical alignment.
-  DevelText::VerticalLineAlignment::Type mVerticalLineAlignment; ///< The layout's vertical line alignment.
-  Text::LineWrap::Mode mLineWrapMode;                            ///< The text wrap mode
-  float mAlignmentOffset;                                        ///< The alignment offset.
-  bool mElideEnabled : 1;                                        ///< Whether the text's elide is enabled.
-  bool mIgnoreSpacesAfterText : 1; ///< Whether ignoring spaces after text or not. Default is true.
-  bool mRemoveFrontInset : 1;      ///< Whether to ignore xBearing of the first glyph. Default is true.
-  bool mRemoveBackInset : 1;       ///< Whether to ignore advance of the last glyph. Default is true.
-  DevelText::MatchLayoutDirection
-      mMatchLayoutDirection; ///< Whether to match text alignment with layout direction or not.
-  DevelText::EllipsisPosition::Type mEllipsisPosition; ///< Where is the location the text elide
+  Vector2                      mScrollPosition;            ///< The text is offset by this position when scrolling.
+  Vector2                      mScrollPositionLast;        ///< The last offset value of mScrollPosition
+  Vector2                      mLayoutAlignmentOffset;     ///< The offset of the layout based on the controller due to alignment.
+  Vector2                      mLayoutOffsetWithPadding;   ///< The offset that includes padding in the layout alignment offset.
+  Alignment                    mHorizontalAlignment;       ///< The layout's horizontal alignment.
+  Alignment                    mVerticalAlignment;         ///< The layout's vertical alignment.
+  Alignment                    mVerticalLineAlignment;     ///< The layout's vertical line alignment.
+  LineWrapMode                 mLineWrapMode;              ///< The text wrap mode
+  float                        mAlignmentOffset;           ///< The alignment offset.
+  bool                         mElideEnabled : 1;          ///< Whether the text's elide is enabled.
+  bool                         mIgnoreSpacesAfterText : 1; ///< Whether ignoring spaces after text or not. Default is true.
+  bool                         mRemoveFrontInset : 1;      ///< Whether to ignore xBearing of the first glyph. Default is true.
+  bool                         mRemoveBackInset : 1;       ///< Whether to ignore advance of the last glyph. Default is true.
+  LayoutDirectionMode          mMatchLayoutDirection;      ///< Whether to match text alignment with layout direction or not.
+  Text::EllipsisPosition::Type mEllipsisPosition;          ///< Where is the location the text elide
 };
 
 } // namespace Text

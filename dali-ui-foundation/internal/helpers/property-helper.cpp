@@ -19,6 +19,7 @@
 #include <dali-ui-foundation/internal/helpers/property-helper.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-array.h>
 
 namespace Dali
@@ -30,20 +31,20 @@ namespace Internal
 bool GetStringFromProperty(const Property::Value& value, std::string& output)
 {
   bool extracted = false;
-  if (value.Get(output))
+  if(Dali::Integration::GetStdString(value, output))
   {
     extracted = true;
   }
   else
   {
     const Property::Array* array = value.GetArray();
-    if (array)
+    if(array)
     {
       const unsigned int arraySize = array->Size();
-      for (unsigned int i = 0; i < arraySize; ++i)
+      for(unsigned int i = 0; i < arraySize; ++i)
       {
         std::string element;
-        if (array->GetElementAt(i).Get(element))
+        if(Dali::Integration::GetStdString(array->GetElementAt(i), element))
         {
           extracted = true;
           output += element + '\n';

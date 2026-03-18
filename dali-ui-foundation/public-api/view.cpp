@@ -19,11 +19,9 @@
 #include <dali-ui-foundation/public-api/view.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/integration-api/trait-id.h>
 #include <dali-ui-foundation/integration-api/view-impl.h>
 #include <dali-ui-foundation/public-api/clickable-trait.h>
 #include <dali-ui-foundation/public-api/layout.h>
@@ -52,12 +50,12 @@ View View::New()
 }
 
 View::View(const View& view)
-  : Ui::Control(view)
+: Ui::Control(view)
 {
 }
 
 View::View(View&& rhs) noexcept
-  : Ui::Control(std::move(rhs))
+: Ui::Control(std::move(rhs))
 {
 }
 
@@ -71,12 +69,12 @@ View View::DownCast(BaseHandle handle)
 }
 
 View::View(Integration::ViewImpl& implementation)
-  : Control(implementation)
+: Control(implementation)
 {
 }
 
 View::View(Dali::Internal::CustomActor* internal)
-  : Control(internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Integration::ViewImpl>(internal);
 }
@@ -328,11 +326,11 @@ View& View::SetTouchFocusable(bool touchFocusable)
 
 ClickableTrait View::GetOrAttachClickableTrait()
 {
-  auto& impl = Integration::GetImpl(*this);
+  auto&                      impl = Integration::GetImpl(*this);
   const Integration::TraitId interactionTraitId(Integration::ReservedTraitId::INTERACTION_TRAIT);
-  Trait existing = impl.GetTrait(interactionTraitId);
+  Trait                      existing = impl.GetTrait(interactionTraitId);
 
-  if (!existing)
+  if(!existing)
   {
     ClickableTrait clickable = ClickableTrait::New();
     impl.SetTrait(interactionTraitId, clickable);
@@ -340,7 +338,7 @@ ClickableTrait View::GetOrAttachClickableTrait()
   }
 
   ClickableTrait clickable = ClickableTrait::DownCast(existing);
-  if (!clickable)
+  if(!clickable)
   {
     DALI_ASSERT_ALWAYS(false && "View already has a different interaction trait; cannot attach ClickableTrait");
     return ClickableTrait();
@@ -351,9 +349,20 @@ ClickableTrait View::GetOrAttachClickableTrait()
 
 ClickableTrait View::GetClickableTrait() const
 {
-  const auto& impl = Integration::GetImpl(*this);
-  Trait trait = impl.GetTrait(Integration::TraitId(Integration::ReservedTraitId::INTERACTION_TRAIT));
+  const auto& impl  = Integration::GetImpl(*this);
+  Trait       trait = impl.GetTrait(Integration::TraitId(Integration::ReservedTraitId::INTERACTION_TRAIT));
   return ClickableTrait::DownCast(trait);
+}
+
+BaseHandle View::GetLayoutParamsTrait(LayoutParamsType type) const
+{
+  return Integration::GetImpl(*this).GetLayoutParamsTrait(type);
+}
+
+View& View::SetLayoutParams(LayoutParams params)
+{
+  Integration::GetImpl(*this).SetLayoutParams(params);
+  return *this;
 }
 
 } // namespace Ui
