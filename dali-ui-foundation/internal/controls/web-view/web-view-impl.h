@@ -26,8 +26,8 @@
 #include <memory>
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/devel-api/controls/control-accessible.h>
 #include <dali-ui-foundation/devel-api/visual-factory/visual-base.h>
+#include <dali-ui-foundation/integration-api/control-accessible.h>
 #include <dali-ui-foundation/public-api/controls/control-impl.h>
 #include <dali-ui-foundation/public-api/controls/image-view/image-view.h>
 #include <dali-ui-foundation/public-api/controls/web-view/web-view.h>
@@ -231,19 +231,19 @@ public:
   /**
    * @copydoc Dali::Ui::WebView::EvaluateJavaScript()
    */
-  void EvaluateJavaScript(const std::string& script,
+  void EvaluateJavaScript(const std::string&                                      script,
                           Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback resultHandler);
 
   /**
    * @copydoc Dali::Ui::WebView::AddJavaScriptMessageHandler()
    */
-  void AddJavaScriptMessageHandler(const std::string& exposedObjectName,
+  void AddJavaScriptMessageHandler(const std::string&                                      exposedObjectName,
                                    Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler);
 
   /**
    * @copydoc Dali::Ui::WebView::AddJavaScriptEntireMessageHandler()
    */
-  void AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName,
+  void AddJavaScriptEntireMessageHandler(const std::string&                                            exposedObjectName,
                                          Dali::WebEnginePlugin::JavaScriptEntireMessageHandlerCallback handler);
 
   /**
@@ -365,7 +365,7 @@ public:
   void RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback);
   void RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback callback);
   void RegisterNavigationPolicyDecidedCallback(
-      Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
+    Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
   void RegisterNewWindowPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback callback);
   void RegisterNewWindowCreatedCallback(Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback callback);
   void RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback);
@@ -383,56 +383,56 @@ public:
   void RegisterFileChooserRequestedCallback(Dali::WebEnginePlugin::WebEngineFileChooserRequestedCallback callback);
   void RegisterWebProcessCrashedCallback(Dali::WebEnginePlugin::WebEngineWebProcessCrashedCallback callback);
   void RegisterUserMediaPermissionRequestCallback(
-      Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback);
+    Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback);
   void RegisterDeviceConnectionChangedCallback(
-      Dali::WebEnginePlugin::WebEngineDeviceConnectionChangedCallback callback);
+    Dali::WebEnginePlugin::WebEngineDeviceConnectionChangedCallback callback);
   void RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback);
   void FeedMouseWheel(bool yDirection, int step, int x, int y);
   void SetVideoHole(bool enabled, bool isWaylandWindow);
 
 public: // Properties
-  static void SetProperty(Dali::BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value);
+  static void                  SetProperty(Dali::BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value);
   static Dali::Property::Value GetProperty(Dali::BaseObject* object, Dali::Property::Index propertyIndex);
 
 private: // From Control
-  void OnInitialize() override;
-  DevelControl::ControlAccessible* CreateAccessibleObject() override;
-  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
-  Vector3 GetNaturalSize() override;
-  bool OnKeyEvent(const Dali::KeyEvent& event) override;
-  void OnKeyInputFocusGained() override;
-  void OnKeyInputFocusLost() override;
-  void OnSceneConnection(int depth) override;
-  void OnSceneDisconnection() override;
+  void               OnInitialize() override;
+  ControlAccessible* CreateAccessibleObject() override;
+  void               OnRelayout(const Vector2& size, RelayoutContainer& container) override;
+  Vector3            GetNaturalSize() override;
+  bool               OnKeyEvent(const Dali::KeyEvent& event) override;
+  void               OnKeyInputFocusGained() override;
+  void               OnKeyInputFocusLost() override;
+  void               OnSceneConnection(int depth) override;
+  void               OnSceneDisconnection() override;
 
 private:
   // Undefined
   WebView(const WebView& webView);
   WebView& operator=(const WebView& webView);
 
-  void SetScrollPosition(int32_t x, int32_t y);
-  Dali::Vector2 GetScrollPosition() const;
-  Dali::Vector2 GetScrollSize() const;
-  Dali::Vector2 GetContentSize() const;
-  std::string GetTitle() const;
-  void SetDocumentBackgroundColor(Dali::Vector4 color);
-  void ClearTilesWhenHidden(bool cleared);
-  void SetTileCoverAreaMultiplier(float multiplier);
-  void EnableCursorByClient(bool enabled);
-  std::string GetSelectedText() const;
-  std::string GetUrl() const;
-  std::string GetUserAgent() const;
-  void SetUserAgent(const std::string& userAgent);
-  void SetPageZoomFactor(float zoomFactor);
-  float GetPageZoomFactor() const;
-  void SetTextZoomFactor(float zoomFactor);
-  float GetTextZoomFactor() const;
-  float GetLoadProgressPercentage() const;
-  bool SetVisibility(bool visible);
-  void EnableVideoHole(bool enabled);
-  void EnableBlendMode(bool blendEnabled);
-  void EnableMouseEvents(bool enabled);
-  void EnableKeyEvents(bool enabled);
+  void                SetScrollPosition(int32_t x, int32_t y);
+  Dali::Vector2       GetScrollPosition() const;
+  Dali::Vector2       GetScrollSize() const;
+  Dali::Vector2       GetContentSize() const;
+  std::string         GetTitle() const;
+  void                SetDocumentBackgroundColor(Dali::Vector4 color);
+  void                ClearTilesWhenHidden(bool cleared);
+  void                SetTileCoverAreaMultiplier(float multiplier);
+  void                EnableCursorByClient(bool enabled);
+  std::string         GetSelectedText() const;
+  std::string         GetUrl() const;
+  std::string         GetUserAgent() const;
+  void                SetUserAgent(const std::string& userAgent);
+  void                SetPageZoomFactor(float zoomFactor);
+  float               GetPageZoomFactor() const;
+  void                SetTextZoomFactor(float zoomFactor);
+  float               GetTextZoomFactor() const;
+  float               GetLoadProgressPercentage() const;
+  bool                SetVisibility(bool visible);
+  void                EnableVideoHole(bool enabled);
+  void                EnableBlendMode(bool blendEnabled);
+  void                EnableMouseEvents(bool enabled);
+  void                EnableKeyEvents(bool enabled);
   Dali::Ui::ImageView CreateImageView(Dali::PixelData pixel) const;
 
   bool OnTouchEvent(Actor actor, const Dali::TouchEvent& touch);
@@ -445,7 +445,7 @@ private:
   void SetDisplayArea(const Dali::Rect<int32_t>& displayArea);
 
 protected:
-  class WebViewAccessible : public DevelControl::ControlAccessible
+  class WebViewAccessible : public ControlAccessible
   {
   public:
     WebViewAccessible() = delete;
@@ -454,7 +454,7 @@ protected:
 
   protected:
     Dali::Accessibility::Attributes GetAttributes() const override;
-    void DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children) override;
+    void                            DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children) override;
 
   private:
     void OnAccessibilityEnabled();
@@ -462,31 +462,31 @@ protected:
     void SetRemoteChildAddress(Dali::Accessibility::Address address);
 
     Dali::Accessibility::ProxyAccessible mRemoteChild;
-    Dali::WebEngine& mWebEngine;
+    Dali::WebEngine&                     mWebEngine;
   };
 
 private:
   Dali::Ui::Visual::Base mVisual;
-  Dali::Size mWebViewSize;
-  Dali::WebEngine mWebEngine;
+  Dali::Size             mWebViewSize;
+  Dali::WebEngine        mWebEngine;
 
   uint32_t mLastRenderedNativeImageWidth;
   uint32_t mLastRenderedNativeImageHeight;
 
-  std::unique_ptr<Dali::Ui::WebSettings> mWebSettings;
+  std::unique_ptr<Dali::Ui::WebSettings>        mWebSettings;
   std::unique_ptr<Dali::Ui::WebBackForwardList> mWebBackForwardList;
 
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;
   Dali::PropertyNotification mScaleUpdateNotification;
-  Dali::Rect<int32_t> mWebViewArea;
-  bool mVideoHoleEnabled;
-  bool mMouseEventsEnabled;
-  bool mKeyEventsEnabled;
+  Dali::Rect<int32_t>        mWebViewArea;
+  bool                       mVideoHoleEnabled;
+  bool                       mMouseEventsEnabled;
+  bool                       mKeyEventsEnabled;
 
   bool mVisualChangeRequired;
 
-  Dali::Ui::WebView::WebViewScreenshotCapturedCallback mScreenshotCapturedCallback;
+  Dali::Ui::WebView::WebViewScreenshotCapturedCallback  mScreenshotCapturedCallback;
   Dali::WebEnginePlugin::WebEngineFrameRenderedCallback mFrameRenderedCallback;
 
   static std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Ui::WebView>> mPluginWebViewMap;

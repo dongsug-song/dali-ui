@@ -285,10 +285,9 @@ int UtcDaliWebViewUserAgentProperty(void)
   DALI_TEST_CHECK(view);
 
   // SetUserAgent/GetUserAgent delegate to WebEngine; without plugin, get returns empty string
-  std::string userAgent = "Mozilla/5.0 TestAgent";
-  view.SetProperty(WebView::Property::USER_AGENT, userAgent);
+  view.SetProperty(WebView::Property::USER_AGENT, "Mozilla/5.0 TestAgent");
   // Just verify the call doesn't crash
-  view.GetProperty<std::string>(WebView::Property::USER_AGENT);
+  view.GetProperty<Dali::String>(WebView::Property::USER_AGENT);
   DALI_TEST_CHECK(view);
 
   END_TEST;
