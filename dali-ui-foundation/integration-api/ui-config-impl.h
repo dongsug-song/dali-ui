@@ -19,12 +19,14 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/base-object.h>
 #include <cstdint>
 #include <string>
 #include <vector>
 
 // INTERNAL INCLUDES
+#include <dali-ui-foundation/integration-api/theme-loader-interface.h>
 #include <dali-ui-foundation/public-api/ui-config.h>
 
 namespace Dali
@@ -234,6 +236,36 @@ public:
   bool IsFocusIndicatorAlwaysShown() const;
 
   /**
+   * @brief Sets the default font size.
+   *
+   * @pre Must not be frozen.
+   * @param[in] fontSize The default font size
+   */
+  void SetDefaultFontSize(float fontSize);
+
+  /**
+   * @brief Retrieves the default font size.
+   *
+   * @return The default font size
+   */
+  float GetDefaultFontSize() const;
+
+  /**
+   * @brief Sets the default text color.
+   *
+   * @pre Must not be frozen.
+   * @param[in] color The default text color
+   */
+  void SetDefaultTextColor(const Vector4& color);
+
+  /**
+   * @brief Retrieves the default text color.
+   *
+   * @return The default text color
+   */
+  Vector4 GetDefaultTextColor() const;
+
+  /**
    * @brief Called after this config is applied via UiConfig::Apply().
    *
    * Derived config implementations override this to register themselves
@@ -241,6 +273,17 @@ public:
    * The base implementation does nothing.
    */
   virtual void OnInitialized();
+
+  /**
+   * @brief Creates a ThemeLoaderInterface instance.
+   *
+   * Called internally by UiConfigManager during initialization. Derived
+   * implementations override this to provide a custom theme loader.
+   * The framework takes ownership of the returned pointer.
+   *
+   * @return A ThemeLoaderInterface instance, or nullptr to use the default loader
+   */
+  virtual ThemeLoaderInterface* CreateThemeLoader();
 
 protected:
   /**
@@ -263,7 +306,9 @@ private:
   std::string mBrokenImageUrls[3]{}; ///< Broken image URLs for SMALL, NORMAL, LARGE
 
   ExecutionKeyPredicate mExecutionKeyPredicate;
+  Vector4               mDefaultTextColor;
   float                 mScalingFactor;
+  float                 mDefaultFontSize;
   int                   mDpi;
   int                   mBaselineDpi;
   KeyClickPolicy        mKeyClickPolicy;

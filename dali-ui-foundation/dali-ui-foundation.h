@@ -25,16 +25,11 @@
 #include <dali-ui-foundation/public-api/ui-config.h>
 #include <dali-ui-foundation/public-api/unit.h>
 #include <dali-ui-foundation/public-api/view.h>
+#include <dali-ui-foundation/public-api/ui-color.h>
 
 #include <dali-ui-foundation/public-api/controls/control-impl.h>
 #include <dali-ui-foundation/public-api/controls/control.h>
 #include <dali-ui-foundation/public-api/controls/image-view/image-view.h>
-#include <dali-ui-foundation/public-api/controls/text-controls/hidden-input-properties.h>
-#include <dali-ui-foundation/public-api/controls/text-controls/input-filter-properties.h>
-#include <dali-ui-foundation/public-api/controls/text-controls/placeholder-properties.h>
-#include <dali-ui-foundation/public-api/controls/text-controls/text-editor.h>
-#include <dali-ui-foundation/public-api/controls/text-controls/text-field.h>
-#include <dali-ui-foundation/public-api/controls/text-controls/text-label.h>
 
 #include <dali-ui-foundation/public-api/focus-manager/keyboard-focus-manager.h>
 

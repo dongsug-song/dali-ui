@@ -42,21 +42,21 @@ public:
     window.SetBackgroundColor(Color::WHITE);
 
     window.Add(Layout::New() // Parent
-      .BackgroundColor(Color::YELLOW)
+      .SetBackgroundColor(UiColor(0xFFFF00))
       .SetSizeWidth(200_spx)
       .SetSizeHeight(200_spx)
       .Contents({
         View::New() // Red child
-          .BackgroundColor(Color::RED)
+          .SetBackgroundColor(UiColor(0xFF0000))
           .SetSizeWidth(100_spx)
           .SetSizeHeight(100_spx)
           .AsClickable(this, [this](View view, const InputEvent& event)
           {
-            mSecondChild.SetBackgroundColor(Color::GREEN);
+            mSecondChild.SetBackgroundColor(UiColor(0x00FF00));
             return true;
           }),
         View::New() // Blue child
-          .BackgroundColor(Color::BLUE)
+          .SetBackgroundColor(UiColor(0x0000FF))
           .SetSizeWidth(100_spx)
           .SetSizeHeight(100_spx)
           .SetPositionX(100_spx)

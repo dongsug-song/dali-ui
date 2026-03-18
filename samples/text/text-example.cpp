@@ -46,15 +46,14 @@ public:
       .SetLayoutHeight(LayoutDimension::MatchParent)
       .SetViewPadding(Extents(20, 20, 20, 20))
       .Contents({
-        Label::New()
-          .SetText("Simple Label")
+        Label::New("Simple Label")
           .SetFontSize(20),
 
         CreateLabel("Hello world", "SamsungOneUI_400", 40.0f)
           .SetLayoutWidth(LayoutDimension::WrapContent)
           .SetLayoutHeight(100.0f)
           .SetViewPadding(Extents(10, 10, 10, 10))
-          .BackgroundColor(Color::RED)
+          .SetBackgroundColor(Color::RED)
           .SetTextColor(Color::ORANGE)
           .SetHorizontalTextAlignment(Text::Alignment::CENTER)
           .SetVerticalTextAlignment(Text::Alignment::CENTER)
@@ -66,7 +65,7 @@ public:
           .SetMaximumWidth(600)
           .SetMaximumHeight(300)
           .SetViewPadding(Extents(20, 20, 20, 20))
-          .BackgroundColor(Color::DARK_GRAY)
+          .SetBackgroundColor(Color::DARK_GRAY)
           .SetTextColor(Color::RED)
           .SetMultiLine(true)
           .As(mLabel2),
@@ -75,37 +74,34 @@ public:
           .SetLayoutWidth(LayoutDimension::MatchParent)
           .SetLayoutHeight(150.0f)
           .SetViewPadding(Extents(20, 20, 20, 20))
-          .BackgroundColor(Color::BLACK)
+          .SetBackgroundColor(Color::BLACK)
           .SetTextColor(Color::WHITE)
           .SetMultiLine(true)
           .As(mLabel3),
 
          View::New()
-          .BackgroundColor(Color::BLUE)
+          .SetBackgroundColor(Color::BLUE)
           .SetLayoutWidth(LayoutDimension::MatchParent)
           .SetLayoutHeight(30.0f),
 
-        Label::New()
-          .SetText("Label Alignment")
-          .BackgroundColor(Color::GRAY)
+        Label::New("Label Alignment")
+          .SetBackgroundColor(Color::GRAY)
           .SetFontSize(10)
           .SetLayoutWidth(LayoutDimension::MatchParent)
           .SetLayoutHeight(30.0f)
           .SetHorizontalTextAlignment(Text::Alignment::START)
           .SetVerticalTextAlignment(Text::Alignment::START),
 
-        Label::New()
-          .SetText("Label Alignment")
-          .BackgroundColor(Color::GRAY)
+        Label::New("Label Alignment")
+          .SetBackgroundColor(Color::GRAY)
           .SetFontSize(10)
           .SetLayoutWidth(LayoutDimension::MatchParent)
           .SetLayoutHeight(30.0f)
           .SetHorizontalTextAlignment(Text::Alignment::CENTER)
           .SetVerticalTextAlignment(Text::Alignment::CENTER),
 
-        Label::New()
-          .SetText("Label Alignment")
-          .BackgroundColor(Color::GRAY)
+        Label::New("Label Alignment")
+          .SetBackgroundColor(Color::GRAY)
           .SetFontSize(10)
           .SetLayoutWidth(LayoutDimension::MatchParent)
           .SetLayoutHeight(30.0f)
@@ -121,7 +117,7 @@ public:
     window.KeyEventSignal().Connect(this, &StackLayoutController::OnKeyEvent);
   }
 
-  Label CreateLabel(std::string text, std::string fontFamily, float fontSize)
+  Label CreateLabel(Dali::String text, Dali::String fontFamily, float fontSize)
   {
     return Label::New()
           .SetText(text)
@@ -129,13 +125,13 @@ public:
           .SetFontSize(fontSize);
   }
 
-  void Print(Label label, std::string title)
+  void Print(Label label, Dali::String title)
   {
     DALI_LOG_ERROR("----------------------------------------------------------------\n");
-    DALI_LOG_ERROR("%s\n", title.c_str());
+    DALI_LOG_ERROR("%s\n", title.CStr());
 
-    DALI_LOG_ERROR("Text       : %s\n", label.GetText().c_str());
-    DALI_LOG_ERROR("FontFamily : %s\n", label.GetFontFamily().c_str());
+    DALI_LOG_ERROR("Text       : %s\n", label.GetText().CStr());
+    DALI_LOG_ERROR("FontFamily : %s\n", label.GetFontFamily().CStr());
     DALI_LOG_ERROR("Fontsize   : %f\n", label.GetFontSize());
     DALI_LOG_ERROR("MultiLine  : %d\n", label.IsMultiLine());
     DALI_LOG_ERROR("TextColor  : %.2f, %.2f, %.2f, %.2f\n", label.GetTextColor().r, label.GetTextColor().g, label.GetTextColor().b, label.GetTextColor().a);
@@ -163,20 +159,20 @@ public:
       {
         if (mLabel.GetTextColor() == Color::ORANGE)
         {
-          mLabel.BackgroundColor(Color::ORANGE);
+          mLabel.SetBackgroundColor(Color::ORANGE);
           mLabel.SetTextColor(Color::RED);
-          mLabel2.BackgroundColor(Color::RED);
-          mLabel2.SetTextColor(Color::DARK_GRAY);          
-          mLabel3.BackgroundColor(Color::WHITE);
+          mLabel2.SetBackgroundColor(Color::RED);
+          mLabel2.SetTextColor(Color::DARK_GRAY);
+          mLabel3.SetBackgroundColor(Color::WHITE);
           mLabel3.SetTextColor(Color::BLACK);
         }
         else
         {
-          mLabel.BackgroundColor(Color::RED);
+          mLabel.SetBackgroundColor(Color::RED);
           mLabel.SetTextColor(Color::ORANGE);
-          mLabel2.BackgroundColor(Color::DARK_GRAY);
-          mLabel2.SetTextColor(Color::RED);          
-          mLabel3.BackgroundColor(Color::BLACK);
+          mLabel2.SetBackgroundColor(Color::DARK_GRAY);
+          mLabel2.SetTextColor(Color::RED);
+          mLabel3.SetBackgroundColor(Color::BLACK);
           mLabel3.SetTextColor(Color::WHITE);
         }
       }
