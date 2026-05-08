@@ -384,6 +384,9 @@ void WebViewImpl::OnInitialize()
   self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
   self.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
 
+  // Connect touch handler for touch event signal emission and web engine forwarding.
+  self.TouchedSignal().Connect(this, &WebViewImpl::OnTouchEvent);
+
   // --- Property notifications for display-area tracking ---
   // Fire when world position, size, or scale change by at least 1 unit / 0.1 scale step.
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
@@ -1162,6 +1165,60 @@ void WebViewImpl::FeedMouseWheel(bool yDirection, int step, int x, int y)
   {
     mWebEngine.FeedMouseWheel(yDirection, step, x, y);
   }
+}
+
+bool WebViewImpl::FeedKeyEvent(const KeyEvent& keyEvent)
+{
+  if(mWebEngine)
+  {
+    return mWebEngine.SendKeyEvent(keyEvent);
+  }
+  return false;
+}
+
+bool WebViewImpl::FeedTouchEvent(const TouchEvent& touchEvent)
+{
+  if(mWebEngine)
+  {
+    return mWebEngine.SendTouchEvent(touchEvent);
+  }
+  return false;
+}
+
+bool WebViewImpl::OnKeyEvent(const Dali::KeyEvent& event)
+{
+  Dali::Ui::WebView handle(GetOwner());
+
+  bool consumed = false;
+  if(!mWebViewKeyEventSignal.Empty())
+  {
+    consumed = mWebViewKeyEventSignal.Emit(handle, event);
+  }
+
+  if(!consumed && mKeyEventsEnabled && mWebEngine)
+  {
+    consumed = mWebEngine.SendKeyEvent(event);
+  }
+
+  return consumed;
+}
+
+bool WebViewImpl::OnTouchEvent(Dali::Actor /*actor*/, Dali::TouchEvent touch)
+{
+  Dali::Ui::WebView handle(GetOwner());
+
+  bool consumed = false;
+  if(!mWebViewTouchEventSignal.Empty())
+  {
+    consumed = mWebViewTouchEventSignal.Emit(handle, touch);
+  }
+
+  if(!consumed && mMouseEventsEnabled && mWebEngine)
+  {
+    consumed = mWebEngine.SendTouchEvent(touch);
+  }
+
+  return consumed;
 }
 
 void WebViewImpl::SetVideoHole(bool enabled, bool isWaylandWindow)

@@ -19,6 +19,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/events/key-event.h>
+#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
@@ -120,6 +122,13 @@ public: // Signal types
   // -- Process events --
   /// @brief Signal type for web process crash events.
   using WebProcessCrashedSignalType = Signal<void(WebView)>;
+
+  // -- Input events --
+  /// @brief Signal type for key events. Return true to mark the event as consumed.
+  using KeyEventSignalType = Signal<bool(WebView, KeyEvent)>;
+
+  /// @brief Signal type for touch events. Return true to mark the event as consumed.
+  using TouchEventSignalType = Signal<bool(WebView, TouchEvent)>;
 
 public: // Creation & Destruction
   /**
@@ -538,6 +547,28 @@ public: // Actions (non-chainable, void or special return)
    */
   void FeedMouseWheel(bool yDirection, int step, int x, int y);
 
+  /**
+   * @brief Feeds a key event directly to the web engine.
+   *
+   * Use this to forward key events to the web engine when automatic key event
+   * forwarding is disabled (SetKeyEventsEnabled(false)).
+   *
+   * @param[in] keyEvent The key event to feed
+   * @return True if the event was consumed by the web engine
+   */
+  bool FeedKeyEvent(const KeyEvent& keyEvent);
+
+  /**
+   * @brief Feeds a touch event directly to the web engine.
+   *
+   * Use this to forward touch events to the web engine when automatic touch
+   * forwarding is disabled (SetMouseEventsEnabled(false)).
+   *
+   * @param[in] touchEvent The touch event to feed
+   * @return True if the event was consumed by the web engine
+   */
+  bool FeedTouchEvent(const TouchEvent& touchEvent);
+
 public: // Screenshot & Page Info
   /**
    * @brief Gets a screenshot.
@@ -704,6 +735,32 @@ public: // Signals
    * @brief Signal emitted when web process crashes.
    */
   WebProcessCrashedSignalType& WebProcessCrashedSignal();
+
+  /**
+   * @brief Signal emitted when a key event is received by the web view.
+   *
+   * The handler receives the WebView handle and the KeyEvent. Return true to
+   * consume the event (prevent further propagation).
+   *
+   * @code
+   * bool OnKeyEvent(WebView webView, KeyEvent event) { ... return consumed; }
+   * webView.KeyEventSignal().Connect(this, &MyClass::OnKeyEvent);
+   * @endcode
+   */
+  KeyEventSignalType& KeyEventSignal();
+
+  /**
+   * @brief Signal emitted when a touch event is received by the web view.
+   *
+   * The handler receives the WebView handle and the TouchEvent. Return true to
+   * consume the event (prevent further propagation).
+   *
+   * @code
+   * bool OnTouchEvent(WebView webView, TouchEvent event) { ... return consumed; }
+   * webView.TouchEventSignal().Connect(this, &MyClass::OnTouchEvent);
+   * @endcode
+   */
+  TouchEventSignalType& TouchEventSignal();
 
 public: // Not intended for application developers
   /// @cond internal
