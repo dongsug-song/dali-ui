@@ -78,7 +78,7 @@ ADD_WEBVIEW_API_TEST(web-view-scroll-zoom-test web-view-scroll-zoom-test.cpp)
 #       SetKeyEventsEnabled, GetKeyEventsEnabled,
 #       FeedMouseWheel, FeedKeyEvent, FeedTouchEvent,
 #       GetScreenshot, GetScreenshotAsynchronously
-# Signals: KeyEventSignal, TouchEventSignal
+# Signals: View::KeyEventSignal, Actor::TouchedSignal
 # ---------------------------------------------------------------------------
 ADD_WEBVIEW_API_TEST(web-view-input-screenshot-test web-view-input-screenshot-test.cpp)
 

@@ -384,7 +384,8 @@ void WebViewImpl::OnInitialize()
   self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
   self.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
 
-  // Connect touch handler for touch event signal emission and web engine forwarding.
+  Dali::Ui::View view(GetOwner());
+  view.KeyEventSignal().Connect(this, &WebViewImpl::OnKeyEvent);
   self.TouchedSignal().Connect(this, &WebViewImpl::OnTouchEvent);
 
   // --- Property notifications for display-area tracking ---
@@ -1185,40 +1186,22 @@ bool WebViewImpl::FeedTouchEvent(const TouchEvent& touchEvent)
   return false;
 }
 
-bool WebViewImpl::OnKeyEvent(const Dali::KeyEvent& event)
+bool WebViewImpl::OnKeyEvent(Dali::Ui::View /*view*/, Dali::KeyEvent event)
 {
-  Dali::Ui::WebView handle(GetOwner());
-
-  bool consumed = false;
-  if(!mWebViewKeyEventSignal.Empty())
+  if(mKeyEventsEnabled && mWebEngine)
   {
-    consumed = mWebViewKeyEventSignal.Emit(handle, event);
+    return mWebEngine.SendKeyEvent(event);
   }
-
-  if(!consumed && mKeyEventsEnabled && mWebEngine)
-  {
-    consumed = mWebEngine.SendKeyEvent(event);
-  }
-
-  return consumed;
+  return false;
 }
 
 bool WebViewImpl::OnTouchEvent(Dali::Actor /*actor*/, Dali::TouchEvent touch)
 {
-  Dali::Ui::WebView handle(GetOwner());
-
-  bool consumed = false;
-  if(!mWebViewTouchEventSignal.Empty())
+  if(mMouseEventsEnabled && mWebEngine)
   {
-    consumed = mWebViewTouchEventSignal.Emit(handle, touch);
+    return mWebEngine.SendTouchEvent(touch);
   }
-
-  if(!consumed && mMouseEventsEnabled && mWebEngine)
-  {
-    consumed = mWebEngine.SendTouchEvent(touch);
-  }
-
-  return consumed;
+  return false;
 }
 
 void WebViewImpl::SetVideoHole(bool enabled, bool isWaylandWindow)

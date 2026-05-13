@@ -169,8 +169,6 @@ automated-tests/src/dali-ui-foundation/
 | `TextFoundSignal` | `(WebView, uint32_t count)` | 텍스트 검색 결과 반환 시 발생 |
 | `GeolocationPermissionSignal` | `(WebView, String origin, String url)` → bool | 위치 권한 요청 시 발생 |
 | `WebProcessCrashedSignal` | `(WebView)` | 웹 프로세스 크래시 시 발생 |
-| `KeyEventSignal` | `(WebView, KeyEvent)` → bool | 키 이벤트 수신 (true 반환 시 소비) |
-| `TouchEventSignal` | `(WebView, TouchEvent)` → bool | 터치 이벤트 수신 (true 반환 시 소비) |
 
 ---
 

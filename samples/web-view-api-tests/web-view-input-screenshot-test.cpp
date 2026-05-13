@@ -27,9 +27,9 @@
  *   D        FeedKeyEvent  (manually feed Tab key to web engine)
  *   ESC/BACK Quit
  *
- * Signals verified:
- *   KeyEventSignal   — logs key name; returns false (does NOT consume)
- *   TouchEventSignal — logs touch count; returns false (does NOT consume)
+ * Signals observed:
+ *   View::KeyEventSignal — logs key name; returns false (does not consume)
+ *   Actor::TouchedSignal — logs touch count; returns false (does not consume)
  */
 
 #include <dali-ui-foundation/dali-ui-foundation.h>
@@ -154,9 +154,9 @@ private:
     mWebView.SetMouseEventsEnabled(true);
     mWebView.SetKeyEventsEnabled(true);
 
-    // Connect to WebView's input event signals for observation
+    // Connect to the base view/actor input signals for observation.
     mWebView.KeyEventSignal().Connect(this, &InputScreenshotTestController::OnWebViewKeyEvent);
-    mWebView.TouchEventSignal().Connect(this, &InputScreenshotTestController::OnWebViewTouchEvent);
+    mWebView.TouchedSignal().Connect(this, &InputScreenshotTestController::OnWebViewTouchEvent);
 
     mWebView.PageLoadFinishedSignal().Connect(this, &InputScreenshotTestController::OnPageLoadFinished);
 
@@ -170,20 +170,20 @@ private:
   }
 
   // ---------------------------------------------------------------------------
-  // WebView input signals (observation — do NOT consume)
+  // WebView input signals (observation - do not consume)
   // ---------------------------------------------------------------------------
 
-  bool OnWebViewKeyEvent(WebView /*view*/, KeyEvent event)
+  bool OnWebViewKeyEvent(View /*view*/, KeyEvent event)
   {
-    DALI_LOG_RELEASE_INFO("[InputTest] KeyEventSignal: key=%s state=%d\n",
+    DALI_LOG_RELEASE_INFO("[InputTest] View::KeyEventSignal: key=%s state=%d\n",
                           event.GetKeyName().c_str(),
                           static_cast<int>(event.GetState()));
     return false; // do not consume
   }
 
-  bool OnWebViewTouchEvent(WebView /*view*/, TouchEvent touch)
+  bool OnWebViewTouchEvent(Actor /*actor*/, TouchEvent touch)
   {
-    DALI_LOG_RELEASE_INFO("[InputTest] TouchEventSignal: points=%u\n",
+    DALI_LOG_RELEASE_INFO("[InputTest] Actor::TouchedSignal: points=%u\n",
                           touch.GetPointCount());
     return false; // do not consume
   }
@@ -308,7 +308,7 @@ private:
 
   void UpdateStateLabel()
   {
-    SetInfo("mouse=%s  key=%s  WebView signals: listening",
+    SetInfo("mouse=%s  key=%s  input signals: listening",
             mMouseEnabled ? "ON" : "OFF",
             mKeyEnabled ? "ON" : "OFF");
   }

@@ -123,13 +123,6 @@ public: // Signal types
   /// @brief Signal type for web process crash events.
   using WebProcessCrashedSignalType = Signal<void(WebView)>;
 
-  // -- Input events --
-  /// @brief Signal type for key events. Return true to mark the event as consumed.
-  using KeyEventSignalType = Signal<bool(WebView, KeyEvent)>;
-
-  /// @brief Signal type for touch events. Return true to mark the event as consumed.
-  using TouchEventSignalType = Signal<bool(WebView, TouchEvent)>;
-
 public: // Creation & Destruction
   /**
    * @brief Creates an uninitialized WebView handle.
@@ -735,32 +728,6 @@ public: // Signals
    * @brief Signal emitted when web process crashes.
    */
   WebProcessCrashedSignalType& WebProcessCrashedSignal();
-
-  /**
-   * @brief Signal emitted when a key event is received by the web view.
-   *
-   * The handler receives the WebView handle and the KeyEvent. Return true to
-   * consume the event (prevent further propagation).
-   *
-   * @code
-   * bool OnKeyEvent(WebView webView, KeyEvent event) { ... return consumed; }
-   * webView.KeyEventSignal().Connect(this, &MyClass::OnKeyEvent);
-   * @endcode
-   */
-  KeyEventSignalType& KeyEventSignal();
-
-  /**
-   * @brief Signal emitted when a touch event is received by the web view.
-   *
-   * The handler receives the WebView handle and the TouchEvent. Return true to
-   * consume the event (prevent further propagation).
-   *
-   * @code
-   * bool OnTouchEvent(WebView webView, TouchEvent event) { ... return consumed; }
-   * webView.TouchEventSignal().Connect(this, &MyClass::OnTouchEvent);
-   * @endcode
-   */
-  TouchEventSignalType& TouchEventSignal();
 
 public: // Not intended for application developers
   /// @cond internal

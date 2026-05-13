@@ -596,19 +596,5 @@ WebView::WebProcessCrashedSignalType& WebView::WebProcessCrashedSignal()
   return GetImpl(*this).mWebProcessCrashedSignal;
 }
 
-// ---------------------------------------------------------------------------
-// Signals - Input Events
-// ---------------------------------------------------------------------------
-
-WebView::KeyEventSignalType& WebView::KeyEventSignal()
-{
-  return GetImpl(*this).mWebViewKeyEventSignal;
-}
-
-WebView::TouchEventSignalType& WebView::TouchEventSignal()
-{
-  return GetImpl(*this).mWebViewTouchEventSignal;
-}
-
 } // namespace Ui
 } // namespace Dali

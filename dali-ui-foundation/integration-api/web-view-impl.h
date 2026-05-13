@@ -537,18 +537,14 @@ private: // From ViewImpl
   MeasuredSize OnArrange(const LayoutRect& bounds) override;
 
   /**
-   * @copydoc ViewImpl::OnKeyEvent
-   *
-   * Emits KeyEventSignal and, when key events are enabled, forwards the event
-   * to the web engine via SendKeyEvent.
+   * @brief Handles key events from View::KeyEventSignal.
    */
-  bool OnKeyEvent(const Dali::KeyEvent& event) override;
+  bool OnKeyEvent(Dali::Ui::View view, Dali::KeyEvent event);
 
   /**
    * @brief Handles touch events from Actor::TouchedSignal.
    *
-   * Emits TouchEventSignal and, when mouse events are enabled, forwards the
-   * touch to the web engine via SendTouchEvent.
+   * Forwards the touch to the web engine via SendTouchEvent.
    */
   bool OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch);
 
@@ -657,8 +653,6 @@ public: // Signal members (accessible by WebView for signal emission)
   WebView::TextFoundSignalType             mTextFoundSignal;
   WebView::GeolocationPermissionSignalType mGeolocationPermissionSignal;
   WebView::WebProcessCrashedSignalType     mWebProcessCrashedSignal;
-  WebView::KeyEventSignalType              mWebViewKeyEventSignal;
-  WebView::TouchEventSignalType            mWebViewTouchEventSignal;
 
 private:                      // Data — Engine
   Dali::WebEngine mWebEngine; ///< The underlying dali-adaptor web engine instance
