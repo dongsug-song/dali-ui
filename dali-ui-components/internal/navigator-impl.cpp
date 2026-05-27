@@ -18,14 +18,6 @@
 // EXTERNAL INCLUDES
 #include <dali-ui-foundation/public-api/focus-manager/focus-manager.h>
 #include <dali-ui-foundation/public-api/layouts/layout-types.h>
-#include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
-#include <dali/devel-api/object/property-helper-devel.h>
-#include <dali/public-api/actors/actor.h>
-#include <dali/public-api/adaptor-framework/window.h>
-#include <dali/public-api/animation/alpha-function.h>
-#include <dali/public-api/object/property.h>
-#include <dali/public-api/render-tasks/render-task-list.h>
 #include <algorithm>
 #include <stdexcept>
 
@@ -40,23 +32,6 @@ namespace Ui
 
 namespace Internal
 {
-
-namespace
-{
-constexpr unsigned int NAVIGATION_POSITION_DURATION = 450u;
-constexpr unsigned int NAVIGATION_OPACITY_DURATION  = 150u;
-constexpr unsigned int MODAL_DURATION               = 300u;
-
-float GetWindowWidth(Dali::Actor actor)
-{
-  Window window = DevelWindow::Get(actor);
-  if(window)
-  {
-    return window.GetSize().GetWidth();
-  }
-  return 720.0f;
-}
-} // namespace
 
 Ui::Navigator NavigatorImpl::New()
 {
@@ -427,55 +402,23 @@ void NavigatorImpl::SetHiddenBelowTop(Ui::View view, bool hidden)
 
 void NavigatorImpl::PlayDefaultTransition(Ui::View appearing, Ui::View disappearing, bool animated, bool modal)
 {
-  if(!animated)
-  {
-    if(appearing)
-    {
-      appearing.SetOpacity(1.0f);
-    }
-    if(disappearing)
-    {
-      disappearing.SetOpacity(1.0f);
-    }
-    return;
-  }
+  (void)animated;
+  (void)modal;
 
+  // Some dali-ui deployments do not expose Actor opacity as an animatable
+  // property for CustomActor-derived View handles. Keep the default transition
+  // as an immediate state update until Navigator has a dedicated animation
+  // bridge that can use only registered animatable properties.
   if(appearing)
   {
     appearing.SetVisibility(true);
-    appearing.SetOpacity(0.0f);
-  }
-
-  mCurrentAnimation = Animation::New(modal ? MODAL_DURATION : NAVIGATION_POSITION_DURATION);
-  AlphaFunction alpha(AlphaFunction::EASE_OUT);
-
-  if(appearing)
-  {
-    mCurrentAnimation.AnimateTo(Property(appearing, Actor::Property::OPACITY), 1.0f, alpha, TimePeriod(0u, NAVIGATION_OPACITY_DURATION));
+    appearing.SetOpacity(1.0f);
   }
 
   if(disappearing)
   {
-    mCurrentAnimation.AnimateTo(Property(disappearing, Actor::Property::OPACITY), modal ? 1.0f : 0.0f, alpha, TimePeriod(0u, NAVIGATION_OPACITY_DURATION));
+    disappearing.SetOpacity(1.0f);
   }
-
-  if(!modal)
-  {
-    const float offset = GetWindowWidth(Self()) * 0.1f;
-    if(appearing)
-    {
-      const float finalX = appearing.GetPositionX();
-      appearing.SetProperty(Actor::Property::POSITION_X, finalX + offset);
-      mCurrentAnimation.AnimateTo(Property(appearing, Actor::Property::POSITION_X), finalX, alpha);
-    }
-    if(disappearing)
-    {
-      const float finalX = disappearing.GetPositionX();
-      mCurrentAnimation.AnimateTo(Property(disappearing, Actor::Property::POSITION_X), finalX - offset, alpha);
-    }
-  }
-
-  mCurrentAnimation.Play();
 }
 
 void NavigatorImpl::StopCurrentAnimation()

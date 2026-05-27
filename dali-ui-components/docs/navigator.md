@@ -71,8 +71,10 @@ The sample demonstrates regular push/pop, modal push/pop, and back navigation.
 
 ## Current Limitations
 
-- Default transitions are intentionally simple and are implemented inside
-  Navigator.
+- The `animated` parameter is reserved for the default transition path, but the
+  current implementation applies state changes immediately for compatibility
+  with dali-ui deployments where actor opacity is not registered as animatable
+  for `View` handles.
 - Per-view custom transition controllers from the C# OneUI Navigator are not
   exposed yet. A future extension can add callback or signal based transition
   hooks without changing the core stack API.

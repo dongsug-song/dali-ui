@@ -34,7 +34,6 @@ class NavigatorImpl;
 }
 
 #include "navigator.autogen.h"
-
 /**
  * @brief Navigator manages regular and modal view stacks.
  *

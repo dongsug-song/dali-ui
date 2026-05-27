@@ -43,7 +43,10 @@ The implementation follows the existing dali-ui component pattern:
 - Internal state stored in `NavigatorImpl`
 
 The first implementation keeps the API synchronous. It preserves the C# stack
-semantics while using C++ handle APIs and simple default transitions.
+semantics while using C++ handle APIs. The `animated` parameter is kept in the
+API, but state changes are currently applied immediately for compatibility with
+dali-ui deployments where actor opacity is not registered as animatable for
+`View` handles.
 
 ## Tests
 
