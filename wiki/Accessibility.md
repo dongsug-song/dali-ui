@@ -428,6 +428,12 @@ Adding a language span fails | Check the code-point range, empty locale, zero le
 
 See the [accessibility-view-api sample](https://github.sec.samsung.net/NUI/dali-ui/tree/devel/samples/accessibility-view-api) for an executable demonstration that reports results on screen and to stdout.
 
+For step-by-step verification of every API with a real target Screen Reader and
+AT-SPI bridge, see the
+[accessibility-wiki-target-test sample](https://github.sec.samsung.net/NUI/dali-ui/tree/devel/samples/accessibility-wiki-target-test).
+Its C++ source contains detailed Korean comments describing each API, target
+test procedure, and expected result.
+
 <br/>
 
 ---

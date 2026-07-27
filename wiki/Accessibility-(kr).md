@@ -426,6 +426,10 @@ language span 추가가 실패 | code-point 범위, 빈 locale, 길이 0, 기존
 
 전체 API를 실행하고 결과를 화면과 stdout으로 확인하는 예제는 [accessibility-view-api sample](https://github.sec.samsung.net/NUI/dali-ui/tree/devel/samples/accessibility-view-api)을 참고하세요.
 
+실제 타겟의 Screen Reader와 AT-SPI bridge를 사용해 wiki 전체 API를 단계별로 검증하고 싶다면
+[accessibility-wiki-target-test sample](https://github.sec.samsung.net/NUI/dali-ui/tree/devel/samples/accessibility-wiki-target-test)을 참고하세요.
+이 샘플의 C++ 소스에는 각 API의 의미, 실타겟 조작 방법과 기대 결과가 한글 주석으로 정리되어 있습니다.
+
 <br/>
 
 ---
